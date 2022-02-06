@@ -1,0 +1,316 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Gastos</ui:define>
+
+    <ui:define name="head">
+        <style type="text/css">
+            .ui-selectoneradio.ui-grid-responsive .ui-grid-col-4, .ui-selectmanycheckbox.ui-grid-responsive .ui-grid-col-4{
+                padding-bottom: 10px;
+            }
+            .layout-wrapper .layout-main {
+                margin-left: 65px;
+                padding: 5px;
+                -moz-transition: margin-left 0.3s;
+                -o-transition: margin-left 0.3s;
+                -webkit-transition: margin-left 0.3s;
+                transition: margin-left 0.3s;
+            }
+            .divCenter {
+                display: inline;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+            .ui-dialog .ui-dialog-title{
+                font-size: 13px!important;
+                float:left;
+                margin:.3em 16px .1em 0;
+            }
+
+            .tdCss {
+                font-size: 13px;
+                color: #1976d2!important;
+                padding-bottom: 5px;
+            }
+            .ui-button{
+                font-size: 10px;
+            }
+            .divFooterRed{
+                background-color: #DC143C!important;
+                width: 400px;
+                padding: 8px;
+                height: 8px;
+                color: #FFFFFF;
+                pointer-events: none;
+                display: block;
+                border: black solid;
+            }
+            .divFalta{
+                /*border-radius: 0px 0px 5px 5px;*/
+                /*position: absolute;*/
+                /*display: block;*/
+            }
+            .divFooterRoxo{
+                background-color: #9370DB!important;
+                width: 400px;
+                padding: 8px;
+                height: 8px;
+                color: #FFFFFF;
+                pointer-events: none;
+                display: block;
+                border: black solid;
+            }
+            .marginTopLabelDiv{
+                margin-top: -2%;
+            }
+            .divLabelFooterLeft{
+                float: left;
+                padding:2px;
+                font-size: 12px;
+                margin-top: -2%;
+            }
+            .divLabelFooterRight{
+                float: right;
+                padding:2px;
+                font-size: 12px;
+                margin-top: -2%;
+            }
+            /* Works on Firefox */
+            * {
+                scrollbar-width:thin;
+                scrollbar-color:#D3D3D3;
+            }
+
+            /* Works on Chrome, Edge, and Safari */
+            *::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            *::-webkit-scrollbar-track {
+                background: white;
+            }
+
+            *::-webkit-scrollbar-thumb {
+                background-color: #D3D3D3;
+                border-radius: 20px;
+            }
+            /*div {*/
+            /*    border: 1px solid red;*/
+            /*}*/
+
+            table {
+                border-collapse: separate;
+                border-spacing: 0px;
+                /*margin-top: -8px;*/
+            }
+
+            td {
+                /*border: 1px solid green;*/
+                /*border-left-width: 0;*/
+                /*min-width: 120px;*/
+                /*height: 14px;*/
+            }
+
+            td:first-child {
+                border-left-width: 1px;
+            }
+            .div_main{
+                background-color: #FFFFFF;
+                color: black;
+                float: left;
+                border-radius: 0px 10px 10px 0px;
+                height: 80px;width: 99%;
+            }
+
+            .div_main:hover{
+                /*background-color: #ECEFF1;*/
+                pointer-events: visible;
+                box-shadow: 0px 0px 8px #7e7f81;
+            }
+            .shadow{
+                -webkit-box-shadow: 0px 10px 13px -7px #000000, 50px 50px 18px 44px rgba(0,0,0,0);
+                box-shadow: 0px 10px 13px -7px #000000, 50px 50px 18px 44px rgba(0,0,0,0);
+            }
+            .iconSelect{
+
+            }
+            .iconUnselect{
+                background-color: #7e7f81;
+            }
+            .breakDiv{
+                flex-basis: 100%;
+                height: 0;
+            }
+            .styleBox{
+                padding: 0 !important;
+                border-radius: 10px;
+                box-shadow: 0px 0px 8px #666;
+                text-align: center;
+                width: 230px;
+            }
+            .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-icon-left{
+                border-radius: 3px;
+            }
+            .btnMenor90 {
+                transform: scale(0.85); /* (110% zoom) */
+            }
+            .btnMenor90 .ui-button-text {
+                letter-spacing: 0.3px !important;
+            }
+            .layout-wrapper .layout-breadcrumb {
+                background-color: #ffffff;
+                box-shadow: inset 0 -2px 4px 0 rgb(0 0 0 / 14%);
+                -webkit-box-shadow: inset 0 -2px 4px 0 rgb(0 0 0 / 14%);
+                -moz-box-shadow: inset 0 -2px 4px 0 rgba(0, 0, 0, 0.14);
+                min-height: 38px;
+                width: 100%;
+                border-radius: 6px;
+            }body, html{
+                 height: 100%;
+             }
+
+            body{
+                background-color: blue;
+            }
+
+            .menu{
+                background-color: red;
+                height: 100%;
+                width: 250px;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <h:body>
+            <p:remoteCommand name="rmtGraficosGeral"
+                             process="@this"
+                             action="#{graficoFaces.populaValoresGeral}"
+                             autoRun="true"
+                             update="form:pnlGeral"
+                             onstart="PF('mpProc').show();"
+                             oncomplete="PF('mpProc').hide();"/>
+            <h:form id="form">
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <p:growl id="erro" showDetail="true"/>
+                <p:outputPanel id="pnlGeral">
+                    <div class="layout-breadcrumb">
+                        <p:outputPanel style="padding: 4px; color: #999999;" >
+                            <i class="fa fa-fw fa-area-chart" style="font-size: 23px;"/>
+                            <p:spacer width="3px"/>
+                            <p:outputLabel value="Dashboard" style="font-family: 'Century Gothic'; font-size: 16px;"/>
+                        </p:outputPanel>
+                    </div>
+                    <p:spacer height="1px"/>
+                    <div>
+                        <div class="ui-g">
+                            <div style="margin-left: 10px;">
+                                <label class="ui-icon-colorTheme">Ano</label>
+                                <br/>
+                                <p:selectOneMenu id="ano"
+                                                 style="width: 55px;"
+                                                 value="#{graficoFaces.ano}">
+                                    <f:selectItem itemValue="2019" itemLabel="2019"/>
+                                    <f:selectItem itemValue="2020" itemLabel="2020"/>
+                                    <f:selectItem itemValue="2021" itemLabel="2021"/>
+                                    <p:ajax process="@this"
+                                            onstart="PF('mpProc').show();"
+                                            oncomplete="PF('mpProc').hide();rmtGraficosGeral();"/>
+                                </p:selectOneMenu>
+                            </div>
+                            <p:spacer width="20px"/>
+                            <div>
+                                <label class="ui-icon-colorTheme">Mês</label>
+                                <br/>
+                                <p:selectOneMenu id="meses"
+                                                 value="#{graficoFaces.mes}">
+                                    <f:selectItem itemValue="1" itemLabel="Janeiro"/>
+                                    <f:selectItem itemValue="2" itemLabel="Fevereiro"/>
+                                    <f:selectItem itemValue="3" itemLabel="Março"/>
+                                    <f:selectItem itemValue="4" itemLabel="Abril"/>
+                                    <f:selectItem itemValue="5" itemLabel="Maio"/>
+                                    <f:selectItem itemValue="6" itemLabel="Junho"/>
+                                    <f:selectItem itemValue="7" itemLabel="Julho"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agosto"/>
+                                    <f:selectItem itemValue="9" itemLabel="Setembro"/>
+                                    <f:selectItem itemValue="10" itemLabel="Outubro"/>
+                                    <f:selectItem itemValue="11" itemLabel="Novembro"/>
+                                    <f:selectItem itemValue="12" itemLabel="Dezembro"/>
+                                    <p:ajax process="@this"
+                                            onstart="PF('mpProc').show();"
+                                            oncomplete="PF('mpProc').hide();rmtGraficosGeral();"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-g dashboard">
+                        <div class="ui-g-12 ui-md-6 ui-lg-3">
+                            <div class="ui-g card overview-box overview-box-1">
+                                <span class="overview-box-name">Receita</span>
+                                <span class="overview-box-count">#{graficoFaces.valorReceita}</span>
+                                <span class="overview-box-badge" style="display: none">+30%</span>
+                                <p:graphicImage name="images/dashboard/chart-1.svg" library="barcelona-layout" />
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-3">
+                            <div class="ui-g card overview-box overview-box-2">
+                                <span class="overview-box-name">Despesa</span>
+                                <span class="overview-box-count">#{graficoFaces.valorDespesa}</span>
+                                <span class="overview-box-badge" style="display: none">+45%</span>
+                                <p:graphicImage name="images/dashboard/chart-2.svg" library="barcelona-layout" />
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-3">
+                            <div class="ui-g card overview-box overview-box-3">
+                                <span class="overview-box-name">Poupança</span>
+                                <span class="overview-box-count">R$ 0,00</span>
+                                <span class="overview-box-badge" style="display: none">-75%</span>
+                                <p:graphicImage name="images/dashboard/chart-3.svg" library="barcelona-layout" />
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6 ui-lg-3">
+                            <div class="ui-g card overview-box overview-box-4">
+                                <span class="overview-box-name">Contas Atrasadas</span>
+                                <span class="overview-box-count">#{graficoFaces.valorContasPagar}</span>
+                                <span class="overview-box-badge" style="display: none">25%</span>
+                                <p:graphicImage name="images/dashboard/chart-4.svg" library="barcelona-layout" />
+                            </div>
+                        </div>
+
+                        <div class="ui-g-12">
+                            <ui:include src="graficoUsuario.xhtml"/>
+                        </div>
+
+                        <div class="ui-g-12 activity-feed">
+                            <div class="ui-g">
+                                <div class="ui-g-12 ui-md-3">
+                                    <span>INCOME</span>
+                                    <div class="knob income">$900</div>
+                                </div>
+                                <div class="ui-g-12 ui-md-3">
+                                    <span>TAX</span>
+                                    <div class="knob tax">$250</div>
+                                </div>
+                                <div class="ui-g-12 ui-md-3">
+                                    <span>INVOICES</span>
+                                    <div class="knob invoice">$125</div>
+                                </div>
+                                <div class="ui-g-12 ui-md-3">
+                                    <span>EXPENSES</span>
+                                    <div class="knob expense">$250</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p:outputPanel>
+            </h:form>
+        </h:body>
+    </ui:define>
+</ui:composition>

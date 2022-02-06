@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      template="/WEB-INF/template.xhtml">
+
+<script>
+    function timer() {
+        document.getElementById('frmMpProc:processando').value = '1';
+        setTimeout(mostrar, 8000)
+    }
+    function mostrar() {
+        if (document.getElementById('frmMpProc:processando').value == 1) {
+            document.getElementById('frmMpProc:msglento1').className = 'visivel';
+            document.getElementById('frmMpProc:msglento2').className = 'visivel';
+            document.getElementById('frmMpProc:msglento3').className = 'visivel';
+        } else {
+            document.getElementById('frmMpProc:msglento1').className = 'invisivel';
+            document.getElementById('frmMpProc:msglento2').className = 'invisivel';
+            document.getElementById('frmMpProc:msglento3').className = 'invisivel';
+        }
+    }
+    function pararProcesso() {
+        document.getElementById('frmMpProc:processando').value = '0';
+        document.getElementById('frmMpProc:msglento1').className = 'invisivel';
+        document.getElementById('frmMpProc:msglento2').className = 'invisivel';
+        document.getElementById('frmMpProc:msglento3').className = 'invisivel';
+    }
+</script>
+<style type="text/css">
+    .visivel{
+        display: inline;
+    }
+    .invisivel{
+        display: none;
+    }
+    .mpprocStyle{
+        border: none !important;
+        background: none !important;
+    }
+    .mpprocStyle>.ui-widget-header{
+        display: none !important;
+    }
+    .ui-widget-overlay {
+        opacity: .4 !important;
+    }
+    .mpprocStyle>.ui-dialog-content{
+        overflow: hidden !important;
+    }
+    .fast-spin{
+        -webkit-animation: fa-spin 0.5ms infinite linear;
+        animation: fa-spin 1s infinite linear;
+        filter: brightness(120%);
+    }
+</style>
+<script>
+    $(document).ready(function () {
+//            $('.ui-shadow').removeClass();
+        $(".mpprocStyle").removeClass("ui-shadow");
+    });
+</script>
+<p:dialog modal="true" closable="false" closeOnEscape="false"
+          draggable="false" width="150" height="90"   resizable="false" header="Processando..."
+          widgetVar="mpProc" styleClass="mpprocStyle">
+    <h:form id="frmMpProc">
+        <table align="center">
+            <tr>
+                <td align="center">
+                    <i class="fa fa-spinner fast-spin ajax-loader" aria-hidden="true" style="font-size: 90px"></i>
+                </td>
+            </tr>
+        </table>
+    </h:form>
+</p:dialog>
+
+</html>
+

@@ -1,0 +1,64 @@
+package com.DAO;
+import com.Bean.Gasto;
+import com.Util.HibernateUtil;
+import com.Util.MensagensErros;
+import java.util.List;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+/**
+ *
+ * @author Sergio - 03/09/2021
+ */
+public class GastoDAO extends GenericDAO {
+    private static final long serialVersionUID = 1L;
+    private Session session;
+	
+    public GastoDAO(Session session) {
+        this.session = session;
+    }
+
+    public GastoDAO() {
+        this.session = getSession();
+    }
+    public int addGasto(Gasto gasto) {
+        setAtualizar(false);
+            saveOrUpdatePojo(gasto);
+            if (MensagensErros.isErro()) {
+                return 0;
+            } else {
+                return gasto.getGasCodigo();
+            }   
+    }
+    public Gasto getGasto(int gastoID) {
+        return getPojo(Gasto.class, gastoID);
+    }
+    public void updateGasto(Gasto gasto) {
+        setAtualizar(true);
+        saveOrUpdatePojo(gasto);
+    }
+    public void removeGasto(Gasto gasto) {
+        removePojo(gasto);
+    }
+
+    public List<Gasto> getGastos() {
+        return getPureList(Gasto.class, "from Gasto ar");
+    }
+
+    public List<Gasto> getGastosUsuario(int usuario, int mes, int ano) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        try {
+            String sql = "SELECT * FROM gasto g \n" +
+                    "     WHERE MONTH(g.gasDataCad) = " + mes + "\n" +
+                    "     AND YEAR(g.gasDataCad) = " + ano + "\n" +
+                    "     AND gasUsuCodigo = " + usuario;
+            Query q = ses.createNativeQuery(sql).addEntity(Gasto.class);
+            return q.list();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally {
+            ses.close();
+        }
+        return null;
+    }
+}

@@ -1,0 +1,129 @@
+package com.ManagedBeans;
+
+import com.Bean.Setor;
+import com.DAO.SetorDAO;
+import com.Bean.Setor;
+import com.Bean.Usuario;
+import com.DAO.SetorDAO;
+import com.DAO.UsuarioDAO;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.io.Serializable;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+import com.Util.MensagensErros;
+import javax.inject.Named;
+import javax.enterprise.context.SessionScoped;
+
+/**
+ *
+ * @author Sergio - 02/09/2021
+ */
+@Named
+@SessionScoped
+public class SetorFaces implements Serializable{
+
+    private List<Setor> cachedSetors = null;
+    private SetorDAO setorDAO = new SetorDAO();
+    private Setor setorSelected;
+    private Usuario usuario;
+    private Setor setor;
+
+    public Setor getSetor() {
+        return setor;
+    }
+
+    public void setSetor(Setor setor) {
+        this.setor = setor;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public SetorDAO getSetorDAO() {
+        return setorDAO;
+    }
+
+    public void setSetorDAO(SetorDAO setorDAO) {
+        this.setorDAO = setorDAO;
+    }
+
+    public Setor getSetorSelected() {
+        return setorSelected;
+    }
+
+    public void setSetorSelected(Setor setorSelected) {
+        this.setorSelected = setorSelected;
+    }
+
+    public List<Setor> getCachedSetors() {
+        if (cachedSetors == null) {
+            this.cachedSetors = setorDAO.getSetors();
+        }
+        return cachedSetors;
+    }
+
+    public String doAddSetor() {
+        int setor = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("setor").toString());
+        int usuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        setorSelected = new Setor(setor, usuario);
+        return "setorNew";
+    }
+
+    public String dofinishAddSetor() {
+        Date date = new Date();
+        setorSelected.setDataHoraAtualizacao(date);
+        setorDAO.addSetor(setorSelected);
+        cachedSetors = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "setorList";
+        }
+    }
+
+    public String doRemoveSetor() {
+        setorDAO.removeSetor(setorSelected);
+        cachedSetors = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "setorList";
+        }
+    }
+
+    public String doUpdateSetor() {
+        UsuarioDAO usuDAO = new UsuarioDAO();
+        usuario = usuDAO.getUsuario(setorSelected.getCodUsuario());
+        SetorDAO posDAO = new SetorDAO();
+        setor = posDAO.getSetor(setorSelected.getCodSetor());
+        return "setorEdit";
+    }
+
+    public String dofinishUpdateSetor() {
+        Date date = new Date();
+        int codUsuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        setorSelected.setCodUsuario(codUsuario);
+        int codSetor = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("setor").toString());
+        setorSelected.setCodSetor(codSetor);
+        setorSelected.setDataHoraAtualizacao(date);
+        setorDAO.updateSetor(setorSelected);
+        cachedSetors = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "setorList";
+        }
+    }
+
+    public String doCancelSetor() {
+        cachedSetors = null;
+        return "setorList";
+    }
+}

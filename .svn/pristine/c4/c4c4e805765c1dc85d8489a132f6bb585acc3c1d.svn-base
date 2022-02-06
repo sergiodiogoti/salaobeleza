@@ -1,0 +1,278 @@
+package com.ManagedBeans;
+
+import com.Bean.Gasto;
+import com.Bean.Setor;
+import com.DAO.AniversarianteDAO;
+import com.Bean.Aniversariante;
+import com.Bean.Usuario;
+import com.DAO.SetorDAO;
+import com.DAO.UsuarioDAO;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.util.*;
+import java.io.Serializable;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
+import javax.faces.model.SelectItem;
+
+import com.Util.HibernateUtil;
+import com.Util.MensagensErros;
+import com.Util.UtilFaces;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.type.StandardBasicTypes;
+import org.primefaces.event.FileUploadEvent;
+
+import javax.inject.Named;
+import javax.enterprise.context.SessionScoped;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ *
+ * @author Sergio - 25/09/2021
+ */
+@Named
+@SessionScoped
+public class AniversarianteFaces implements Serializable{
+
+    private List<Aniversariante> cachedAniversariantes = null;
+    private AniversarianteDAO aniversarianteDAO = new AniversarianteDAO();
+    private Aniversariante aniversarianteSelected;
+    private Usuario usuario;
+    private Setor setor;
+    private List<Object[]> listaAniversariantes;
+    private String parametroBusca;
+    private String retornaFoto;
+    private boolean existeFoto;
+
+    public void setRetornaFoto(String retornaFoto) {
+        this.retornaFoto = retornaFoto;
+    }
+
+    public boolean isExisteFoto() {
+        return existeFoto;
+    }
+
+    public void setExisteFoto(boolean existeFoto) {
+        this.existeFoto = existeFoto;
+    }
+
+    public String getParametroBusca() {
+        return parametroBusca;
+    }
+
+    public void setParametroBusca(String parametroBusca) {
+        this.parametroBusca = parametroBusca;
+    }
+
+    public List<Object[]> getListaAniversariantes() {
+        return listaAniversariantes;
+    }
+
+    public void setListaAniversariantes(List<Object[]> listaAniversariantes) {
+        this.listaAniversariantes = listaAniversariantes;
+    }
+
+    public Setor getSetor() {
+        return setor;
+    }
+
+    public void setSetor(Setor setor) {
+        this.setor = setor;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public AniversarianteDAO getAniversarianteDAO() {
+        return aniversarianteDAO;
+    }
+
+    public void setAniversarianteDAO(AniversarianteDAO aniversarianteDAO) {
+        this.aniversarianteDAO = aniversarianteDAO;
+    }
+
+    public Aniversariante getAniversarianteSelected() {
+        return aniversarianteSelected;
+    }
+
+    public void setAniversarianteSelected(Aniversariante aniversarianteSelected) {
+        this.aniversarianteSelected = aniversarianteSelected;
+    }
+
+    public List<Aniversariante> getCachedAniversariantes() {
+        if (cachedAniversariantes == null) {
+            this.cachedAniversariantes = aniversarianteDAO.getAniversariantes();
+        }
+        return cachedAniversariantes;
+    }
+
+    public String doAddAniversariante() {
+        int setor = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("setor").toString());
+        int usuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        aniversarianteSelected = new Aniversariante(setor, usuario);
+        aniversarianteSelected.setAniUsuCodigo((Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario"));
+        return "aniversarianteNew";
+    }
+
+    public String dofinishAddAniversariante() {
+        Date date = new Date();
+        aniversarianteSelected.setDataHoraAtualizacao(date);
+        aniversarianteDAO.addAniversariante(aniversarianteSelected);
+        cachedAniversariantes = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "aniversarianteList";
+        }
+    }
+
+    public String doRemoveAniversariante() {
+        aniversarianteDAO.removeAniversariante(aniversarianteSelected);
+        cachedAniversariantes = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "aniversarianteList";
+        }
+    }
+
+    public String doUpdateAniversariante() {
+        UsuarioDAO usuDAO = new UsuarioDAO();
+        usuario = usuDAO.getUsuario(aniversarianteSelected.getCodUsuario());
+        SetorDAO posDAO = new SetorDAO();
+        setor = posDAO.getSetor(aniversarianteSelected.getCodSetor());
+        return "aniversarianteEdit";
+    }
+
+    public String dofinishUpdateAniversariante() {
+        Date date = new Date();
+        int codUsuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        aniversarianteSelected.setCodUsuario(codUsuario);
+        int codSetor = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("setor").toString());
+        aniversarianteSelected.setCodSetor(codSetor);
+        aniversarianteSelected.setDataHoraAtualizacao(date);
+        aniversarianteDAO.updateAniversariante(aniversarianteSelected);
+        cachedAniversariantes = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "aniversarianteList";
+        }
+    }
+
+    public String doCancelAniversariante() {
+        cachedAniversariantes = null;
+        return "aniversarianteList";
+    }
+
+    public void populaListaAniversariantes(){
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        Usuario usuario = new UtilFaces().getUsuarioLogadoBean();
+        listaAniversariantes = new ArrayList<>();
+        try{
+            String clausulaBusca = "true";
+            if(parametroBusca != null){
+                clausulaBusca = "aniNome like '%"+ parametroBusca +"%'";
+            }
+            String sql ="SELECT\n" +
+                    "CASE WHEN MONTH(NOW()) <= MONTH(aniDataAniversario) THEN \n" +
+                    "DATEDIFF(DATE_ADD(aniDataAniversario, INTERVAL \n" +
+                    "(SELECT YEAR(NOW()) - YEAR(aniDataAniversario)\n" +
+                    "FROM aniversariante a2 \n" +
+                    "WHERE a2.aniCodigo = a.aniCodigo) YEAR),NOW())\n" +
+                    "ELSE\n" +
+                    "DATEDIFF(DATE_ADD(aniDataAniversario, INTERVAL \n" +
+                    "(SELECT YEAR(NOW()) - YEAR(aniDataAniversario) + 1 \n" +
+                    "FROM aniversariante a2 \n" +
+                    "WHERE a2.aniCodigo = a.aniCodigo) YEAR),NOW())\n" +
+                    "END AS diasFaltam, \n" +
+                    "YEAR(NOW()) - YEAR(aniDataAniversario) AS idadeAtual,\n" +
+                    "YEAR(NOW()) - YEAR(aniDataAniversario) + 1 AS idadefazer,\n" +
+                    "a.* FROM aniversariante a\n" +
+                    "WHERE a.aniUsuCodigo = "+ usuario.getUsuCodigo()+"\n" +
+                    "AND "+clausulaBusca;
+            SQLQuery q = ses.createSQLQuery(sql)
+                    .addScalar("diasFaltam", StandardBasicTypes.INTEGER)
+                    .addScalar("idadeAtual", StandardBasicTypes.INTEGER)
+                    .addScalar("idadefazer", StandardBasicTypes.INTEGER)
+                    .addEntity("a", Aniversariante.class);
+            listaAniversariantes = q.list();
+        }catch (Exception ex){
+            listaAniversariantes = new ArrayList<>();
+            ex.printStackTrace();
+        }finally {
+            ses.close();
+        }
+    }
+    public void changeParam(ValueChangeEvent e){
+        parametroBusca = (String) e.getNewValue();
+    }
+
+    public String getRetornaFoto(String aniFoto) {
+        HttpServletRequest url = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        String urlBase = url.getRequestURL().toString().substring(0, (url.getRequestURL().toString().length() - url.getServletPath().length()));
+        if (aniFoto != null){
+            FacesContext aFacesContext = FacesContext.getCurrentInstance();
+            ServletContext context = (ServletContext) aFacesContext.getExternalContext().getContext();
+            String realPath = context.getRealPath("/");
+            File file = new File(realPath + "/fotosAniversariantes//");
+            //verifica se existe o diretorio de imagem no servidor
+            if (file.exists()) {
+                existeFoto = true;
+                retornaFoto = urlBase + "/fotosAniversariantes/" + aniFoto;
+            }
+        }
+        return retornaFoto;
+    }
+
+
+    public void upload(FileUploadEvent event) {
+        try {
+            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+            @SuppressWarnings("unused")
+            HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
+
+            FacesContext aFacesContext = FacesContext.getCurrentInstance();
+            ServletContext context = (ServletContext) aFacesContext.getExternalContext().getContext();
+
+            String realPath = context.getRealPath("/");
+
+            // Aqui cria o diretorio caso não exista
+            File file = new File(realPath + "/fotosAniversariantes//");
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+
+            byte[] arquivo = event.getFile().getContents();
+            String caminho = realPath + "\\fotosAniversariantes\\" + event.getFile().getFileName();
+            String nomeFoto = event.getFile().getFileName();
+            // esse trecho grava o arquivo no diretório
+            FileOutputStream fos = new FileOutputStream(caminho);
+            fos.write(arquivo);
+            fos.close();
+
+            aniversarianteSelected.setAniFoto(nomeFoto);
+            aniversarianteDAO.updateAniversariante(aniversarianteSelected);
+
+            System.out.println("Arquivo: " + arquivo);
+            System.out.println("Caminho da imagem: " + caminho);
+            System.out.println("Nome da imagem: " + nomeFoto);
+            System.out.println("Caminho imagem 2: " + file + "\\" + aniversarianteSelected.getAniFoto());
+
+        } catch (Exception ex) {
+            System.out.println("Erro no upload de imagem" + ex);
+        }
+
+    }
+}

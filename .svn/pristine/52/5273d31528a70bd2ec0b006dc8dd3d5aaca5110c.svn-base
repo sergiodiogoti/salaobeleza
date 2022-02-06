@@ -1,0 +1,188 @@
+/*
+SQLyog Ultimate v10.00 Beta1
+MySQL - 5.5.5-10.4.8-MariaDB : Database - exodo
+*********************************************************************
+*/
+
+/*!40101 SET NAMES utf8 */;
+
+/*!40101 SET SQL_MODE=''*/;
+
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`exodo` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+
+USE `exodo`;
+
+/*Table structure for table `setor` */
+
+DROP TABLE IF EXISTS `setor`;
+
+CREATE TABLE `setor` (
+  `setCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `setNome` VARCHAR(50) DEFAULT NULL,
+  `setResponsavel` VARCHAR(50) DEFAULT NULL,
+  `setCidade` VARCHAR(50) DEFAULT NULL,
+  `codUsuario` INT(11) DEFAULT NULL,
+  `codSetor` INT(11) DEFAULT NULL,
+  `dataHoraAtualizacao` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`setCodigo`)
+) ENGINE=INNODB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+
+/*Data for the table `setor` */
+
+INSERT  INTO `setor`(`setCodigo`,`setNome`,`setResponsavel`,`setCidade`,`codUsuario`,`codSetor`,`dataHoraAtualizacao`) VALUES (1,'SANTA DIOGO','SERGIO','LUANDA',1,1,'2021-08-30 01:16:49'),(2,'ANTÓNIA DIOGO','SERGIO','LUANDA',1,1,'2021-08-30 01:17:39'),(3,'CLAUDIO CORREIA','SERGIO','LUANDA',1,1,'2021-08-30 01:17:40');
+
+/*Table structure for table `usuario` */
+
+DROP TABLE IF EXISTS `usuario`;
+
+CREATE TABLE `usuario` (
+  `usuCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `usuNome` VARCHAR(50) DEFAULT NULL,
+  `usuLogin` VARCHAR(50) DEFAULT NULL,
+  `usuSenha` VARCHAR(12) DEFAULT NULL,
+  `usuSetCodigo` INT(11) NOT NULL,
+  `codUsuario` INT(11) DEFAULT NULL,
+  `codSetor` INT(11) DEFAULT NULL,
+  `dataHoraAtualizacao` DATETIME DEFAULT NULL,
+  `usuNomeFoto` TEXT DEFAULT NULL,
+  `usuConfirmaSenha` VARCHAR(12) DEFAULT NULL,
+  `usuSexo` VARCHAR(1) DEFAULT NULL,
+  `usuTelefone` VARCHAR(20) DEFAULT NULL,
+  `usuDataNasc` DATE DEFAULT NULL,
+  `usuNovaSenha` VARCHAR(12) DEFAULT NULL,
+  `usuSenhaAntiga` VARCHAR(12) DEFAULT NULL,
+  `usuTema` VARCHAR(100) DEFAULT NULL,
+  PRIMARY KEY (`usuCodigo`),
+  KEY `fk_usuSetor` (`usuSetCodigo`),
+  CONSTRAINT `fk_usuSetor` FOREIGN KEY (`usuSetCodigo`) REFERENCES `setor` (`setCodigo`)
+) ENGINE=INNODB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
+/*Data for the table `usuario` */
+
+INSERT  INTO `usuario`(`usuCodigo`,`usuNome`,`usuLogin`,`usuSenha`,`usuSetCodigo`,`codUsuario`,`codSetor`,`dataHoraAtualizacao`,`usuNomeFoto`,`usuConfirmaSenha`,`usuSexo`,`usuTelefone`,`usuDataNasc`,`usuNovaSenha`,`usuSenhaAntiga`,`usuTema`) VALUES (1,'SERGIO','SERGIO','1234',1,1,1,'2021-10-15 16:15:58',NULL,'1234','M',NULL,'1993-05-15','1234','123','dark-blue'),(2,'VIVIANE','VIVIANE','123',2,2,1,'2021-10-15 16:43:38',NULL,'trurtu','F',NULL,'1997-03-30','tyurtu','gtrtur','teal');
+
+
+/*Table structure for table `aniversariante` */
+
+DROP TABLE IF EXISTS `aniversariante`;
+
+CREATE TABLE `aniversariante` (
+  `aniCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `aniNome` VARCHAR(30) DEFAULT NULL,
+  `aniDataAniversario` DATE DEFAULT NULL,
+  `aniUsuCodigo` INT(11) DEFAULT NULL,
+  `codUsuario` INT(11) DEFAULT NULL,
+  `codSetor` INT(11) DEFAULT NULL,
+  `dataHoraAtualizacao` DATETIME DEFAULT NULL,
+  `aniMensagem` TEXT DEFAULT NULL,
+  `aniTelefone` VARCHAR(50) DEFAULT NULL,
+  `aniFoto` TEXT DEFAULT NULL,
+  PRIMARY KEY (`aniCodigo`),
+  KEY `fkusuarioaniversario` (`aniUsuCodigo`),
+  CONSTRAINT `fkusuarioaniversario` FOREIGN KEY (`aniUsuCodigo`) REFERENCES `usuario` (`usuCodigo`)
+) ENGINE=INNODB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+
+/*Data for the table `aniversariante` */
+
+INSERT  INTO `aniversariante`(`aniCodigo`,`aniNome`,`aniDataAniversario`,`aniUsuCodigo`,`codUsuario`,`codSetor`,`dataHoraAtualizacao`,`aniMensagem`,`aniTelefone`,`aniFoto`) VALUES (8,'viviane','1997-03-30',1,1,1,'2021-10-07 04:33:52','O Terror dessas Gostosa','(14) 9 9893-6355',NULL);
+
+/*Table structure for table `categoria` */
+
+DROP TABLE IF EXISTS `categoria`;
+
+CREATE TABLE `categoria` (
+  `catCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `catDescricao` VARCHAR(500) DEFAULT NULL,
+  `codUsuario` INT(11) DEFAULT NULL,
+  `codSetor` INT(11) DEFAULT NULL,
+  `dataHoraAtualizacao` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`catCodigo`)
+) ENGINE=INNODB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4;
+
+/*Data for the table `categoria` */
+
+INSERT  INTO `categoria`(`catCodigo`,`catDescricao`,`codUsuario`,`codSetor`,`dataHoraAtualizacao`) VALUES (34,'Aluguel',2,1,'2021-10-05 10:44:48'),(35,'Água/Energia',2,1,'2021-10-05 10:45:47'),(36,'Internet',2,1,'2021-10-05 10:46:07'),(37,'Crédito Bradesco',2,1,'2021-10-05 10:46:40'),(38,'Empréstimo Bradesco',2,1,'2021-10-05 10:46:56'),(39,'Vale Alimentção',1,1,'2021-10-05 19:58:53'),(40,'Salario',1,1,'2021-10-05 20:00:07'),(41,'Celular',1,1,'2021-10-07 01:54:55'),(42,'Crédito Nubank',1,1,'2021-10-07 02:01:12'),(43,'Assinaturas',1,1,'2021-10-07 13:34:43'),(44,'Gasto alimentar',1,1,'2021-10-07 14:11:53');
+
+/*Table structure for table `familiar` */
+
+DROP TABLE IF EXISTS `familiar`;
+
+CREATE TABLE `familiar` (
+  `famCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `famNome` VARCHAR(500) DEFAULT NULL,
+  `famDataNasc` DATE DEFAULT NULL,
+  `famTelefone` VARCHAR(20) DEFAULT NULL,
+  `famTipo` VARCHAR(100) DEFAULT NULL,
+  `famUsuCodigo` INT(11) DEFAULT NULL,
+  `codUsuario` INT(11) DEFAULT NULL,
+  `codSetor` INT(11) DEFAULT NULL,
+  `dataHoraAtualizacao` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`famCodigo`),
+  KEY `FK_usuario_familiar` (`famUsuCodigo`),
+  CONSTRAINT `FK_usuario_familiar` FOREIGN KEY (`famUsuCodigo`) REFERENCES `usuario` (`usuCodigo`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4;
+
+/*Data for the table `familiar` */
+
+/*Table structure for table `gasto` */
+
+DROP TABLE IF EXISTS `gasto`;
+
+CREATE TABLE `gasto` (
+  `gasCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `gasTipo` VARCHAR(50) DEFAULT NULL,
+  `gasDataCad` DATE DEFAULT NULL,
+  `gasValor` DECIMAL(10,5) DEFAULT NULL,
+  `gasDescricao` VARCHAR(500) DEFAULT NULL,
+  `gasPago` CHAR(1) DEFAULT 'N',
+  `gasVencimento` DATE DEFAULT NULL,
+  `gasReceberNotificacao` TINYINT(1) DEFAULT 0,
+  `gasUsuCodigo` INT(11) DEFAULT NULL,
+  `gasNotificarEm` DATE DEFAULT NULL,
+  `gasAnotacaoExtra` TEXT DEFAULT NULL,
+  `codUsuario` INT(11) DEFAULT NULL,
+  `codSetor` INT(11) DEFAULT NULL,
+  `dataHoraAtualizacao` DATETIME DEFAULT NULL,
+  `gastCatCodigo` INT(11) DEFAULT NULL,
+  PRIMARY KEY (`gasCodigo`),
+  KEY `FK_usuario_gastos` (`gasUsuCodigo`),
+  KEY `FK_categoria_gastos` (`gastCatCodigo`),
+  CONSTRAINT `FK_categoria_gastos` FOREIGN KEY (`gastCatCodigo`) REFERENCES `categoria` (`catCodigo`),
+  CONSTRAINT `FK_usuario_gastos` FOREIGN KEY (`gasUsuCodigo`) REFERENCES `usuario` (`usuCodigo`)
+) ENGINE=INNODB AUTO_INCREMENT=198 DEFAULT CHARSET=utf8mb4;
+
+/*Data for the table `gasto` */
+
+INSERT  INTO `gasto`(`gasCodigo`,`gasTipo`,`gasDataCad`,`gasValor`,`gasDescricao`,`gasPago`,`gasVencimento`,`gasReceberNotificacao`,`gasUsuCodigo`,`gasNotificarEm`,`gasAnotacaoExtra`,`codUsuario`,`codSetor`,`dataHoraAtualizacao`,`gastCatCodigo`) VALUES (130,'D','2021-10-07','639.38000','Aluguel setembro/atrasado','S','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-07 12:34:03',34),(131,'D','2021-10-07','43.70000','água/Setembro','S','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-07 12:35:36',35),(132,'D','2021-10-07','581.25000','Aluguel',NULL,'2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-07 01:49:19',34),(133,'D','2021-10-07','44.12000','Água','S','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-07 12:35:39',NULL),(134,'D','2021-10-07','99.90000','Internet Linsfibra','S','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 16:11:00',36),(135,'D','2021-10-07','826.93000','Crédito bradesco','S','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 02:59:57',37),(136,'D','2021-10-07','115.74000','Empréstimo bradesco','S','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-07 13:23:45',38),(137,'D','2021-10-07','189.64000','ceLULAR VIVIANE','S','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-07 13:26:59',41),(138,'D','2021-10-07','122.36000','nUBANK vIVIANE','S','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-07 13:20:44',42),(139,'D','2021-10-07','38.00000','Celular sérgio',NULL,'2021-10-20',0,1,'2021-10-07','',1,1,'2021-10-07 02:02:32',41),(140,'D','2021-10-07','200.00000','nUBANK SÉRGIO','S','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-07 12:31:56',42),(141,'D','2021-10-07','639.38000','Aluguel setembro/atrasado',NULL,'2021-10-08',0,2,'2021-10-07','',2,1,'2021-10-07 01:47:42',34),(142,'D','2021-10-07','43.70000','água/Setembro',NULL,'2021-10-08',0,2,'2021-10-07','',2,1,'2021-10-07 01:48:46',35),(143,'D','2021-10-07','581.25000','Aluguel',NULL,'2021-10-08',0,2,'2021-10-07','',2,1,'2021-10-07 01:49:19',34),(144,'D','2021-10-07','44.12000','Água',NULL,'2021-10-08',0,2,'2021-10-07','',2,1,'2021-10-07 01:49:44',NULL),(145,'D','2021-10-07','99.90000','Internet Linsfibra',NULL,'2021-10-08',0,2,'2021-10-07','',2,1,'2021-10-07 01:50:39',36),(146,'D','2021-10-07','826.93000','Crédito bradesco',NULL,'2021-10-08',0,2,'2021-10-07','',2,1,'2021-10-07 01:51:57',37),(147,'D','2021-10-07','115.74000','Empréstimo bradesco',NULL,'2021-10-08',0,2,'2021-10-07','',2,1,'2021-10-07 02:07:08',38),(148,'D','2021-10-07','189.64000','ceLULAR VIVIANE',NULL,'2021-10-08',0,2,'2021-10-07','',2,1,'2021-10-07 01:56:54',41),(149,'D','2021-10-07','122.36000','nUBANK vIVIANE',NULL,'2021-10-08',0,2,'2021-10-07','',2,1,'2021-10-07 02:01:33',42),(150,'D','2021-10-07','38.00000','Celular sérgio',NULL,'2021-10-20',0,2,'2021-10-07','',2,1,'2021-10-07 02:02:32',41),(151,'D','2021-10-07','200.00000','nUBANK SÉRGIO',NULL,'2021-10-08',0,2,'2021-10-07','',2,1,'2021-10-07 02:03:38',42),(156,'R','2021-10-07','1880.00000','pagamento ferias',NULL,'2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-07 13:30:17',40),(157,'R','2021-10-07','2440.00000','pagamento do mes',NULL,'2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-07 13:30:44',40),(158,'D','2021-10-07','55.90000','netflix','S','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-07 13:35:54',43),(159,'R','2021-10-07','398.00000','vale alimentação',NULL,'2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-07 14:06:05',39),(160,'D','2021-10-07','378.00000','1ª compra do mes','S','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-07 14:12:55',44),(161,'D','2021-10-07','110.00000','mercado','S','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-07 20:03:31',44),(162,'D','2021-01-07','581.25000','Aluguel','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:15:40',34),(163,'D','2021-02-07','581.25000','Aluguel','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:15:50',34),(164,'D','2021-03-07','581.25000','Aluguel','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:15:56',34),(165,'D','2021-04-07','581.25000','Aluguel','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:16:01',34),(166,'D','2021-05-07','581.25000','Aluguel','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:16:06',34),(167,'D','2021-06-07','581.25000','Aluguel','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:16:11',34),(168,'D','2021-07-07','581.25000','Aluguel','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:16:17',34),(169,'D','2021-08-07','581.25000','Aluguel','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:16:23',34),(170,'D','2021-09-07','581.25000','Aluguel','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:16:28',34),(171,'R','2021-01-07','398.00000','vale alimentação','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:17:15',39),(172,'R','2021-02-07','398.00000','vale alimentação','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:17:22',39),(173,'R','2021-03-07','398.00000','vale alimentação','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:17:29',39),(174,'R','2021-04-07','398.00000','vale alimentação','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:17:35',39),(175,'R','2021-05-07','398.00000','vale alimentação','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:17:42',39),(176,'R','2021-06-07','398.00000','vale alimentação','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:17:49',39),(177,'R','2021-07-07','398.00000','vale alimentação','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:18:00',39),(178,'R','2021-08-07','398.00000','vale alimentação','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:18:08',39),(179,'R','2021-09-07','398.00000','vale alimentação','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:18:18',39),(180,'R','2021-01-07','2500.00000','pagamento do mes','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:22:11',40),(181,'R','2021-02-07','2500.00000','pagamento do mes','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:22:25',40),(182,'R','2021-03-07','2500.00000','pagamento do mes','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:22:37',40),(183,'R','2021-04-07','2500.00000','pagamento do mes','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:22:48',40),(184,'R','2021-05-07','2500.00000','pagamento do mes','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:22:58',40),(185,'R','2021-06-07','2500.00000','pagamento do mes','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:23:09',40),(186,'R','2021-07-07','2500.00000','pagamento do mes','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:23:19',40),(187,'R','2021-08-07','2500.00000','pagamento do mes','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:23:35',40),(188,'R','2021-09-07','2500.00000','pagamento do mes','N','2021-10-07',0,1,'2021-10-07','',1,1,'2021-10-08 03:23:47',40),(189,'D','2021-01-07','99.90000','Internet Linsfibra','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:24:12',36),(190,'D','2021-02-07','99.90000','Internet Linsfibra','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:24:20',36),(191,'D','2021-03-07','99.90000','Internet Linsfibra','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:24:28',36),(192,'D','2021-04-07','99.90000','Internet Linsfibra','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:24:42',36),(193,'D','2021-05-07','99.90000','Internet Linsfibra','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:24:51',36),(194,'D','2021-06-07','99.90000','Internet Linsfibra','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:25:04',36),(195,'D','2021-07-07','99.90000','Internet Linsfibra','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:25:14',36),(196,'D','2021-08-07','99.90000','Internet Linsfibra','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:25:28',36),(197,'D','2021-09-07','99.90000','Internet Linsfibra','N','2021-10-08',0,1,'2021-10-07','',1,1,'2021-10-08 03:25:40',36);
+
+/*Table structure for table `metagasto` */
+
+DROP TABLE IF EXISTS `metagasto`;
+
+CREATE TABLE `metagasto` (
+  `metGaCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `metGaMes` INT(11) DEFAULT NULL,
+  `metGaAno` INT(11) DEFAULT NULL,
+  `metGaValor` DECIMAL(10,5) DEFAULT NULL,
+  `metGaUsuCodigo` INT(11) DEFAULT NULL,
+  `codUsuario` INT(11) DEFAULT NULL,
+  `codSetor` INT(11) DEFAULT NULL,
+  `dataHoraAtualizacao` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`metGaCodigo`),
+  KEY `fk_usuario_meta` (`metGaUsuCodigo`),
+  CONSTRAINT `fk_usuario_meta` FOREIGN KEY (`metGaUsuCodigo`) REFERENCES `usuario` (`usuCodigo`)
+) ENGINE=INNODB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+
+/*Data for the table `metagasto` */
+
+INSERT  INTO `metagasto`(`metGaCodigo`,`metGaMes`,`metGaAno`,`metGaValor`,`metGaUsuCodigo`,`codUsuario`,`codSetor`,`dataHoraAtualizacao`) VALUES (4,10,2021,'2700.00000',1,1,1,'2021-10-11 00:19:52');
+
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

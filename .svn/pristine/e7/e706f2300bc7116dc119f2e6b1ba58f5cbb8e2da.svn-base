@@ -1,0 +1,120 @@
+ <!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </f:facet>
+        <title>Login</title>
+        <h:outputScript name="js/ripple.js" library="barcelona-layout" />
+        <h:outputScript name="js/layout.js" library="barcelona-layout" />
+    </h:head>
+
+    <style>
+        .breakDiv{
+            flex-basis: 100%;
+            height: 0;
+        }
+        .styleBox{
+           padding: 0 !important;
+            box-shadow: 0px 0px 8px #666;
+            width: 230px;
+        }
+        .btnMenor90 {
+            transform: scale(0.85); /* (110% zoom) */
+        }
+        .btnMenor90 .ui-button-text {
+            letter-spacing: 0.3px !important;
+        }
+        .ui-panel>.ui-widget-header {
+            border-top-left-radius: 8px !important;
+            border-top-right-radius: 8px !important;
+        }
+        .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-icon-left{
+            border-radius: 3px;
+        }
+    </style>
+
+    <h:body>
+        <ui:include src="/mpProc.xhtml"/>
+        <h:form id="form">
+            <p:growl id="erro" showDetail="true"/>
+            <div class="ui-g dashboard">
+            <table width="100" align="center" border="0">
+                <tr>
+                    <td>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <p:panel header="Login" styleClass="styleBox" style="border-radius: 8px;">
+                        <table border="0" align="center" style="width: 100%" cellpadding="3">
+                            <tr>
+                                <td align="center" colspan="4">
+                                    <p:graphicImage name="images/logo-login.png" library="barcelona-layout" width="180" height="150"/>
+                                    <br/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <div>
+                                        <div style="float: left">
+                                            <p:graphicImage name="images/login/user.png" library="barcelona-layout" width="18" height="18"/>
+                                        </div>
+                                        <div style="float: left; margin-left: 8px;">
+                                            <h:panelGroup styleClass="md-inputfield">
+                                                <p:inputText value="#{usuarioFaces.username}" size="20" />
+                                                <label>Usuario</label>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <div style="margin-top: 18px;">
+                                        <div style="float: left">
+                                            <p:graphicImage name="images/login/password.png" library="barcelona-layout" width="18" height="18" styleClass="ui ui-icon-colorTheme"/>
+                                        </div>
+                                        <div style="float: left; margin-left: 8px;">
+                                            <h:panelGroup styleClass="md-inputfield">
+                                                <p:password value="#{usuarioFaces.password}" size="20" toggleMask="true" redisplay="true"/>
+                                                <label>Senha</label>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="center">
+                                    <br/>
+                                    <p:commandButton value="Entrar"
+                                                     icon="fa fa-unlock-alt"
+                                                     onclick="PF('mpProc').show();"
+                                                     oncomplete="if(!args.validationFailed){PF('mpProc').hide();}"
+                                                     update="form:erro"
+                                                     ajax="false"
+                                                     action="#{usuarioFaces.doLogin}"
+                                                     id="btnLogar">
+                                    </p:commandButton>
+                                    <br/>
+                                </td>
+                            </tr>
+                        </table>
+                        </p:panel>
+                    </td>
+                </tr>
+            </table>
+            </div>
+        </h:form>
+        <h:outputStylesheet name="css/layout-#{guestPreferences.layout}.css" library="barcelona-layout" />
+        <h:outputStylesheet name="css/ripple.css" library="barcelona-layout" />
+    </h:body>
+</html>

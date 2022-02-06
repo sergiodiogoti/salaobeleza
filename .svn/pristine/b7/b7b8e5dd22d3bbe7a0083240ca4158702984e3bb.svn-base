@@ -1,0 +1,47 @@
+package com.DAO;
+import com.Bean.Aniversariante;
+import com.Bean.Gasto;
+import com.Util.HibernateUtil;
+import com.Util.MensagensErros;
+import java.util.List;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+/**
+ *
+ * @author Sergio - 25/09/2021
+ */
+public class AniversarianteDAO extends GenericDAO {
+    private static final long serialVersionUID = 1L;
+    private Session session;
+
+    public AniversarianteDAO(Session session) {
+        this.session = session;
+    }
+
+    public AniversarianteDAO() {
+        this.session = getSession();
+    }
+    public int addAniversariante(Aniversariante aniversariante) {
+        setAtualizar(false);
+        saveOrUpdatePojo(aniversariante);
+        if (MensagensErros.isErro()) {
+            return 0;
+        } else {
+            return aniversariante.getAniCodigo();
+        }
+    }
+    public Aniversariante getAniversariante(int aniversarianteID) {
+        return getPojo(Aniversariante.class, aniversarianteID);
+    }
+    public void updateAniversariante(Aniversariante aniversariante) {
+        setAtualizar(true);
+        saveOrUpdatePojo(aniversariante);
+    }
+    public void removeAniversariante(Aniversariante aniversariante) {
+        removePojo(aniversariante);
+    }
+    public List<Aniversariante> getAniversariantes() {
+        return getPureList(Aniversariante.class, "from Aniversariante ar");
+    }
+}

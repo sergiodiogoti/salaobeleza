@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Usuario</ui:define>
+
+    <ui:define name="head">
+        <style type="text/css">
+            .style-Icon {
+                color: #2d353c;
+                font-size: 17px;
+            }
+
+            .style-button {
+                font-size: 13px;
+                border: #1976d2 !important;
+            }
+
+            .text-column {
+                text-align: center;
+            }
+
+            .width-column-equals {
+                width: 7vw;
+            }
+
+            .width-column-dif {
+                width: 9vw;
+            }
+
+            .width-column-main {
+                width: 14vw;
+                text-align: left;
+            }
+            input::placeholder {
+                color: #FFFFFF;
+                font-size: 11px;
+            }
+        </style>
+
+        <script type="text/javascript">
+            function upperCase(a) {
+                setTimeout(function () {
+                    a.value = a.value.toUpperCase();
+                }, 1);
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="erro" showDetail="true" showSummary="true"/>
+            <table align="center" width="700px">
+                <tr>
+                    <td colspan="2">
+                        <p:panel styleClass="styleBox-title" style="border-radius: 8px;">
+                            <p:outputPanel style="text-align: center">
+                                <i class="fa fa-user" style="font-size: 20px; color: #9e9e9e;"/>
+                                <p:spacer width="5px"/>
+                                <p:outputLabel value="USUARIO" style="font-size: 20px; color: #9e9e9e;"/>
+                            </p:outputPanel>
+                        </p:panel>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p:remoteCommand name="updateUsuarioList"
+                                         autoRun="true"
+                                         update="usuarioList"
+                                         process="@this"
+                                         onstart="PF('mpProc').show()"
+                                         oncomplete="PF('mpProc').hide();"
+                                         actionListener="#{usuarioFaces.populaUsuario}"/>
+                        <p:dataTable var="item"
+                                     id="usuarioList"
+                                     value="#{usuarioFaces.usuarioList}"
+                                     emptyMessage="Nenhum arquivo encontrado!">
+                            <f:facet name="header">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <p:commandButton
+                                                value="Novo"
+                                                icon="ui-icon-add"
+                                                update="formUsuario:pnlUsuario"
+                                                styleClass="btnMenor90"
+                                                action="#{usuarioFaces.doAddUsuario}"
+                                                onclick="PF('mpProc').show()"
+                                                oncomplete="PF('mpProc').hide();PF('usuarioDlg').show();">
+                                            <f:setPropertyActionListener value="INTERNO" target="#{usuarioFaces.tipoUsuario}"/>
+                                        </p:commandButton>
+                                    </div>
+                                    <div>
+                                        <p:inputText style="width: 200px;"
+                                                     value="#{usuarioFaces.param}"
+                                                     placeholder="Busque por nome,celular ou cpf"/>
+                                        <p:commandButton
+                                                icon="ui-icon-search"
+                                                styleClass="btnMenor90"
+                                                process="@this,@form"
+                                                onclick="PF('mpProc').show()"
+                                                oncomplete="PF('mpProc').hide();updateUsuarioList();"/>
+                                    </div>
+                                </div>
+
+                            </f:facet>
+                            <p:column headerText="Codigo" styleClass="text-column width-column-equals"
+                                      sortBy="#{item.usuCodigo}">
+                                <h:outputText value="#{item.usuCodigo}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome" sortBy="#{item.usuNome}" styleClass="width-column-main">
+                                <h:outputText value="#{item.usuNome}"/>
+                            </p:column>
+
+                            <p:column headerText="Data Nasc" styleClass="text-column width-column-dif"
+                                      sortBy="#{item.usuDataNasc}">
+                                <h:outputLabel value="#{item.usuDataNasc}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="Celular" styleClass="text-column width-column-dif"
+                                      sortBy="#{item.usuTelefone}">
+                                <h:outputText value="#{item.usuTelefone}"/>
+                            </p:column>
+
+                            <p:column styleClass="text-column width-column-equals">
+                                <p:commandLink
+                                        title="Editar"
+                                        update="formUsuario:pnlUsuario"
+                                        onclick="PF('mpProc').show()"
+                                        oncomplete="PF('mpProc').hide();PF('usuarioDlg').show();">
+                                    <i class="fa fa-edit style-Icon"/>
+                                    <f:setPropertyActionListener value="#{item}"
+                                                                 target="#{usuarioFaces.usuarioSelected}"/>
+                                </p:commandLink>
+                                <p:spacer width="5px"/>
+                                <p:commandLink
+                                        title="Remover"
+                                        onclick="PF('mpProc').show();"
+                                        process="@this"
+                                        style="width: 8%"
+                                        oncomplete="PF('mpProc').hide();PF('removeUsuario').show();">
+                                    <i class="fa fa-trash style-Icon"/>
+                                    <f:setPropertyActionListener value="#{item}"
+                                                                 target="#{usuarioFaces.usuarioSelected}"/>
+                                </p:commandLink>
+                            </p:column>
+                        </p:dataTable>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+        <h:form>
+            <p:growl id="message2" showDetail="true"/>
+            <p:confirmDialog id="removeUsuario" widgetVar="removeUsuario"
+                             header="Remover Cliente"
+                             message="Tem certeza que deseja remover?"
+                             style=" font-size: 13px;"
+                             severity="true"
+                             showEffect="bounce"
+                             hideEffect="bounce"
+                             width="300">
+                <p:commandButton value="Sim"
+                                 process="@this"
+                                 update="form:erro"
+                                 styleClass="style-button"
+                                 onclick="PF('mpProc').show();"
+                                 oncomplete="PF('mpProc').hide();updateUsuarioList();PF('removeUsuario').hide();"
+                                 actionListener="#{usuarioFaces.doRemoveUsuario}"
+                                 icon="ui-icon-check"/>
+
+                <p:commandButton value="Nao"
+                                 styleClass="style-button"
+                                 onclick="PF('removeUsuario').hide();"
+                                 icon="ui-icon-close"/>
+            </p:confirmDialog>
+        </h:form>
+        <p:dialog id="usuarioDlg"
+                  widgetVar="usuarioDlg"
+                  responsive="true"
+                  header="Usuario"
+                  modal="true">
+            <h:form id="formUsuario">
+                <p:outputPanel id="pnlUsuario">
+                    <table cellpadding="5" cellspacing="5" border="0" style="width: 400px">
+                        <tr>
+                            <td colspan="3">
+                                <label class="ui-icon-colorTheme">Nome <span
+                                        style="color: red">*</span></label>
+                                <br/>
+                                <p:inputText value="#{usuarioFaces.usuarioSelected.usuNome}"
+                                             id="nome"
+                                             required="true"
+                                             onkeyup="upperCase(this)"
+                                             requiredMessage="Nome é Obrigatório"
+                                             maxlength="500"
+                                             style="width: 90%"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <label class="ui-icon-colorTheme">E-mail <span style="color: red">*</span></label>
+                                <br/>
+                                <p:inputText id="email" value="#{usuarioFaces.usuarioSelected.usuEmail}"
+                                             required="true"
+                                             requiredMessage="E-mail é Obrigatório"
+                                             style="width: 98%"
+                                             label="Email">
+                                </p:inputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <label class="ui-icon-colorTheme">Login<span style="color: red">*</span></label>
+                                <br/>
+                                <p:inputText id="login" value="#{usuarioFaces.usuarioSelected.usuLogin}"
+                                             required="true"
+                                             onkeyup="upperCase(this)"
+                                             requiredMessage="Login é Obrigatório"
+                                             style="width: 90%"
+                                             label="Email">
+                                </p:inputText>
+                            </td>
+                            <td colspan="2">
+                                <label class="ui-icon-colorTheme">Senha <span style="color: red">*</span></label>
+                                <br/>
+                                <p:password value="#{usuarioFaces.usuarioSelected.usuSenha}"
+                                            required="true"
+                                            requiredMessage="Senha é Obrigatório"
+                                            size="27" toggleMask="true" redisplay="true"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <label class="ui-icon-colorTheme">Sexo</label>
+                                <br/>
+                                <p:selectOneMenu id="sexo"
+                                                 style="width: 90%"
+                                                 value="#{usuarioFaces.usuarioSelected.usuSexo}">
+                                    <f:selectItem itemValue="F" itemLabel="Feminino"/>
+                                    <f:selectItem itemValue="M" itemLabel="Masculino"/>
+                                    <p:ajax/>
+                                </p:selectOneMenu>
+                            </td>
+                            <td colspan="2">
+                                <label class="ui-icon-colorTheme">Data Nascimento</label>
+                                <br/>
+                                <p:calendar id="dataNasc"
+                                            style="width: 98%"
+                                            placeholder="dd/mm/aaaa"
+                                            locale="pt_BR"
+                                            mask="true"
+                                            pattern="dd/MM/yyyy"
+                                            value="#{usuarioFaces.usuarioSelected.usuDataNasc}">
+                                </p:calendar>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <label class="ui-icon-colorTheme">Celular <span style="color: red">*</span></label>
+                                <br/>
+                                <p:inputMask id="tel"
+                                             required="true"
+                                             requiredMessage="Telefone é Obrigatório"
+                                             value="#{usuarioFaces.usuarioSelected.usuTelefone}"
+                                             style="width: 98%"
+                                             mask="(99)99999-9999"/>
+                            </td>
+                            <td colspan="2">
+                                <label class="ui-icon-colorTheme">CPF <span
+                                        style="color: red">*</span></label>
+                                <br/>
+                                <p:inputMask id="cpf"
+                                             required="true"
+                                             requiredMessage="CPF é obrigatório"
+                                             value="#{usuarioFaces.usuarioSelected.usuCPF}"
+                                             style="width: 90%"
+                                             mask="999.999.999-99">
+                                    <p:ajax/>
+                                </p:inputMask>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <label class="ui-icon-colorTheme">Cliente </label>
+                                <br/>
+                                <p:autoComplete id="cliente"
+                                                value="#{usuarioFaces.usuarioSelected.usuCliCodigo}"
+                                                var="c"
+                                                size="50"
+                                                dropdown="true"
+                                                itemLabel="#{c.cliNome}"
+                                                itemValue="#{c}"
+                                                converter="ClienteConverter"
+                                                forceSelection="true"
+                                                placeholder="buscar"
+                                                completeMethod="#{clienteFaces.buscaClienteAutoComplete}">
+                                    <p:ajax event="itemSelect" listener="#{usuarioFaces.handlerCliente}"
+                                            update="cliente,profissional"
+                                            process="@this"/>
+                                </p:autoComplete>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <label class="ui-icon-colorTheme">Profissional </label>
+                                <br/>
+                                <p:autoComplete id="profissional"
+                                                value="#{usuarioFaces.usuarioSelected.usuProCodigo}"
+                                                var="p"
+                                                size="50"
+                                                dropdown="true"
+                                                itemLabel="#{p.proNome}"
+                                                itemValue="#{p}"
+                                                converter="ProfissionalConverter"
+                                                forceSelection="true"
+                                                completeMethod="#{profissionalFaces.buscaProfissionalAutoComplete}">
+                                    <p:ajax event="itemSelect" listener="#{usuarioFaces.handlerProfissional}"
+                                            update="cliente,profissional"
+                                            process="@this"/>
+                                </p:autoComplete>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left">
+                                <span style="color: red">*</span>
+                                <i style="font-size: 9px;">Campos obrigatórios</i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" align="right">
+                                <p:commandButton value="Cancelar"
+                                                 process="@this"
+                                                 style="background-color: #C62828;"
+                                                 icon="fa fa-reply"
+                                                 onclick="PF('usuarioDlg').hide();"
+                                                 id="btnCancelar">
+                                </p:commandButton>
+                                <p:spacer width="5px"/>
+                                <p:commandButton value="Salvar"
+                                                 process="@this,@form"
+                                                 style="background-color: #1ab394;"
+                                                 update="form:erro"
+                                                 icon="fa fa-check"
+                                                 onclick="PF('mpProc').show();"
+                                                 oncomplete="if(!args.validationFailed){PF('usuarioDlg').hide();updateUsuarioList();}PF('mpProc').hide();"
+                                                 action="#{usuarioFaces.doSaveOrUpdateUsuario}"
+                                                 id="btnSalvar">
+                                </p:commandButton>
+                            </td>
+                        </tr>
+                    </table>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

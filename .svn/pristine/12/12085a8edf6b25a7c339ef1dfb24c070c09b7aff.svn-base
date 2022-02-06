@@ -1,0 +1,161 @@
+package com.Bean;
+
+import java.util.Date;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+/**
+ *
+ * @author Sergio - 02/09/2021
+ */
+
+@Entity
+@Table(name = "familiar")
+public class Familiar implements java.io.Serializable {
+private static final long serialVersionUID = 1L;
+
+@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="famCodigo", nullable=false)
+    private Integer famCodigo;
+
+@Column(name="famNome")
+    private String famNome;
+
+@Column(name = "famDataNasc")
+    @Temporal(TemporalType.DATE)
+    private Date famDataNasc;
+
+@Column(name="famTelefone")
+    private String famTelefone;
+
+@Column(name="famTipo")
+    private String famTipo;
+
+@Column(name="famUsuCodigo")
+    private Integer famUsuCodigo;
+
+@Column(name="codUsuario")
+    private Integer codUsuario;
+
+@Column(name="codSetor")
+    private Integer codSetor;
+
+@Column(name="dataHoraAtualizacao")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataHoraAtualizacao;
+
+public Familiar() {
+    }
+
+public Familiar(int setor, int usuario) {
+        setCodSetor(setor);
+        setCodUsuario(usuario);
+    }
+
+
+
+public Integer getFamCodigo() {
+        return famCodigo;
+    }
+
+    public void setFamCodigo(Integer famCodigo) {
+        this.famCodigo = famCodigo;
+    }
+
+public String getFamNome() {
+        return famNome;
+    }
+
+    public void setFamNome(String famNome) {
+        this.famNome = famNome;
+    }
+
+public Date getFamDataNasc() {
+        return famDataNasc;
+    }
+
+    public void setFamDataNasc(Date famDataNasc) {
+        this.famDataNasc = famDataNasc;
+    }
+
+public String getFamTelefone() {
+        return famTelefone;
+    }
+
+    public void setFamTelefone(String famTelefone) {
+        this.famTelefone = famTelefone;
+    }
+
+public String getFamTipo() {
+        return famTipo;
+    }
+
+    public void setFamTipo(String famTipo) {
+        this.famTipo = famTipo;
+    }
+
+public Integer getFamUsuCodigo() {
+        return famUsuCodigo;
+    }
+
+    public void setFamUsuCodigo(Integer famUsuCodigo) {
+        this.famUsuCodigo = famUsuCodigo;
+    }
+
+public Integer getCodUsuario() {
+        return codUsuario;
+    }
+
+    public void setCodUsuario(Integer codUsuario) {
+        this.codUsuario = codUsuario;
+    }
+
+public Integer getCodSetor() {
+        return codSetor;
+    }
+
+    public void setCodSetor(Integer codSetor) {
+        this.codSetor = codSetor;
+    }
+
+public Date getDataHoraAtualizacao() {
+        return dataHoraAtualizacao;
+    }
+
+    public void setDataHoraAtualizacao(Date dataHoraAtualizacao) {
+        this.dataHoraAtualizacao = dataHoraAtualizacao;
+    }
+@Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Familiar other = (Familiar) obj;
+        if (this.famCodigo != other.famCodigo && (this.famCodigo == null || !this.famCodigo.equals(other.famCodigo))) {
+            return false;
+        }
+        return true;
+    }
+@Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + (this.famCodigo != null ? this.famCodigo.hashCode() : 0);
+        return hash;
+    }
+@Override
+  public String toString(){
+    return famCodigo+"";
+  }
+}

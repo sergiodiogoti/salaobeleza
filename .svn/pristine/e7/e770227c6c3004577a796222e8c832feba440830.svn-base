@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="conteudo">
+        <h:form id="form">
+            <h:panelGrid style="width:100%; height:100%;" columns="1">
+                <p:dataTable var="item"
+                             paginatorPosition="bottom"
+                             emptyMessage="Nenhum arquivo encontrado!"
+                             rows="5"
+                             paginator="true">
+                    <p:column headerText="Id">
+                    </p:column>
+
+                    <p:column headerText="Year">
+                    </p:column>
+
+                    <p:column headerText="Brand">
+                    </p:column>
+
+                    <p:column headerText="Color">
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+        </h:form>
+        <p:dialog id="mdlNovo"
+                  modal="true"
+                  hideEffect="explode"
+                  showEffect="slide"
+                  widgetVar="mdlNovo">
+
+            <h:panelGrid style="width:100%; height:100%;" columns="1">
+                <h:form>
+                    <p:panel header="Enter your passwords"
+                             style="width:400px; margin-left:auto; margin-right:auto;">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="Non-Feedback: " />
+                            <p:password value="#{passwordBean.password1}" feedback="false" />
+
+                            <h:outputText value="Feedback: " />
+                            <p:password value="#{passwordBean.password2}" />
+
+                            <h:outputText value="Inline Feedback: " />
+                            <p:password value="#{passwordBean.password4}" inline="true" />
+
+                            <h:outputText value="Custom Feedback: " />
+                            <p:password value="#{passwordBean.password5}"
+                                        inline="true"/>
+                        </h:panelGrid>
+                    </p:panel>
+                </h:form>
+            </h:panelGrid>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

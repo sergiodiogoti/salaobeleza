@@ -1,0 +1,232 @@
+package com.Bean;
+
+import java.util.Date;
+import java.util.List;
+import javax.persistence.*;
+
+/**
+ *
+ * @author Sergio - 03/09/2021
+ */
+
+@Entity
+@Table(name = "gasto")
+public class Gasto implements java.io.Serializable {
+private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="gasCodigo", nullable=false)
+    private Integer gasCodigo;
+
+    @Column(name="gasTipo")
+    private String gasTipo;
+
+    @Column(name = "gasDataCad")
+    @Temporal(TemporalType.DATE)
+    private Date gasDataCad;
+
+    @Column(name="gasValor")
+    private Double gasValor;
+
+    @Column(name="gasDescricao")
+    private String gasDescricao;
+
+    @Column(name="gasPago")
+    private String gasPago ;
+
+    @Column(name="gasAnotacaoExtra")
+    private String gasAnotacaoExtra;
+
+    @Column(name = "gasVencimento")
+    @Temporal(TemporalType.DATE)
+    private Date gasVencimento;
+
+    @Column(name="gasReceberNotificacao")
+    private Boolean gasReceberNotificacao;
+
+    @ManyToOne
+    @JoinColumn(name="gasUsuCodigo", referencedColumnName="usuCodigo",nullable=true)
+    private Usuario gasUsuCodigo;
+
+    @ManyToOne
+    @JoinColumn(name="gastCatCodigo", referencedColumnName="catCodigo",nullable=true)
+    private Categoria gastCatCodigo;
+
+    @Column(name = "gasNotificarEm")
+    @Temporal(TemporalType.DATE)
+    private Date gasNotificarEm;
+
+    @Column(name="codUsuario")
+    private Integer codUsuario;
+
+    @Column(name="codSetor")
+    private Integer codSetor;
+
+    @Column(name="dataHoraAtualizacao")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataHoraAtualizacao;
+
+    public Gasto() {
+    }
+
+    public Gasto(int setor, int usuario) {
+        setCodSetor(setor);
+        setCodUsuario(usuario);
+        setGasDataCad(new Date());
+        setGasVencimento(new Date());
+        setGasNotificarEm(new Date());
+    }
+
+
+    public Categoria getGastCatCodigo() {
+        return gastCatCodigo;
+    }
+
+    public void setGastCatCodigo(Categoria gastCatCodigo) {
+        this.gastCatCodigo = gastCatCodigo;
+    }
+
+    public Integer getGasCodigo() {
+        return gasCodigo;
+    }
+
+    public void setGasCodigo(Integer gasCodigo) {
+        this.gasCodigo = gasCodigo;
+    }
+
+    public String getGasTipo() {
+        if(gasTipo == null){
+            gasTipo = "D";
+        }
+        return gasTipo;
+    }
+
+    public void setGasTipo(String gasTipo) {
+        this.gasTipo = gasTipo;
+    }
+
+    public Date getGasDataCad() {
+        return gasDataCad;
+    }
+
+    public void setGasDataCad(Date gasDataCad) {
+        this.gasDataCad = gasDataCad;
+    }
+
+    public Double getGasValor() {
+        return gasValor;
+    }
+
+    public void setGasValor(Double gasValor) {
+        this.gasValor = gasValor;
+    }
+
+    public String getGasDescricao() {
+        return gasDescricao;
+    }
+
+    public void setGasDescricao(String gasDescricao) {
+        this.gasDescricao = gasDescricao;
+    }
+
+    public String getGasPago() {
+        return gasPago;
+    }
+
+    public void setGasPago(String gasPago) {
+        this.gasPago = gasPago;
+    }
+
+    public Date getGasVencimento() {
+        return gasVencimento;
+    }
+
+    public void setGasVencimento(Date gasVencimento) {
+        this.gasVencimento = gasVencimento;
+    }
+
+    public Boolean getGasReceberNotificacao() {
+        return gasReceberNotificacao;
+    }
+
+    public Boolean isGasReceberNotificacao() {
+        return gasReceberNotificacao;
+    }
+
+    public void setGasReceberNotificacao(Boolean gasReceberNotificacao) {
+        this.gasReceberNotificacao = gasReceberNotificacao;
+    }
+
+    public Usuario getGasUsuCodigo() {
+        return gasUsuCodigo;
+    }
+
+    public void setGasUsuCodigo(Usuario gasUsuCodigo) {
+        this.gasUsuCodigo = gasUsuCodigo;
+    }
+
+    public Date getGasNotificarEm() {
+        return gasNotificarEm;
+    }
+
+    public void setGasNotificarEm(Date gasNotificarEm) {
+        this.gasNotificarEm = gasNotificarEm;
+    }
+
+    public Integer getCodUsuario() {
+        return codUsuario;
+    }
+
+    public void setCodUsuario(Integer codUsuario) {
+        this.codUsuario = codUsuario;
+    }
+
+    public Integer getCodSetor() {
+        return codSetor;
+    }
+
+    public void setCodSetor(Integer codSetor) {
+        this.codSetor = codSetor;
+    }
+
+    public String getGasAnotacaoExtra() {
+        return gasAnotacaoExtra;
+    }
+
+    public void setGasAnotacaoExtra(String gasAnotacaoExtra) {
+        this.gasAnotacaoExtra = gasAnotacaoExtra;
+    }
+
+    public Date getDataHoraAtualizacao() {
+        return dataHoraAtualizacao;
+    }
+
+    public void setDataHoraAtualizacao(Date dataHoraAtualizacao) {
+        this.dataHoraAtualizacao = dataHoraAtualizacao;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Gasto other = (Gasto) obj;
+        if (this.gasCodigo != other.gasCodigo && (this.gasCodigo == null || !this.gasCodigo.equals(other.gasCodigo))) {
+            return false;
+        }
+        return true;
+    }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + (this.gasCodigo != null ? this.gasCodigo.hashCode() : 0);
+        return hash;
+    }
+    @Override
+        public String toString(){
+    return gasCodigo+"";
+  }
+    }

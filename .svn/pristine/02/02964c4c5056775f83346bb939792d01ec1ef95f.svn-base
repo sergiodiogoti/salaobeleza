@@ -1,0 +1,460 @@
+package com.ManagedBeans;
+
+import com.Bean.Setor;
+import com.Conexao.ConexaoMySQL;
+import com.DAO.UsuarioDAO;
+import com.Bean.Usuario;
+import com.Bean.Usuario;
+import com.DAO.SetorDAO;
+import com.DAO.UsuarioDAO;
+
+import java.io.*;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import com.Util.HibernateUtil;
+import com.Util.MensagensErros;
+import com.Util.UtilFaces;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.primefaces.barcelona.view.GuestPreferences;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
+
+import javax.faces.webapp.FacesServlet;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.enterprise.context.SessionScoped;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ *
+ * @author Sergio - 02/09/2021
+ */
+@Named
+@SessionScoped
+public class UsuarioFaces implements Serializable{
+
+    private List<Usuario> cachedUsuarios = null;
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private Usuario usuarioSelected;
+    private Usuario usuario;
+    private Setor setor;
+    private boolean existUser;
+    private String username,password;
+    private int setorLogin;
+    private Usuario usuarioLogadoBean;
+    private UploadedFile file;
+    private String nomeFoto;
+    private String uploadSalveImagem;
+    private String retornaFoto;
+    private  String corTema;
+
+    public String getCorTema() {
+        if(null == corTema){
+            corTema = "blue";
+        }
+        return corTema;
+    }
+
+    public void setCorTema(String corTema) {
+        this.corTema = corTema;
+    }
+
+    public void setRetornaFoto(String retornaFoto) {
+        this.retornaFoto = retornaFoto;
+    }
+
+    public String getUploadSalveImagem() {
+        return uploadSalveImagem;
+    }
+
+    public void setUploadSalveImagem(String uploadSalveImagem) {
+        this.uploadSalveImagem = uploadSalveImagem;
+    }
+
+    public String getNomeFoto() {
+        return nomeFoto;
+    }
+
+    public void setNomeFoto(String nomeFoto) {
+        this.nomeFoto = nomeFoto;
+    }
+
+    public UploadedFile getFile() {
+        return file;
+    }
+
+    public void setFile(UploadedFile file) {
+        this.file = file;
+    }
+
+    public Usuario getUsuarioLogadoBean() {
+        return usuarioLogadoBean;
+    }
+
+    public void setUsuarioLogadoBean(Usuario usuarioLogadoBean) {
+        this.usuarioLogadoBean = usuarioLogadoBean;
+    }
+
+    public int getSetorLogin() {
+        return setorLogin;
+    }
+
+    public void setSetorLogin(int setorLogin) {
+        this.setorLogin = setorLogin;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isExistUser() {
+        return existUser;
+    }
+
+    public void setExistUser(boolean existUser) {
+        this.existUser = existUser;
+    }
+
+    public Setor getSetor() {
+        return setor;
+    }
+
+    public void setSetor(Setor setor) {
+        this.setor = setor;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public UsuarioDAO getUsuarioDAO() {
+        return usuarioDAO;
+    }
+
+    public void setUsuarioDAO(UsuarioDAO usuarioDAO) {
+        this.usuarioDAO = usuarioDAO;
+    }
+
+    public Usuario getUsuarioSelected() {
+        return usuarioSelected;
+    }
+
+    public void setUsuarioSelected(Usuario usuarioSelected) {
+        this.usuarioSelected = usuarioSelected;
+    }
+
+    public List<Usuario> getCachedUsuarios() {
+        if (cachedUsuarios == null) {
+            this.cachedUsuarios = usuarioDAO.getUsuarios();
+        }
+        return cachedUsuarios;
+    }
+
+    public String doAddUsuario() {
+        int setor = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("setor").toString());
+        int usuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        usuarioSelected = new Usuario(setor, usuario);
+        return "usuarioNew";
+    }
+
+    public String dofinishAddUsuario() {
+        Date date = new Date();
+        usuarioSelected.setDataHoraAtualizacao(date);
+        usuarioDAO.addUsuario(usuarioSelected);
+        cachedUsuarios = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "usuarioList";
+        }
+    }
+
+    public String doRemoveUsuario() {
+        usuarioDAO.removeUsuario(usuarioSelected);
+        cachedUsuarios = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "usuarioList";
+        }
+    }
+
+    public String doUpdateUsuario() {
+        UsuarioDAO usuDAO = new UsuarioDAO();
+        usuario = usuDAO.getUsuario(usuarioSelected.getCodUsuario());
+        SetorDAO posDAO = new SetorDAO();
+        setor = posDAO.getSetor(usuarioSelected.getCodSetor());
+        return "usuarioEdit";
+    }
+
+    public String dofinishUpdateUsuario() {
+        if("".equals(usuarioSelected.getUsuSenha()) || usuarioSelected.getUsuSenha() == null){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Atenção!", "Campo senha não pode ser vazio."));
+            FacesContext.getCurrentInstance().validationFailed();
+            return  null;
+        }
+        Date date = new Date();
+        int codUsuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        usuarioSelected.setCodUsuario(codUsuario);
+        usuarioSelected.setCodSetor(1);
+        usuarioSelected.setUsuTema(corTema);
+        usuarioSelected.setDataHoraAtualizacao(date);
+        usuarioDAO.updateUsuario(usuarioSelected);
+        if(null == corTema){
+            corTema = "blue";
+        }
+        changeTemaUsuario(corTema);
+        cachedUsuarios = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "usuarioList";
+        }
+
+    }
+
+    public String doCancelUsuario() {
+        cachedUsuarios = null;
+        return "usuarioList";
+    }
+
+    public void usuarioExists(String user, String pass) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        try {
+            existUser= false;
+            String sql = "SELECT u.*FROM usuario u " +
+                    "WHERE u.usuLogin = '" + user + "' " +
+                    "AND u.usuSenha = '" + pass + "' LIMIT 1";
+            Query q = ses.createNativeQuery(sql).addEntity(Usuario.class);
+            Usuario usuario = (Usuario) q.uniqueResult();
+            if(q.list().size() > 0){
+                existUser= true;
+                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("usuario",usuario);
+                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("setor",1);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            ses.close();
+        }
+    }
+
+
+    public String doLogin() {
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("usuario",null);
+        if(null == username || "".equals(username)){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Atenção!", "Campo Usuário não foi preenchido."));
+            return  null;
+        }
+        if(null == password || "".equals(password)){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Atenção!", "Campo Senha não foi preenchido."));
+            return  null;
+        }
+        usuarioExists(username,password);
+        if(!existUser){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro!", "Usuario/Senha Incorretos,Verifique o seus dados."));
+            return  null;
+        }else{
+           usuarioLogadoBean = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario");
+            changeTemaUsuario(usuarioLogadoBean.getUsuTema());
+            corTema = usuarioLogadoBean.getUsuTema();
+            return "dashboard?faces-redirect=true";
+        }
+    }
+    public String doLogout() {
+        setUsername(null);
+        setPassword(null);
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("usuario",null);
+        return "";
+
+    }
+    public String getSaudacao(){
+        String hora = new SimpleDateFormat("HH").format(new Date());
+        String minuto = new SimpleDateFormat("mm").format(new Date());
+        String segundo = new SimpleDateFormat("ss").format(new Date());
+        int h = Integer.parseInt(hora);
+        int m = Integer.parseInt(minuto);
+        int s = Integer.parseInt(segundo);
+        String mensagem = "";
+        if(h >= 00 && h <= 05 && m < 59 && s < 60){
+            mensagem = "Boa madrugada";
+        }
+        if(h >= 06 && h <= 11 && m < 59 && s < 60){
+            mensagem = "Bom dia";
+        }
+        if(h >= 12 && h <= 17 && m < 59 && s < 60){
+            mensagem = "Boa tarde";
+        }
+        if(h >= 18 && h <= 23 && m < 59 && s < 60){
+            mensagem = "Boa noite";
+        }
+
+        return mensagem;
+    }
+    public String transformTextInicialMaiusculo(String str){
+        String textTransformado = "";
+        try {
+            if(null == str || "".equals(str)){
+                return "";
+            }
+            String transf = str.substring(0,1).toUpperCase();
+           textTransformado = transf + "" + str.substring(1, str.length()).toLowerCase();
+        }catch (Exception exception){
+            exception.printStackTrace();
+        }
+        return textTransformado;
+    }
+
+//    public void getUploadSalveImagem() throws SQLException {
+//        Connection con = ConexaoMySQL.getConexaoMySQL();
+//        try {
+//              if(file != null) {
+//                 Class.forName("com.mysql.jdbc.Driver");
+//                  String sql = "UPDATE usuario SET usuPhoto =? "
+//                          + " WHERE usuCodigo =?";
+//
+//                  PreparedStatement stm = con.prepareStatement(sql);
+//                  stm.setBinaryStream(1, file.getInputstream());
+//                  stm.setInt(2, usuarioLogadoBean.getUsuCodigo());
+//                  stm.executeUpdate();
+//              }
+//          }catch (Exception ex){
+//              ex.printStackTrace();
+//          }finally {
+//              con.close();
+//          }
+//    }
+
+    public StreamedContent getExibirFoto() throws SQLException {
+        Connection con = ConexaoMySQL.getConexaoMySQL();
+        ResultSet rs = null;
+        Statement st = null;
+        try {
+            st = con.createStatement();
+            String sql = "SELECT usuPhoto FROM usuario WHERE usuCodigo = " +usuarioLogadoBean.getUsuCodigo();
+            rs = st.executeQuery(sql);
+            if(rs.next()){
+                InputStream img = new ByteArrayInputStream(rs.getBytes("usuPhoto"));
+                return new DefaultStreamedContent(img, "image/png");
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally {
+            con.close();
+        }
+
+        return null;
+    }
+
+    public String getRetornaFoto() {
+        HttpServletRequest url = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        String urlBase = url.getRequestURL().toString().substring(0, (url.getRequestURL().toString().length() - url.getServletPath().length()));
+        usuarioSelected = new UtilFaces().getUsuarioLogadoBean();
+        if (usuarioSelected.getUsuNomeFoto() != null) {
+            retornaFoto = urlBase + "/fotos/" + usuarioSelected.getUsuNomeFoto();
+        } else {
+//            retornaFoto = urlBase + "/resources/barcelona-layout/images/semfoto.png";
+            retornaFoto = urlBase + "/fotos/semfoto.png";
+        }
+        return retornaFoto;
+    }
+
+
+    public void upload(FileUploadEvent event) {
+        try {
+            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+            @SuppressWarnings("unused")
+            HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
+
+            FacesContext aFacesContext = FacesContext.getCurrentInstance();
+            ServletContext context = (ServletContext) aFacesContext.getExternalContext().getContext();
+
+            String realPath = context.getRealPath("/");
+
+            // Aqui cria o diretorio caso não exista
+            File file = new File(realPath + "/fotos//");
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+
+            byte[] arquivo = event.getFile().getContents();
+            String caminho = realPath + "\\fotos\\" + event.getFile().getFileName();
+            String nomeFoto = event.getFile().getFileName();
+            // esse trecho grava o arquivo no diretório
+            FileOutputStream fos = new FileOutputStream(caminho);
+            fos.write(arquivo);
+            fos.close();
+
+            usuarioSelected.setUsuNomeFoto(nomeFoto);
+            usuarioDAO.updateUsuario(usuarioSelected);
+
+            System.out.println("Arquivo: " + arquivo);
+            System.out.println("Caminho da imagem: " + caminho);
+            System.out.println("Nome da imagem: " + nomeFoto);
+            System.out.println("CAminho imagem 2: " + file + "\\" + this.getNomeFoto());
+
+        } catch (Exception ex) {
+            System.out.println("Erro no upload de imagem" + ex);
+        }
+
+    }
+
+    public void doUpdateSenha(){
+        if(!usuarioSelected.getUsuSenhaAntiga().equals(usuarioSelected.getUsuSenha())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Atenção!", "Senha antiga não corresponde"));
+            FacesContext.getCurrentInstance().validationFailed();
+            return;
+        }
+        if(usuarioSelected.getUsuSenhaAntiga().equals(usuarioSelected.getUsuNovaSenha())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Atenção!", "A senha nova não pode ser igual a senha antiga"));
+            FacesContext.getCurrentInstance().validationFailed();
+            return;
+        }
+        if(!usuarioSelected.getUsuNovaSenha().equals(usuarioSelected.getUsuConfirmaSenha())){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Atenção!", "A senha nova não é igual a senha de confirmação"));
+            FacesContext.getCurrentInstance().validationFailed();
+            return;
+        }
+        usuarioSelected.setUsuSenha(usuarioSelected.getUsuNovaSenha());
+        usuarioDAO.updateUsuario(usuarioSelected);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "OK!", "Senha alterada com sucesso"));
+        return;
+    }
+    public void changeTemaUsuario(String cor){
+        if(null == cor){
+            cor = "blue";
+        }
+        GuestPreferences guestPreferences = UtilFaces.getManagedBean(GuestPreferences.class);
+        guestPreferences.setTheme(cor);
+
+    }
+}

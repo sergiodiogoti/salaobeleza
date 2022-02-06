@@ -1,0 +1,41 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+                
+    <ui:define name="title">Familiar</ui:define>
+    
+    <ui:define name="head">
+        <style type="text/css">
+            .ui-selectoneradio.ui-grid-responsive .ui-grid-col-4,
+            .ui-selectmanycheckbox.ui-grid-responsive .ui-grid-col-4{
+                padding-bottom: 10px;
+            }
+        </style>
+    </ui:define>
+                
+    <ui:define name="content">
+        <h:form id="form">
+                <p:dataTable var="item"
+                             paginatorPosition="bottom"
+                             emptyMessage="Nenhum arquivo encontrado!"
+                             rows="5"
+                             paginator="true">
+                    <p:column headerText="Id">
+                    </p:column>
+
+                    <p:column headerText="Year">
+                    </p:column>
+
+                    <p:column headerText="Brand">
+                    </p:column>
+
+                    <p:column headerText="Color">
+                    </p:column>
+                </p:dataTable>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

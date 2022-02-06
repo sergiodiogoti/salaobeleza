@@ -1,0 +1,433 @@
+package com.ManagedBeans;
+
+import com.Bean.Gasto;
+import com.Bean.Setor;
+import com.Bean.Usuario;
+import com.DAO.GastoDAO;
+import com.DAO.SetorDAO;
+import com.DAO.UsuarioDAO;
+import com.Util.HibernateUtil;
+import com.Util.MensagensErros;
+import com.Util.UtilFaces;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.hibernate.type.StandardBasicTypes;
+import org.primefaces.PrimeFaces;
+
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ *
+ * @author Sergio - 03/09/2021
+ */
+@Named
+@SessionScoped
+public class GraficoFaces implements Serializable{
+
+    @Inject
+    private UsuarioFaces usuarioFaces;
+    private Usuario usuario;
+    private Setor setor;
+    private Integer mes;
+    private Integer ano;
+    private Map mapPolaris = new HashMap();
+    private String valorReceita;
+    private String valorDespesa;
+    private String valorContasPagar;
+
+
+    @PostConstruct
+    public void GraficoFaces(){
+        populaValoresGeral();
+    }
+
+    public Map getMapPolaris() {
+        return mapPolaris;
+    }
+
+    public void setMapPolaris(Map mapPolaris) {
+        this.mapPolaris = mapPolaris;
+    }
+
+    public int getMes() {
+        if(mes == null){
+            String m = new SimpleDateFormat("MM").format(new Date());
+            mes = Integer.parseInt(m);
+        }
+        return mes;
+    }
+
+    public void setMes(int mes) {
+        this.mes = mes;
+    }
+
+    public int getAno() {
+        if(ano == null){
+            ano = Calendar.getInstance().get(Calendar.YEAR);
+        }
+        return ano;
+    }
+
+    public void setAno(int ano) {
+        this.ano = ano;
+    }
+
+    public Setor getSetor() {
+        return setor;
+    }
+
+    public void setSetor(Setor setor) {
+        this.setor = setor;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getValorReceita() {
+        return valorReceita;
+    }
+
+    public void setValorReceita(String valorReceita) {
+        this.valorReceita = valorReceita;
+    }
+
+    public String getValorDespesa() {
+        return valorDespesa;
+    }
+
+    public void setValorDespesa(String valorDespesa) {
+        this.valorDespesa = valorDespesa;
+    }
+
+    public String getValorContasPagar() {
+        return valorContasPagar;
+    }
+
+    public void setValorContasPagar(String valorContasPagar) {
+        this.valorContasPagar = valorContasPagar;
+    }
+
+    public void populaValoresGeral(){
+        try {
+            mapPolaris = new HashMap();
+            populaGastoPorCategoria();
+            calculavaloresFinanceiro();
+            populaGastoPorMes();
+            populaContasAtrasadas();
+            populaContasPagas();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+    public void populaGastoPorCategoria(){
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        try{
+            if(mes == null){
+                String m = new SimpleDateFormat("MM").format(new Date());
+                mes = Integer.parseInt(m);
+            }
+            if(ano == null){
+                ano = Calendar.getInstance().get(Calendar.YEAR);
+            }
+            String SQL = "SELECT c.`catDescricao`, \n" +
+                    "(SUM(g.`gasValor`) / (SELECT SUM(g2.`gasValor`)FROM gasto g2 \n" +
+                    "JOIN categoria c ON g2.`gastCatCodigo` = c.`catCodigo`\n" +
+                    "WHERE g2.`gasTipo` = 'D'\n" +
+                    "AND MONTH(g2.gasDataCad) = " + mes + "\n" +
+                    "AND YEAR(g2.gasDataCad) = " + ano + "\n" +
+                    "AND g2.`gasUsuCodigo` = " + usuarioFaces.getUsuarioLogadoBean().getUsuCodigo() + ") * 100) porcentagem\n" +
+                    "FROM gasto g \n" +
+                    "JOIN categoria c ON g.`gastCatCodigo` = c.`catCodigo`\n" +
+                    "JOIN usuario u ON g.`gasUsuCodigo` = u.`usuCodigo` \n" +
+                    "WHERE usuCodigo = " + usuarioFaces.getUsuarioLogadoBean().getUsuCodigo() + "\n" +
+                    "AND g.`gasTipo` = 'D'\n" +
+                    "AND MONTH(g.gasDataCad) = " + mes + "\n" +
+                    "AND YEAR(g.gasDataCad) = " + ano + "\n" +
+                    "GROUP BY c.`catCodigo`; ";
+            SQLQuery q = ses.createSQLQuery(SQL)
+                    .addScalar("catDescricao", StandardBasicTypes.STRING)
+                    .addScalar("porcentagem", StandardBasicTypes.DOUBLE);
+            List<Object[]> listaGastosPorCategoria = q.list();
+
+            String str = new String();
+            int cont = 0;
+            String vlrFinal = "100",vlrConv,descricao;
+            int numAntesdoPonto;
+            double vlrPorcent;
+            for(Object[] ob : listaGastosPorCategoria){
+                vlrPorcent = (double) ob[1];
+                vlrConv = String.valueOf(vlrPorcent);
+                numAntesdoPonto = vlrConv.indexOf(".");
+                if(numAntesdoPonto < 3){
+                    vlrFinal = vlrConv.substring(0,numAntesdoPonto)+""+vlrConv.substring(numAntesdoPonto,numAntesdoPonto+3);
+                }
+                descricao = usuarioFaces.transformTextInicialMaiusculo((String)ob[0]);
+                cont++;
+                if(cont == listaGastosPorCategoria.size()) {
+                    str += "{ label: \"" + descricao + "\", y: " + vlrFinal + "}";
+                }else{
+                    str += "{ label: \"" + descricao + "\", y: " + vlrFinal + "},";
+                }
+            }
+            mapPolaris.put("graficogastos", str);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally {
+            ses.close();
+        }
+    }
+
+    public void populaGastoPorMes(){
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        SimpleDateFormat pegaMes = new SimpleDateFormat("MM");
+        Integer mesAtual = Integer.parseInt(pegaMes.format(new Date()));
+        try{
+            String tipo;
+            List<Object[]>  lista = new ArrayList<>();
+            Map map = null;
+            List<Map> listMapDespesa = new ArrayList<>();
+            List<Map> listMapReceita = new ArrayList<>();
+            for(int i = 1; i <= mesAtual; i++){
+                String SQL = "SELECT CASE \n" +
+                        "WHEN `gasTipo` = 'D' THEN 'Despesa'\n" +
+                        "ELSE NULL END AS tipo, SUM(gasValor) as gasValor\n" +
+                        "FROM gasto g \n" +
+                        "JOIN usuario u ON g.`gasUsuCodigo` = u.`usuCodigo` \n" +
+                        "WHERE usuCodigo = " + usuarioFaces.getUsuarioLogadoBean().getUsuCodigo() +"\n" +
+                        "AND MONTH(g.gasDataCad) = "+ i +"\n" +
+                        "AND YEAR(g.gasDataCad) = "+ ano +"\n" +
+                        "AND `gasTipo` = 'D'\n" +
+                        "GROUP BY gasTipo;";
+                SQLQuery q = ses.createSQLQuery(SQL)
+                        .addScalar("tipo", StandardBasicTypes.STRING)
+                        .addScalar("gasValor", StandardBasicTypes.BIG_DECIMAL);
+                lista = q.list();
+
+                if(lista.size() <= 0){
+                    map = new HashMap();
+                    map.put("tipo","Despesa");
+                    map.put("valor",BigDecimal.ZERO);
+                    map.put("mes",UtilFaces.getSetaMesExtenso(i).substring(0,3));
+                    listMapDespesa.add(map);
+                }else {
+                    for (Object[] ob : lista) {
+                        map = new HashMap();
+                        tipo = (String) ob[0];
+                        map.put("tipo", tipo);
+                        map.put("valor", (BigDecimal) ob[1]);
+                        map.put("mes", UtilFaces.getSetaMesExtenso(i).substring(0,3));
+                        listMapDespesa.add(map);
+                    }
+                }
+                SQL = "SELECT CASE \n" +
+                        "WHEN `gasTipo` = 'R' THEN 'Receita'\n" +
+                        "ELSE NULL END AS tipo, SUM(gasValor) as gasValor\n" +
+                        "FROM gasto g \n" +
+                        "JOIN usuario u ON g.`gasUsuCodigo` = u.`usuCodigo` \n" +
+                        "WHERE usuCodigo = " + usuarioFaces.getUsuarioLogadoBean().getUsuCodigo() +"\n" +
+                        "AND MONTH(g.gasDataCad) = "+ i +"\n" +
+                        "AND YEAR(g.gasDataCad) = "+ ano +"\n" +
+                        "AND `gasTipo` = 'R'\n" +
+                        "GROUP BY gasTipo;";
+                q = ses.createSQLQuery(SQL)
+                        .addScalar("tipo", StandardBasicTypes.STRING)
+                        .addScalar("gasValor", StandardBasicTypes.BIG_DECIMAL);
+                lista = q.list();
+
+                if(lista.size() <= 0){
+                    map = new HashMap();
+                    map.put("tipo","Receita");
+                    map.put("valor",BigDecimal.ZERO);
+                    map.put("mes",UtilFaces.getSetaMesExtenso(i).substring(0,3));
+                    listMapReceita.add(map);
+
+                }else {
+                    for (Object[] ob : lista) {
+                        map = new HashMap();
+                        tipo = (String) ob[0];
+                        map.put("tipo", tipo);
+                        map.put("valor", (BigDecimal) ob[1]);
+                        map.put("mes", UtilFaces.getSetaMesExtenso(i).substring(0,3));
+                        listMapReceita.add(map);
+
+                    }
+                }
+            }
+            int cont = 0;
+            BigDecimal bgValor = null;
+            String str = new String();
+            for(Map mapD : listMapDespesa){
+                cont++;
+                bgValor = BigDecimal.ZERO;
+                bgValor = bgValor.add((BigDecimal) mapD.get("valor"));
+                if(cont == listMapDespesa.size()) {
+                    str += "{ label: \"" + mapD.get("mes") + "\", y: " + bgValor + " }";
+                }else{
+                    str += "{ label: \"" + mapD.get("mes") + "\", y: " + bgValor + " },";
+                }
+            }
+            mapPolaris.put("despesaPormes",str);
+
+            cont=0;
+            str = new String();
+            for(Map mapR : listMapReceita){
+                cont++;
+                bgValor = BigDecimal.ZERO;
+                bgValor = bgValor.add((BigDecimal) mapR.get("valor"));
+                if(cont == listMapReceita.size()) {
+                    str += "{ label: \"" + mapR.get("mes") + "\", y: " + bgValor + " }";
+                }else{
+                    str += "{ label: \"" + mapR.get("mes") + "\", y: " + bgValor + " },";
+                }
+            }
+            mapPolaris.put("receitaPormes",str);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally {
+            ses.close();
+        }
+    }
+
+    public void calculavaloresFinanceiro(){
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        Usuario usuario = new UtilFaces().getUsuarioLogadoBean();
+        List<Gasto>listaGastos = new ArrayList<>();
+        try{
+            String sql = "SELECT g.* FROM gasto g \n" +
+                    "     WHERE gasUsuCodigo = " + usuario +"\n" +
+                    "     AND MONTH(gasDataCad) = " + mes + " \n"+
+                    "     AND YEAR(gasDataCad) = " + ano + " \n";
+            Query q = ses.createNativeQuery(sql).addEntity(Gasto.class);
+            listaGastos = q.list();
+            BigDecimal receitaDispo = BigDecimal.ZERO,
+                    calculaRd = BigDecimal.ZERO,
+                    rd = BigDecimal.ZERO,
+                    somadTotalDispesa = BigDecimal.ZERO,
+                    faltaPag = BigDecimal.ZERO,
+                    dispesaspagas = BigDecimal.ZERO,
+                    calculaFaltaPagar = BigDecimal.ZERO;
+            for(Gasto g : listaGastos){
+                if("D".equals(g.getGasTipo())){
+                    somadTotalDispesa = somadTotalDispesa.add(BigDecimal.valueOf(g.getGasValor()));
+                    if("S".equals(g.getGasPago())){
+                        dispesaspagas = dispesaspagas.add(BigDecimal.valueOf(g.getGasValor()));
+                    }
+                }
+                if("R".equals(g.getGasTipo())){
+                    rd = rd.add(BigDecimal.valueOf(g.getGasValor()));
+                }
+            }
+            calculaFaltaPagar = somadTotalDispesa.subtract(dispesaspagas);
+            faltaPag = faltaPag.add(calculaFaltaPagar);
+
+            calculaRd = rd.subtract(dispesaspagas);
+            receitaDispo = receitaDispo.add(calculaRd);
+
+            valorReceita = UtilFaces.moedaBr(receitaDispo);
+            valorDespesa = UtilFaces.moedaBr(somadTotalDispesa);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally {
+            ses.close();
+        }
+    }
+
+    public void populaContasAtrasadas(){
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        Usuario usuario = new UtilFaces().getUsuarioLogadoBean();
+        try{
+            String sql = "SELECT UPPER(gasDescricao) gasDescricao,IFNULL(gasPago,'N') gasPago, g.`gasVencimento`,gasValor,g.*\n" +
+                    "FROM gasto g\n" +
+                    "WHERE gastipo = 'D' \n" +
+                    "AND gasUsuCodigo = " + usuario.getUsuCodigo() + "  \n" +
+                    "AND DATE_FORMAT(gasVencimento,'%Y-%m-%d') < DATE_FORMAT(NOW(),'%Y-%m-%d')\n" +
+                    "HAVING gasPago = 'N';";
+            SQLQuery q = ses.createSQLQuery(sql)
+                    .addScalar("gasDescricao",StandardBasicTypes.STRING)
+                    .addScalar("gasPago",StandardBasicTypes.STRING)
+                    .addScalar("gasVencimento",StandardBasicTypes.DATE)
+                    .addScalar("gasValor",StandardBasicTypes.BIG_DECIMAL)
+                    .addEntity("g",Gasto.class);
+            List<Object[]> lista = q.list();
+            BigDecimal valor = BigDecimal.ZERO;
+            BigDecimal valorTotal = BigDecimal.ZERO;
+            String str = new String();
+            String desc = "";
+            int cont = 0;
+            if(lista.size() == 0) {
+                str = "{ label: \"" + desc + "\", y: " + valor + " }";
+            }
+            for(Object[] ob : lista){
+                cont++;
+                valor = BigDecimal.ZERO;
+                valor = valor.add((BigDecimal) ob[3]);
+                    if(cont == lista.size()) {
+                        str += "{ label: \"" + ob[0] + "\", y: " + valor + " }";
+                    }else{
+                        str += "{ label: \"" + ob[0] + "\", y: " + valor + " },";
+                    }
+                valorTotal = valorTotal.add(valor);
+            }
+            valorContasPagar = UtilFaces.moedaBr(valorTotal);
+            mapPolaris.put("contasAtrasadas",str);
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally {
+            ses.close();
+        }
+    }
+
+    public void populaContasPagas(){
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        Usuario usuario = new UtilFaces().getUsuarioLogadoBean();
+        try{
+            String sql = "SELECT UPPER(gasDescricao) gasDescricao,gasValor \n" +
+                    "FROM gasto g\n" +
+                    "WHERE gastipo = 'D' \n" +
+                    "AND gasUsuCodigo = " + usuario.getUsuCodigo() + " \n" +
+                    "AND MONTH(g.gasDataCad) = "+ mes +"\n" +
+                    "AND YEAR(g.gasDataCad) = "+ ano +"\n" +
+                    "AND gasPago = 'S';";
+            SQLQuery q = ses.createSQLQuery(sql)
+                    .addScalar("gasDescricao",StandardBasicTypes.STRING)
+                    .addScalar("gasValor",StandardBasicTypes.BIG_DECIMAL);
+            List<Object[]> lista = q.list();
+            BigDecimal valor = BigDecimal.ZERO;
+            String str = new String();
+            int cont = 0;
+            for(Object[] ob : lista){
+                cont++;
+                valor = BigDecimal.ZERO;
+                valor = valor.add((BigDecimal) ob[1]);
+                    if(cont == lista.size()) {
+                        str += "{ label: \"" + ob[0] + "\", y: " + valor + " }";
+                    }else{
+                        str += "{ label: \"" + ob[0] + "\", y: " + valor + " },";
+                    }
+            }
+            mapPolaris.put("contasPagas",str);
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally {
+            ses.close();
+        }
+    }
+}

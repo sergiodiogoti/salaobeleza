@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ui:composition template="../WEB-INF/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html">
+
+    <ui:define name="menu">
+        <ui:include src="../WEB-INF/menu.menu-old.xhtml"/>
+    </ui:define>
+    <ui:define name="conteudo">
+        <h:outputStylesheet library="css" name="style.css"/>
+        <h:form id="form">
+            <h:panelGrid style="width:100%; height:100%;" columns="1">
+                <p:panel header="Cadastrar Morador" style="width:1200px; margin-left:auto; margin-right:auto;text-align: center;">
+
+                    <table align="center">
+                        <tr>
+                            <td colspan="4">
+                                <h:outputText value="Nome:"/><br/>
+                                <p:inputText value="#{moradorFaces.moradorSelected.nome}"/>
+                            </td>
+
+
+
+                            <td colspan="4">
+                                <h:outputText value="CPF:"/><br/>
+                                <p:inputText value="#{moradorFaces.moradorSelected.cpf}"/>
+                            </td>
+
+                            <td colspan="4">
+                                <h:outputText value="Celular:"/><br/>
+                                <p:inputText value="#{moradorFaces.moradorSelected.celular}"/>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <br/>
+                                <p:commandButton value="Salvar"
+                                                 icon="ui-icon-disk"
+                                                 ajax="false"
+                                                 process="@this"
+                                                 action="#{moradorFaces.doFinishAddMorador}"/>
+                                <p:spacer width="3px"/>
+                                <p:commandButton value="Cancelar"
+                                                 icon="ui-icon-close"
+                                                 onclick="PF('mdlNovo').show();"/>
+                            </td>
+                        </tr>
+                    </table>
+                </p:panel>
+            </h:panelGrid>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

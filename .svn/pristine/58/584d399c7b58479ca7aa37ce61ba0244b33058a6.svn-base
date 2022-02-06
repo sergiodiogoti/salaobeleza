@@ -1,0 +1,34 @@
+CREATE TABLE `setor` (
+  `setCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `setNome` VARCHAR(50) DEFAULT NULL,
+  `setResponsavel` VARCHAR(50) DEFAULT NULL,
+  `setCidade` VARCHAR(50) DEFAULT NULL,
+  `codUsuario` INT(11) DEFAULT NULL,
+  `codSetor` INT(11) DEFAULT NULL,
+  `dataHoraAtualizacao` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`setCodigo`)
+) ENGINE=INNODB;
+
+CREATE TABLE `usuario` (
+  `usuCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `usuNome` VARCHAR(50) DEFAULT NULL,
+  `usuLogin` VARCHAR(50) DEFAULT NULL,
+  `usuSenha` VARCHAR(12) DEFAULT NULL,
+  `usuSetCodigo` INT(11) NOT NULL,
+  `codUsuario` INT(11) DEFAULT NULL,
+  `codSetor` INT(11) DEFAULT NULL,
+  `dataHoraAtualizacao` INT(11) DEFAULT NULL,
+  PRIMARY KEY (`usuCodigo`),
+  KEY `fk_usuSetor` (`usuSetCodigo`),
+  CONSTRAINT `fk_usuSetor` FOREIGN KEY (`usuSetCodigo`) REFERENCES `setor` (`setCodigo`)
+) ENGINE=INNODB;
+
+INSERT INTO `setor` VALUES(1,'SANTA DIOGO','SERGIO','LUANDA',1,1,SYSDATE());
+INSERT INTO `setor` VALUES(2,'ANTÓNIA DIOGO','SERGIO','LUANDA',1,1,SYSDATE());
+INSERT INTO `setor` VALUES(3,'CLAUDIO CORREIA','SERGIO','LUANDA',1,1,SYSDATE());
+
+INSERT INTO `usuario` VALUES(1,'SERGIO','SERGIO','deus',1,1,1,SYSDATE());
+INSERT INTO `usuario` VALUES(2,'VIVIANE','VIVIANE','deus',2,1,2,SYSDATE());
+
+
+

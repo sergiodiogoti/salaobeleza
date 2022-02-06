@@ -1,0 +1,23 @@
+Tecnologias usadas no projeto:
+
+JDK 8
+Servidor de aplicação WildFly 17
+Servidor apache XAMP
+IntelliJ IDEA portable
+Maven
+JDBC
+Hibernate,JPA
+MySQL
+
+para rodar o projeto basta ter instalado na maquina:
+jdk 8 
+servidor apache XAMP 
+SQLyog ou qualquer outra ferramenta para sgbd MYSQL
+IntelliJ IDEA portable
+Após abrir o intellij configure o wildFly em Edit Configurations, 
+após isso caso não esteja, coloque o arquivo salaobeleza.war exploded na aba deployment.
+antes de rodar verifique a classe ConexaoMySQL, se os dados lá estão condizendo com os dados do seu banco. 
+verifique tambem se o arquivo hibernate.cfg.xml esta compativel com a configuração do seu banco.
+ 
+
+

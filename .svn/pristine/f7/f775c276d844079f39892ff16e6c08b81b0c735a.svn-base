@@ -1,0 +1,44 @@
+package com.DAO;
+import com.Bean.Categoria;
+import com.Util.MensagensErros;
+import java.util.List;
+import org.hibernate.Session;
+
+/**
+ *
+ * @author Viviane - 09/09/2021
+ */
+public class CategoriaDAO extends GenericDAO {
+    private static final long serialVersionUID = 1L;
+    private Session session;
+	
+    public CategoriaDAO(Session session) {
+        this.session = session;
+    }
+
+    public CategoriaDAO() {
+        this.session = getSession();
+    }
+    public int addCategoria(Categoria categoria) {
+        setAtualizar(false);
+            saveOrUpdatePojo(categoria);
+            if (MensagensErros.isErro()) {
+                return 0;
+            } else {
+                return categoria.getCatCodigo();
+            }   
+    }
+    public Categoria getCategoria(int categoriaID) {
+        return getPojo(Categoria.class, categoriaID);
+    }
+    public void updateCategoria(Categoria categoria) {
+        setAtualizar(true);
+        saveOrUpdatePojo(categoria);
+    }
+    public void removeCategoria(Categoria categoria) {
+        removePojo(categoria);
+    }
+    public List<Categoria> getCategorias() {
+        return getPureList(Categoria.class, "from Categoria ar");
+    }
+}

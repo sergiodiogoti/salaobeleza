@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      template="/WEB-INF/template.xhtml">
+<h:head>
+   <title></title>
+</h:head>
+<h:outputStylesheet>
+</h:outputStylesheet>
+<h:body>
+   <p:outputPanel id="idGraficoUsuario">
+      <div class="ui-g dashboard">
+         <div class="ui-g-12 ui-md-8 ui-lg-6">
+            <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+         </div>
+         <div class="ui-g-12 ui-md-8 ui-lg-6">
+            <div id="chartContainer2" style="height: 300px; width: 100%;"></div>
+         </div>
+      </div>
+      <div class="ui-g dashboard">
+         <div class="ui-g-12 ui-md-8 ui-lg-6">
+            <div id="chartContainer4" style="height: 300px; width: 100%;"></div>
+         </div>
+         <div class="ui-g-12 ui-md-8 ui-lg-6">
+            <div id="chartContainer3" style="height: 300px; width: 100%;"></div>
+         </div>
+      </div>
+   </p:outputPanel>
+</h:body>
+<script type="text/javascript">
+   $(function (){
+      var altura = {
+         animationEnabled: true,
+         theme: "light2",
+         title: {
+            text: "% Despesas por Categoria - #{gastoFaces.getSetaMesExtenso(graficoFaces.mes)} - #{graficoFaces.ano}",
+            fontSize: 17,
+         },
+         axisY: {
+            title: "Porcentagem(%)",
+            fontSize: 11,
+            suffix: "%"
+         },
+         axisX: {
+            title: "",
+            // labelAngle: -80
+         },
+         data: [{
+            type: "column",
+            indexLabelFontSize: 11,
+            yValueFormatString: "#,##0.0#\"%\"",
+            dataPoints: [
+               #{graficoFaces.mapPolaris.graficogastos}
+
+            ]
+         }]
+      };
+      $("#chartContainer").CanvasJSChart(altura);
+   });
+   $(function (){
+      var altura = {
+         animationEnabled: true,
+         theme: "light2",
+         title:{
+            text: "Receitas e Despesas - #{graficoFaces.ano}",
+            fontSize: 17,
+         },
+         axisX: {
+            title: "",
+         },
+         axisY: {
+            title: "Receita",
+            titleFontColor: "#4169E1",
+            lineColor: "#4169E1",
+            labelFontColor: "#4169E1",
+            tickColor: "#4169E1",
+            includeZero: true
+         },
+         axisY2: {
+            title: "Despesa",
+            titleFontColor: "#DC143C",
+            lineColor: "#DC143C",
+            labelFontColor: "#DC143C",
+            tickColor: "##DC143C",
+            includeZero: true
+         },
+         toolTip: {
+            shared: true
+         },
+         legend: {
+            cursor: "pointer",
+            itemclick: toggleDataSeries
+         },
+         data: [{
+            type: "column",
+            yValueFormatString: "#,##0.#",
+            name: "Receita",
+            showInLegend: true,
+            dataPoints: [
+               #{graficoFaces.mapPolaris.receitaPormes}
+
+            ]
+         },
+            {
+               type: "column",
+               name: "Despesa",
+               showInLegend: true,
+               axisYType: "secondary",
+               indexLabelFontSize: 11,
+               color: "#DC143C",
+               yValueFormatString: "#,##0.#",
+               dataPoints: [
+                  #{graficoFaces.mapPolaris.despesaPormes}
+               ]
+            }]
+      };
+      $("#chartContainer2").CanvasJSChart(altura);
+   });
+   $(function (){
+      var altura = {
+         animationEnabled: true,
+         theme: "light2",
+         title: {
+            text: "Despesas Pagas - #{gastoFaces.getSetaMesExtenso(graficoFaces.mes)} - #{graficoFaces.ano}",
+            fontSize: 17,
+         },
+         axisY: {
+            fontSize: 11,
+         },
+         axisX: {
+            title: "",
+            // labelAngle: -80
+         },
+         data: [{
+            type: "bar",
+            indexLabelFontSize: 11,
+            yValueFormatString: "#,##0.#",
+            dataPoints: [
+               #{graficoFaces.mapPolaris.contasPagas}
+
+            ]
+         }]
+      };
+      $("#chartContainer4").CanvasJSChart(altura);
+   });
+   $(function (){
+      var altura = {
+         animationEnabled: true,
+         theme: "light2",
+         title: {
+            text: "Despesas Atrasadas",
+            fontSize: 17,
+         },
+         axisY: {
+            fontSize: 12,
+         },
+         axisX: {
+            title: "",
+            // labelAngle: -80
+         },
+         data: [{
+            type: "doughnut",
+            startAngle: 60,
+            //innerRadius: 60,
+            indexLabelFontSize: 11,
+            indexLabel: "{label}",
+            toolTipContent: "<b>{label}:</b> {y}",
+            yValueFormatString: "#,##0.#",
+            dataPoints: [
+               #{graficoFaces.mapPolaris.contasAtrasadas}
+
+            ]
+         }]
+      };
+      $("#chartContainer3").CanvasJSChart(altura);
+   });
+   function toggleDataSeries(e) {
+      if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+         e.dataSeries.visible = false;
+      } else {
+         e.dataSeries.visible = true;
+      }
+      e.chart.render();
+   }
+</script>
+</html>

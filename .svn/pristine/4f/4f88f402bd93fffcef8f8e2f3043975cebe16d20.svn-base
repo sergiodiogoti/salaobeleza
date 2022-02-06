@@ -1,0 +1,42 @@
+package com.Converters;
+
+
+import com.DAO.MetaGastoDAO;
+import com.Bean.MetaGasto;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+
+/**
+ *
+ * @author Sergio - 10/10/2021
+ */
+@FacesConverter(value="MetaGastoConverter")
+public class MetaGastoConverter  implements Converter{
+
+    private MetaGastoDAO metaGastoDAO =new MetaGastoDAO();
+    public MetaGastoConverter(){
+    }
+
+    public Object getAsObject(FacesContext context, UIComponent component, String value) {
+       if (value == null || value.length() == 0) {
+            return null;
+        }else{
+          try{ 
+              Integer idmetaGasto = Integer.parseInt(value);
+              return metaGastoDAO.getMetaGasto(idmetaGasto);
+          }catch(NumberFormatException n){
+          return null;    
+          }
+       }  
+    }
+
+    public String getAsString(FacesContext context, UIComponent component, Object value) {
+        if(value == null){
+            return "";
+        }
+        return ((MetaGasto)value).getMetGaCodigo().toString();
+    }
+
+}

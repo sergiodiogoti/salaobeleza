@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      template="/WEB-INF/template.xhtml">
+<h:head>
+   <title></title>
+</h:head>
+<h:outputStylesheet>
+</h:outputStylesheet>
+<h:body>
+   <p:outputPanel id="id">
+      <div class="ui-g" style="border: none; border-radius: 5px; box-shadow: 0px 0px 12px aliceblue;">
+         <div>
+             <div id="chartContainer" style="height: 400px; width: 100%;"></div>
+         </div>
+      </div>
+   </p:outputPanel>
+</h:body>
+<script type="text/javascript">
+   $(function (){
+      var altura = {
+         animationEnabled: true,
+         animationDuration: 2000,
+         backgroundColor:"transparent",
+         dataPointMaxWidth: 30,
+         title: {
+            text: "Despesas por categoria",
+            fontSize: 14,
+
+         },
+         axisX:{
+            title:"",
+            labelFontSize: 10,
+            titleFontWeight: "bold",
+            gridThickness: 0,
+
+         },
+         axisY:{
+            title:"",
+            labelAngle:-50,
+            labelFontSize: 10,
+            titleFontWeight: "bold",
+            titleFontSize: 15,
+            gridThickness: 1,
+            valueFormatString: "#"
+         },
+         axisY2:{
+            title:"",
+            labelFontSize: 10,
+            titleFontSize: 15,
+            gridThickness: 1,
+         },
+         data:[{
+            type: "pie",
+            startAngle: 25,
+            toolTipContent: "<b>{x}</b>: {y}%",
+            showInLegend: "true",
+            legendText: "{x}",
+            indexLabelFontSize: 14,
+            indexLabel: "{x} - {y}%",
+            dataPoints: [#{gastoFaces.mapPolaris.graficogastos}]
+         }]
+      };
+      $("#chartContainer").CanvasJSChart(altura);
+   });
+</script>
+<!--<script type="text/javascript">-->
+<!--   $(document).ready(function() {-->
+<!--      var chart = new CanvasJS.Chart("chartContainer",-->
+<!--              {-->
+<!--                 title:{-->
+<!--                    text: "Price History, In Pounds"-->
+<!--                 },-->
+<!--                 animationEnabled: true,-->
+<!--                 axisY:{-->
+<!--                    titleFontFamily: "arial",-->
+<!--                    titleFontSize: 12,-->
+<!--                    includeZero: false-->
+<!--                 },-->
+<!--                 toolTip: {-->
+<!--                    shared: true-->
+<!--                 },-->
+<!--                 data: [-->
+<!--                    {-->
+
+<!--                       type: "spline",-->
+<!--                       name: "ticketbis",-->
+<!--                       showInLegend: true,-->
+<!--                       dataPoints: [-->
+<!--                          {label:"6-02-16", y: 254.02},-->
+<!--                          {label: "7-02-16", y: 264.99},-->
+<!--                          {label: "8-02-16", y: 264.99},-->
+<!--                          {label: "9-02-16", y: 290.00},-->
+<!--                          {label: "10-02-16", y: 285.00},-->
+<!--                          {label: "11-02-16", y: 369.00},-->
+<!--                          {label: "12-02-16", y: 329.30}-->
+<!--                       ]-->
+<!--                    },-->
+<!--                    {-->
+
+<!--                       type: "spline",-->
+<!--                       name: "livefootball",-->
+<!--                       showInLegend: true,-->
+<!--                       dataPoints: [-->
+<!--                          {label:"6-02-16", y: 237.50},-->
+<!--                          {label: "7-02-16", y: 237.50},-->
+<!--                          {label: "8-02-16", y: 237.50},-->
+<!--                          {label: "9-02-16", y: 237.50},-->
+<!--                          {label: "10-02-16", y: 237.50},-->
+<!--                          {label: "11-02-16", y: 0},-->
+<!--                          {label: "12-02-16", y: 469.25}-->
+<!--                       ]-->
+<!--                    },-->
+<!--                    {-->
+
+<!--                       type: "spline",-->
+<!--                       name: "Kix",-->
+<!--                       showInLegend: true,-->
+<!--                       dataPoints: [-->
+<!--                          {label:"6-02-16", y: 220},-->
+<!--                          {label: "7-02-16", y: 220},-->
+<!--                          {label: "8-02-16", y: 220},-->
+<!--                          {label: "9-02-16", y: 320},-->
+<!--                          {label: "10-02-16", y: 320},-->
+<!--                          {label: "11-02-16", y: 320},-->
+<!--                          {label: "12-02-16", y: 320}-->
+<!--                       ]-->
+<!--                    },-->
+<!--                    {-->
+
+<!--                       type: "spline",-->
+<!--                       name: "Sports Events 365",-->
+<!--                       showInLegend: true,-->
+<!--                       dataPoints: [-->
+<!--                          {label:"6-02-16", y: 357},-->
+<!--                          {label: "7-02-16", y: 356},-->
+<!--                          {label: "8-02-16", y: 356},-->
+<!--                          {label: "9-02-16", y: 357},-->
+<!--                          {label: "10-02-16", y: 363},-->
+<!--                          {label: "11-02-16", y: 404},-->
+<!--                          {label: "12-02-16", y: 410}-->
+<!--                       ]-->
+<!--                    },-->
+<!--                    {-->
+
+<!--                       type: "spline",-->
+<!--                       name: "FootballTicketpad",-->
+<!--                       showInLegend: true,-->
+<!--                       dataPoints: [-->
+<!--                          {label:"6-02-16", y: 823.53},-->
+<!--                          {label: "7-02-16", y: 823.53},-->
+<!--                          {label: "8-02-16", y: 823.53},-->
+<!--                          {label: "9-02-16", y: 823.53},-->
+<!--                          {label: "10-02-16", y: 941.18},-->
+<!--                          {label: "11-02-16", y: 0},-->
+<!--                          {label: "12-02-16", y: 47.07}-->
+<!--                       ]-->
+<!--                    },-->
+<!--                    {-->
+
+<!--                       type: "spline",-->
+<!--                       name: "HotFootballTickets",-->
+<!--                       showInLegend: true,-->
+<!--                       dataPoints: [-->
+<!--                          {label:"6-02-16", y: 290},-->
+<!--                          {label: "7-02-16", y: 324},-->
+<!--                          {label: "8-02-16", y: 314},-->
+<!--                          {label: "9-02-16", y: 330},-->
+<!--                          {label: "10-02-16", y: 330},-->
+<!--                          {label: "11-02-16", y: 402},-->
+<!--                          {label: "12-02-16", y: 402}-->
+<!--                       ]-->
+<!--                    },-->
+<!--                    {-->
+
+<!--                       type: "spline",-->
+<!--                       name: "guaranteetickets",-->
+<!--                       showInLegend: true,-->
+<!--                       dataPoints: [-->
+<!--                          {label:"6-02-16", y: 299.71},-->
+<!--                          {label: "7-02-16", y: 299.71},-->
+<!--                          {label: "8-02-16", y: 300.10},-->
+<!--                          {label: "9-02-16", y: 300.88},-->
+<!--                          {label: "10-02-16", y: 308.65},-->
+<!--                          {label: "11-02-16", y: 305.72},-->
+<!--                          {label: "12-02-16", y: 305.72}-->
+<!--                       ]-->
+<!--                    },-->
+<!--                    {-->
+
+<!--                       type: "spline",-->
+<!--                       name: "ticket2",-->
+<!--                       showInLegend: true,-->
+<!--                       dataPoints: [-->
+<!--                          {label:"6-02-16", y: 465.34},-->
+<!--                          {label: "7-02-16", y: 463.92},-->
+<!--                          {label: "8-02-16", y: 463.92},-->
+<!--                          {label: "9-02-16", y: 464.01},-->
+<!--                          {label: "10-02-16", y: 464.01},-->
+<!--                          {label: "11-02-16", y: 503.68},-->
+<!--                          {label: "12-02-16", y: 503.57}-->
+<!--                       ]-->
+<!--                    },-->
+<!--                 ],-->
+<!--                 legend:{-->
+<!--                    cursor:"pointer",-->
+<!--                    itemclick:function(e){-->
+<!--                       if(typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {-->
+<!--                          e.dataSeries.visible = false;-->
+<!--                       }-->
+<!--                       else {-->
+<!--                          e.dataSeries.visible = true;-->
+<!--                       }-->
+<!--                       chart.render();-->
+<!--                    }-->
+<!--                 }-->
+<!--              });-->
+
+<!--      chart.render();-->
+<!--   });-->
+<!--</script>-->
+</html>

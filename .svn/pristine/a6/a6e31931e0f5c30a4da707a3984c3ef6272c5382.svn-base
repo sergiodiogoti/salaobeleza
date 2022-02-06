@@ -1,0 +1,34 @@
+CREATE TABLE `familiar`(  
+  `famCodigo` INT NOT NULL AUTO_INCREMENT,
+  `famNome` VARCHAR(500),
+  `famDataNasc` DATE,
+  `famTelefone` VARCHAR(20),
+  `famTipo` VARCHAR(100),
+  `famUsuCodigo` INT(11),
+  `codUsuario` INT(11),
+  `codSetor` INT(11),
+  `dataHoraAtualizacao` DATETIME,
+  PRIMARY KEY (`famCodigo`),
+  INDEX `FK_usuario_familiar` (`famUsuCodigo`),
+  CONSTRAINT `FK_usuario_familiar` FOREIGN KEY (`famUsuCodigo`) REFERENCES `usuario`(`usuCodigo`)
+);
+
+CREATE TABLE `gasto` (
+  `gasCodigo` int(11) NOT NULL AUTO_INCREMENT,
+  `gasTipo` varchar(50) DEFAULT NULL,
+  `gasDataCad` date DEFAULT NULL,
+  `gasValor` decimal(10,5) DEFAULT NULL,
+  `gasCategoria` varchar(500) DEFAULT NULL,
+  `gasDescricao` varchar(500) DEFAULT NULL,
+  `gasVencimento` date DEFAULT NULL,
+  `gasReceberNotificacao` tinyint(1) DEFAULT 0,
+  `gasUsuCodigo` int(11) DEFAULT NULL,
+  `gasNotificarEm` date DEFAULT NULL,
+  `gasAnotacaoExtra` text DEFAULT NULL,
+  `codUsuario` int(11) DEFAULT NULL,
+  `codSetor` int(11) DEFAULT NULL,
+  `dataHoraAtualizacao` datetime DEFAULT NULL,
+  PRIMARY KEY (`gasCodigo`),
+  KEY `FK_usuario_gastos` (`gasUsuCodigo`),
+  CONSTRAINT `FK_usuario_gastos` FOREIGN KEY (`gasUsuCodigo`) REFERENCES `usuario` (`usuCodigo`)
+) ENGINE=InnoDB;

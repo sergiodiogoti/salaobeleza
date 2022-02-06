@@ -1,0 +1,1538 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.Util;
+
+import com.Bean.*;
+import com.ManagedBeans.UsuarioFaces;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.Serializable;
+import java.lang.InstantiationException;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.text.DecimalFormat;
+import java.text.Normalizer;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Date;
+import java.util.regex.Pattern;
+import javax.el.ELContext;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.model.SelectItem;
+
+import org.hibernate.*;
+import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.exception.GenericJDBCException;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
+import org.hibernate.type.Type;
+
+
+
+
+/**
+ * Essa classe possui métodos de uso geral como salvar um valor na sessão,
+ * remover o valor, criar FacesMessages, etc.
+ *
+ * @author Osvaldo @ estacao1
+ */
+public class UtilFaces implements Serializable{
+
+    private Setor setorLogadoBean;
+    private Usuario usuarioLogadoBean;
+    //private Profissional profissionalLogadoBean;
+    private List<String> bloqueioLogadoBean;
+    //private NivelAcesso nivelAcessolLogadoBean;
+    //private Especialidade especialidadeLogadoBean;
+    private String contexto;
+    private byte[] brasaoDepto;
+    //private com.ManagedBeans.UtilFaces utilFaces = null;
+    private UsuarioFaces usuarioFaces = null;
+    public static final int SAIDA = 1;
+    public static final int ENTRADA = 2;
+    public static final int PERCA = 3;
+    public static final int TRANSFERENCIA = 4;
+    public static final int TRANSFERENCIA_DIRETA = 5;
+
+    private static Map motivo_falta;
+
+    public static Map getMotivo_falta() {
+        if (motivo_falta == null) {
+            motivo_falta = new HashMap();
+            motivo_falta.put(1, "Falta Justificada");
+            motivo_falta.put(2, "Falta Injustificada");
+            motivo_falta.put(3, "Atestado Médico");
+            motivo_falta.put(4, "Atestado Odontológico");
+            motivo_falta.put(5, "Atestado Acompanhante");
+            motivo_falta.put(6, "Exame Médico");
+            motivo_falta.put(7, "Licença Saúde");
+            motivo_falta.put(8, "Licença Gestante");
+            motivo_falta.put(9, "Nojo");
+            motivo_falta.put(10, "Declaração Eleitoral");
+            motivo_falta.put(11, "Falta Abonada");
+            motivo_falta.put(12, "Gala");
+            motivo_falta.put(13, "Declaração Judicial");
+            motivo_falta.put(14, "Efetivo Exercício");
+            motivo_falta.put(15, "Doação de Sangue");
+        }
+        return motivo_falta;
+    }
+
+    public static String statusEncaminhamento(String status) {
+        String s = "";
+        if (status != null && !status.isEmpty()) {
+            switch (status) {
+                case "1":
+                    s = "AGUARDANDO";
+                    break;
+                case "2":
+                    s = "EXECUTANDO";
+                    break;
+                case "3":
+                    s = "AGUARDANDO CORREÇÃO";
+                    break;
+                case "4":
+                    s = "CORRIGIDO";
+                    break;
+                case "5":
+                    s = "DESPACHADO";
+                    break;
+                case "6":
+                    s = "FINALIZADO";
+                    break;
+                case "7":
+                    s = "RESPONDIDO";
+                    break;
+            }
+        }
+        return s;
+    }
+
+    /*public String getContexto() {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        contexto = utilFaces.getContexto();
+        return contexto;
+    }*/
+
+    /*public Especialidade getEspecialidadeLogadoBean() {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        especialidadeLogadoBean = utilFaces.getEspecialidadeLogadoBean();
+        return especialidadeLogadoBean;
+    }*/
+
+    /*public void setEspecialidadeLogadoBean(Especialidade especialidadeLogadoBean) {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        utilFaces.setEspecialidadeLogadoBean(especialidadeLogadoBean);
+        this.especialidadeLogadoBean = especialidadeLogadoBean;
+    }*/
+
+    /*public byte[] getBrasaoDepto() {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        brasaoDepto = utilFaces.getBrasaoDepto();
+        return brasaoDepto;
+    }*/
+
+    /*public void setBrasaoDepto(byte[] brasaoDepto) {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        utilFaces.setBrasaoDepto(brasaoDepto);
+        this.brasaoDepto = brasaoDepto;
+    }*/
+
+    /*public Setor getSetorLogadoBean() {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        setorLogadoBean = utilFaces.getSetorLogadoBean();
+        return setorLogadoBean;
+    }*/
+
+   /* public void setSetorLogadoBean(Setor setorLogadoBean) {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        utilFaces.setSetorLogadoBean(setorLogadoBean);
+        this.setorLogadoBean = setorLogadoBean;
+    }*/
+
+    public Usuario getUsuarioLogadoBean() {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        usuarioFaces = (UsuarioFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "usuarioFaces");
+        usuarioLogadoBean = usuarioFaces.getUsuarioLogadoBean();
+        return usuarioLogadoBean;
+    }
+
+    public void setUsuarioLogadoBean(Usuario usuarioLogadoBean) {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        usuarioFaces = (UsuarioFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "usuarioFaces");
+        usuarioFaces.setUsuarioLogadoBean(usuarioLogadoBean);
+        this.usuarioLogadoBean = usuarioLogadoBean;
+    }
+
+    /*public Profissional getProfissionalLogadoBean() {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        profissionalLogadoBean = utilFaces.getProfissionalLogadoBean();
+        return profissionalLogadoBean;
+    }*/
+
+    /*public void setProfissionalLogadoBean(Profissional profissionalLogadoBean) {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        utilFaces.setProfissionalLogadoBean(profissionalLogadoBean);
+        this.profissionalLogadoBean = profissionalLogadoBean;
+    }*/
+
+    /*public NivelAcesso getNivelAcessolLogadoBean() {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        nivelAcessolLogadoBean = utilFaces.getNivelAcessolLogadoBean();
+        return nivelAcessolLogadoBean;
+    }*/
+
+    /*public void setNivelAcessolLogadoBean(NivelAcesso nivelAcessolLogadoBean) {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        utilFaces.setNivelAcessolLogadoBean(nivelAcessolLogadoBean);
+        this.nivelAcessolLogadoBean = nivelAcessolLogadoBean;
+    }*/
+
+    /*public List<String> getBloqueioLogadoBean() {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        bloqueioLogadoBean = utilFaces.getBloqueioLogadoBean();
+        return bloqueioLogadoBean;
+    }*/
+
+    /*public void setBloqueioLogadoBean(List<String> bloqueioLogadoBean) {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        utilFaces.setBloqueioLogadoBean(bloqueioLogadoBean);
+        this.bloqueioLogadoBean = bloqueioLogadoBean;
+    }*/
+
+    /**
+     * Verivica se um determinado valor existe na sessão
+     *
+     * @param valor
+     * @return true ou false
+     */
+    public static boolean existeNaSessao(String valor) {
+
+        Object verifica = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get(valor);
+
+        if (verifica != null) { //valor existe na sessão
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Adiciona um dado(valor) na sessão
+     *
+     * @param Key   A chave
+     * @param valor O valor
+     */
+    public static void addSessao(String Key, Object valor) {
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(Key, valor);
+    }
+
+    /*public static void addLog(int usuario, String historico) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        addLog(ses, usuario, historico);
+        ses.getTransaction().commit();
+        ses.close();
+    }*/
+
+    /*public static void addLog(Session ses, int usuario, String historico) {
+        Transaction tx = null;
+        try {
+            tx = ses.beginTransaction();
+
+            Date data = new Date();
+            Calendar cal = Calendar.getInstance();
+            String hora = cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
+
+            Auditoria aud = new Auditoria();
+            String aux = jcUtil.getSessao("IP").toString();
+            aud.setAudData(data);
+            aud.setAudHora(hora);
+            aud.setAudIP(jcUtil.getSessao("IP").toString());
+            aud.setAudUsuCodigo(usuario);
+            aud.setAudHistorico(historico);
+            ses.save(aud);
+        } catch (Exception e) {
+            e.printStackTrace();
+            tx.rollback();
+        }
+    }*/
+    /**
+     * Remove um valor da sessão
+     *
+     * @param key
+     */
+    public static void removeSessao(String key) {
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().remove(key);
+    }
+
+    /**
+     * Retorna um objeto que está na sessão
+     *
+     * @param Key
+     * @return
+     */
+    public static Object getSessao(String Key) {
+        return FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get(Key);
+    }
+
+    /**
+     * Adiciona uma mensagem no ciclo atual do faces
+     *
+     * @param msg
+     * @param severity
+     */
+    public static void addMensagem(String msg, FacesMessage.Severity severity) {
+        FacesMessage mensagem = new FacesMessage();
+        mensagem.setSeverity(severity);
+        mensagem.setSummary(msg);
+        FacesContext.getCurrentInstance().addMessage(null, mensagem);
+    }
+
+    public static void addValidationExceptionError(String titu, String descricao) {
+        FacesMessage f = new FacesMessage(FacesMessage.SEVERITY_ERROR, titu, descricao);
+        FacesContext.getCurrentInstance().addMessage(null, f);
+        FacesContext.getCurrentInstance().validationFailed();
+        MensagensErros.setErro(true);
+        throw new AbortProcessingException();
+    }
+
+    public static byte[] fileToByte(File imagem) throws Exception {
+        FileInputStream fis = new FileInputStream(imagem);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[8192];
+        int bytesRead = 0;
+        while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
+            baos.write(buffer, 0, bytesRead);
+        }
+        return baos.toByteArray();
+    }
+
+    /**
+     * Retorna um parâmetro da url
+     *
+     * @param chave -O parâmetro
+     * @return
+     */
+    public static String getParametro(String chave) {
+        return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get(chave);
+    }
+
+    /**
+     * Lista de Ufs
+     */
+    public static SelectItem[] siglasEstado = {
+            new SelectItem("SP", "SP"),
+            new SelectItem("AC", "AC"),
+            new SelectItem("AL", "AL"),
+            new SelectItem("AM", "AM"),
+            new SelectItem("AP", "AP"),
+            new SelectItem("BA", "BA"),
+            new SelectItem("CE", "CE"),
+            new SelectItem("DF", "DF"),
+            new SelectItem("ES", "ES"),
+            new SelectItem("GO", "GO"),
+            new SelectItem("MA", "MA"),
+            new SelectItem("MG", "MG"),
+            new SelectItem("MS", "MS"),
+            new SelectItem("MT", "MT"),
+            new SelectItem("PA", "PA"),
+            new SelectItem("PB", "PB"),
+            new SelectItem("PE", "PE"),
+            new SelectItem("PI", "PI"),
+            new SelectItem("PR", "PR"),
+            new SelectItem("RJ", "RJ"),
+            new SelectItem("RN", "RN"),
+            new SelectItem("RO", "RO"),
+            new SelectItem("RR", "RR"),
+            new SelectItem("RS", "RS"),
+            new SelectItem("SC", "SC"),
+            new SelectItem("SE", "SE"),
+            new SelectItem("SP", "SP"),
+            new SelectItem("TO", "TO")
+    };
+    /**
+     * Select item de sexo
+     */
+    public static SelectItem[] sexo = {
+            new SelectItem("M", "Masculino"),
+            new SelectItem("F", "Feminino")
+    };
+    /**
+     * Tipode de logradouro
+     */
+    public static SelectItem[] tipoLogradouro = {
+            new SelectItem("RUA", "Rua"),
+            new SelectItem("AVENIDA", "Avenida"),
+            new SelectItem("TRAVESSA", "Travessa"),
+            new SelectItem("ALAMEDA", "Alemeda"),
+            new SelectItem("BECO", "Beco")
+    };
+    /**
+     * Estado civil
+     */
+    public static SelectItem[] estadoCivil = {
+            new SelectItem("SOLTEIRO(A)", "SOLTEIRO(A)"),
+            new SelectItem("CASADO(A)", "CASADO(A)"),
+            new SelectItem("DIVORCIADO(A)", "DIVORCIADO(A)"),
+            new SelectItem("SEPARADO(A)", "SEPARADO(A)"),
+            new SelectItem("VIÚVO(A)", "VIÚVO(A)")
+    };
+    /**
+     * EScolha Sim/Não
+     */
+    public static SelectItem[] simNao = {
+            new SelectItem("SIM", "SIM"),
+            new SelectItem("NÃO", "NÃO")
+    };
+    public static SelectItem[] mes = {
+            new SelectItem("JANEIRO", "JANEIRO"),
+            new SelectItem("FEVEREIRO", "FEVEREIRO"),
+            new SelectItem("MARCO", "MARCO"),
+            new SelectItem("ABRIL", "ABRIL"),
+            new SelectItem("MAIO", "MAIO"),
+            new SelectItem("JUNHO", "JUNHO"),
+            new SelectItem("JULHO", "JULHO"),
+            new SelectItem("AGOSTO", "AGOSTO"),
+            new SelectItem("SETEMBRO", "SETEMBRO"),
+            new SelectItem("OUTUBRO", "OUTUBRO"),
+            new SelectItem("NOVEMBRO", "NOVEMBRO"),
+            new SelectItem("DEZEMBRO", "DEZEMBRO")};
+
+    /**
+     * Verifica se uma string contém somente números inteiros
+     *
+     * @param string
+     * @return true ou false
+     */
+    public static boolean isInteger(String string) {
+        try {
+            Integer.valueOf(string);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static String getHoraCorrente() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", new Locale("pt", "BR"));
+
+//        TimeZone tz = TimeZone.getTimeZone("America/Sao_Paulo");
+//        Calendar cal = Calendar.getInstance(tz, new Locale("pt", "BR"));
+        Date data = new Date();
+        //a variavel call abaixo, seta a hora padrao como sendo a hora de São Paulo
+//        cal.setTimeZone(TimeZone.getTimeZone("America/Sao_Paulo"));   //para pegar a hora padrão do sistema, digite cal.setTimeZone(TimeZone.getDefault());
+//        cal.setTime(data);
+//        String hora = Integer.toString(cal.get(Calendar.HOUR_OF_DAY));
+//        String minuto = Integer.toString(cal.get(Calendar.MINUTE));
+//        String segundo = Integer.toString(cal.get(Calendar.SECOND));
+//
+//        if (hora.length() != 2) {
+//            hora = "0" + hora;
+//        }
+//        if (minuto.length() != 2) {
+//            minuto = "0" + minuto;
+//        }
+//        if (segundo.length() != 2) {
+//            segundo = "0" + segundo;
+//        }
+
+//        String horaAtual = hora + ":" + minuto + ":" + segundo;
+        String horaAtual = dateFormat.format(data);
+        return horaAtual;
+    }
+
+    public static <T extends Serializable> List<T> getBuscaGeneric(Class<T> classtoCast, String query, Object... params) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        try {
+            ses.beginTransaction();
+            //fazer consulta sql não hql
+            Query qr = ses.createSQLQuery(query).addEntity(classtoCast);
+            for (int i = 1; i <= params.length; i++) {
+                qr.setParameter(i - 1, params[i - 1]);
+            }
+            @SuppressWarnings("unchecked")
+            List<T> toReturn = qr.list();
+
+            ses.getTransaction().commit();
+            return toReturn;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            ses.close();
+        }
+    }
+
+    public static void deleteInsertUpdateGeneric(String sql) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        try {
+            ses.beginTransaction();
+            //sql normal, não HQL
+            Query q = ses.createSQLQuery(sql);
+            q.executeUpdate();
+            ses.getTransaction().commit();
+        } catch (org.hibernate.exception.ConstraintViolationException e) {
+            MensagensErros.erroConstrain();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Alerta!", MensagensErros.getMsgErro());
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("removePojo", msg);
+        } catch (NullPointerException e) {
+            MensagensErros.erroNullPointer();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Alerta!", MensagensErros.getMsgErro());
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("removePojo", msg);
+        } catch (org.hibernate.exception.GenericJDBCException e) {
+            MensagensErros.erroHibernateJdbc();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Alerta!", MensagensErros.getMsgErro());
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("removePojo", msg);
+        } catch (org.hibernate.HibernateException e) {
+            e.printStackTrace();
+            MensagensErros.erroHibernate();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Alerta!", MensagensErros.getMsgErro());
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("removePojo", msg);
+        } catch (Exception e) {
+            MensagensErros.erroGenericos();
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Alerta!", MensagensErros.getMsgErro());
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("removePojo", msg);
+        } finally {
+            ses.close();
+        }
+    }
+
+    public static List<Object[]> getQuerySQLGeneric(String query, String[] campos, Type... params) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        List<Object[]> toReturn = new ArrayList<Object[]>();
+        try {
+            ses.beginTransaction();
+            //fazer consulta sql não hql
+            SQLQuery qr = ses.createSQLQuery(query);
+            for (int i = 1; i <= params.length; i++) {
+                qr.addScalar(campos[i - 1], params[i - 1]);
+            }
+            toReturn = (List<Object[]>) qr.list();
+
+            ses.getTransaction().commit();
+            return toReturn;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toReturn;
+        } finally {
+            ses.close();
+        }
+    }
+
+    /*public Setor getPostoLogadoBean() {
+        ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+        utilFaces = (UtilFaces) FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, "utilFaces");
+        setorLogadoBean = utilFaces.getSetorLogadoBean();
+        return setorLogadoBean;
+    }*/
+
+    public static <T extends Serializable> Object getObjectQuerySQL(Class<T> classtoCast, String query) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        try {
+            ses.beginTransaction();
+            //fazer consulta sql não hql
+            Query qr = ses.createNativeQuery(query).addEntity(classtoCast);
+            ses.getTransaction().commit();
+            return qr.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            ses.close();
+        }
+    }
+
+    public static <T extends Serializable> Object getObjectoQuerySQL(Session ses, Class<T> classtoCast, String query) {
+        try {
+            SQLQuery qr = ses.createSQLQuery(query).addEntity(classtoCast);
+            return qr.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public static synchronized String getFacesRedirect() {
+        return "?faces-redirect=true";
+    }
+
+    public static String removerAcentos(String str) {
+        return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+    }
+
+    public static String somenteNumeros(String str) {
+        if (str != null) {
+            return str.replaceAll("[^0123456789]", "");
+        } else {
+            return "";
+        }
+    }
+
+    public static synchronized boolean isEmpty(Object obj) {
+        if (obj == null) {
+            return true;
+        } else {
+            if (obj instanceof String) {
+                return obj.toString().trim().isEmpty() || "null".equals(obj.toString());
+            }
+
+            if (obj instanceof StringBuilder) {
+                return ((StringBuilder) obj).length() <= 0;
+            }
+
+            if (obj instanceof List) {
+                return ((List) obj).isEmpty();
+            }
+
+            if (obj instanceof ArrayList) {
+                return ((ArrayList) obj).isEmpty();
+            }
+
+            if (obj instanceof String[]) {
+                return ((String[]) obj).length > 0;
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Recupera o ManagedBean, caso não esteja instanciado na sessão cria um
+     * novo e seta na sessão.
+     *
+     * @param <T>
+     * @param type
+     * @return
+     */
+    public static <T> T getManagedBean(Class<T> type) {
+        try {
+            String[] split = type.toString().split(Pattern.quote("."));
+            String key = split[split.length - 1];
+            key = key.substring(0, 1).toLowerCase() + key.substring(1, key.length());
+            ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+            Object managedBean = FacesContext.getCurrentInstance().getApplication().getELResolver().getValue(elContext, null, key);
+            if (managedBean == null) {
+                managedBean = type.newInstance();
+                FacesContext.getCurrentInstance().getApplication().getELResolver().setValue(elContext, null, key, managedBean);
+            }
+            return (T) managedBean;
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void adicionarLogSession(Session ses, int posto, int usuario, String historico) {
+       /* Date data = new Date();
+        Calendar cal = Calendar.getInstance();
+        String hora = cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
+        String ip = jcUtil.getSessao("IP") == null ? "" : jcUtil.getSessao("IP").toString();
+        Auditoria aud = new Auditoria(posto, usuario);
+        aud.setAudData(data);
+        aud.setAudHora(hora);
+        aud.setAudHistorico(historico + " IP: " + ip);
+        ses.save(aud);*/
+    }
+    public static void adicionarLogSession(Session ses, int posto, int usuario, String historico, String mac, String ip) {
+        /*Date data = new Date();
+        String hora = jcUtil.getHoraCorrente();
+        Auditoria aud = new Auditoria(posto, usuario);
+        aud.setAudData(data);
+        aud.setAudHora(hora);
+        aud.setAudHistorico(historico + " IP: " + ip);
+        ses.save(aud);*/
+    }
+   /* public static void adicionarLogSessionAuditoria(Session ses, int posto, int usuario, String historico, String acao, String controle,String ip) {
+        Date data = new Date();
+        String hora = jcUtil.getHoraCorrente();
+        Auditoria aud = new Auditoria(posto, usuario);
+        aud.setAudData(data);
+        aud.setAudHora(hora);
+        aud.setAudAcao(acao);
+        aud.setAudControle(controle);
+        aud.setAudHistorico(historico + " IP: " + ip);
+        ses.save(aud);
+    }*/
+    /*public static void adicionarLogSessionAuditoria(int posto, int usuario, String historico, String acao, String controle,String ip) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = null;
+        try {
+            tx = ses.beginTransaction();
+            Date data = new Date();
+            String hora = jcUtil.getHoraCorrente();
+            Auditoria aud = new Auditoria(posto, usuario);
+            aud.setAudData(data);
+            aud.setAudHora(hora);
+            aud.setAudAcao(acao);
+            aud.setAudControle(controle);
+            aud.setAudHistorico(historico + " IP: " + ip);
+            ses.save(aud);
+            tx.commit();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            tx.rollback();
+        }finally {
+            ses.close();
+        }
+    }*/
+    public static void adicionarLogSessionAuditoriaConnection(Connection con, int setor, int usuario, String historico, String acao, String controle,String ip) {
+        try {
+
+            String sql = "INSERT INTO `auditoria`\n"
+                    + "            (`auddata`,\n"
+                    + "             `audhora`,\n"
+                    + "             `audusucodigo`,\n"
+                    + "             `audsetcodigo`,\n"
+                    + "             `audip`,\n"
+                    + "             `audhistorico`,\n"
+                    + "             `audControle`,\n"
+                    + "             `audAcao`)\n";
+            sql += "VALUES(CURDATE(), CURTIME(), "+usuario+", "+setor+",?,?,?,?);";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setObject(1, ip);
+            pst.setObject(2, historico);
+            pst.setObject(3, controle);
+            pst.setObject(4, acao);
+            pst.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String formataData(Date data) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(data);
+
+        Integer dia = cal.get(Calendar.DAY_OF_MONTH);
+        Integer mes = (cal.get(Calendar.MONTH) + 1);
+        Integer ano = cal.get(Calendar.YEAR);
+
+        String dtaFormatada;
+
+        if (dia < 10) {
+            dtaFormatada = "0" + dia + "/";
+        } else {
+            dtaFormatada = dia + "/";
+        }
+
+        if (mes < 10) {
+            dtaFormatada = dtaFormatada + "0" + mes + "/";
+        } else {
+            dtaFormatada = dtaFormatada + mes + "/";
+        }
+
+        dtaFormatada = dtaFormatada + ano;
+
+        return dtaFormatada;
+    }
+
+    public String getBimestre(Integer bim) {
+        String bimestre = "";
+        try {
+            switch (bim) {
+                case 1:
+                    bimestre = "1° Bimestre";
+                    break;
+                case 2:
+                    bimestre = "2° Bimestre";
+                    break;
+                case 3:
+                    bimestre = "3° Bimestre";
+                    break;
+                case 4:
+                    bimestre = "4° Bimestre";
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bimestre;
+    }
+
+    public static int dataDiff(java.util.Date dataLow, java.util.Date dataHigh) {
+
+        GregorianCalendar startTime = new GregorianCalendar();
+        GregorianCalendar endTime = new GregorianCalendar();
+
+        GregorianCalendar curTime = new GregorianCalendar();
+        GregorianCalendar baseTime = new GregorianCalendar();
+
+        startTime.setTime(dataLow);
+        endTime.setTime(dataHigh);
+
+        int dif_multiplier = 1;
+
+        // Verifica a ordem de inicio das datas
+        if (dataLow.compareTo(dataHigh) < 0) {
+            baseTime.setTime(dataHigh);
+            curTime.setTime(dataLow);
+            dif_multiplier = 1;
+        } else {
+            baseTime.setTime(dataLow);
+            curTime.setTime(dataHigh);
+            dif_multiplier = -1;
+        }
+
+        int result_years = 0;
+        int result_months = 0;
+        int result_days = 0;
+
+        // Para cada mes e ano, vai de mes em mes pegar o ultimo dia para import acumulando
+        // no total de dias. Ja leva em consideracao ano bissesto
+        while (curTime.get(GregorianCalendar.YEAR) < baseTime.get(GregorianCalendar.YEAR)
+                || curTime.get(GregorianCalendar.MONTH) < baseTime.get(GregorianCalendar.MONTH)) {
+
+            int max_day = curTime.getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
+            result_months += max_day;
+            curTime.add(GregorianCalendar.MONTH, 1);
+
+        }
+
+        // Marca que é um saldo negativo ou positivo
+        result_months = result_months * dif_multiplier;
+
+        // Retirna a diferenca de dias do total dos meses
+        result_days += (endTime.get(GregorianCalendar.DAY_OF_MONTH) - startTime.get(GregorianCalendar.DAY_OF_MONTH));
+
+        return result_years + result_months + result_days;
+    }
+
+    public static Integer getIdade(Date data) {
+        return getIdade(data, new Date());
+    }
+
+    public static Integer getIdade(Date data, Date dataBase) {
+        Calendar dataNascimento = Calendar.getInstance();
+        dataNascimento.setTime(data);
+        Calendar dataAtual = Calendar.getInstance();
+        dataAtual.setTime(dataBase);
+
+        Integer diferencaMes = dataAtual.get(Calendar.MONTH) - dataNascimento.get(Calendar.MONTH);
+        Integer diferencaDia = dataAtual.get(Calendar.DAY_OF_MONTH) - dataNascimento.get(Calendar.DAY_OF_MONTH);
+        Integer idade = (dataAtual.get(Calendar.YEAR) - dataNascimento.get(Calendar.YEAR));
+
+        if (diferencaMes < 0 || (diferencaMes == 0 && diferencaDia < 0)) {
+            idade--;
+        }
+        return idade;
+    }
+
+
+
+    private static boolean isAnoBissexto(int ano) {
+        return ((ano % 4 == 0) && ((ano % 100 != 0) || (ano % 400 == 0)));
+    }
+
+    private static int getDiasNoMes(int ano, int mes) {
+        int[] mes_dias = new int[13];
+
+        int resultado = 0;
+
+        mes_dias[0] = 0;
+        mes_dias[1] = 31;
+        mes_dias[2] = 28;
+        mes_dias[3] = 31;
+        mes_dias[4] = 30;
+        mes_dias[5] = 31;
+        mes_dias[6] = 30;
+        mes_dias[7] = 31;
+        mes_dias[8] = 31;
+        mes_dias[9] = 30;
+        mes_dias[10] = 31;
+        mes_dias[11] = 30;
+        mes_dias[12] = 31;
+
+        if ((mes == 2) && (isAnoBissexto(ano))) {
+            resultado = 29;
+        } else {
+            resultado = mes_dias[mes];
+        }
+
+        return resultado;
+    }
+
+    public static String getIdadePorExtenso(Date dataNasc) {
+        return getIdadePorExtenso(dataNasc, new Date());
+    }
+
+    public static String getIdadePorExtenso(Date dataNasc, Date dataBase) {
+        Calendar cal = Calendar.getInstance();
+        String idade = "";
+
+        cal.setTime(dataNasc);
+
+        int diaNasc = cal.get(Calendar.DAY_OF_MONTH);
+        int mesNasc = (cal.get(Calendar.MONTH) + 1);
+        int anoNasc = cal.get(Calendar.YEAR);
+
+        cal.setTime(dataBase);
+
+        int diaAtual = cal.get(Calendar.DAY_OF_MONTH);
+        int mesAtual = (cal.get(Calendar.MONTH) + 1);
+        int anoAtual = cal.get(Calendar.YEAR);
+
+        if (diaAtual < diaNasc) {
+            mesAtual--;
+            diaAtual += getDiasNoMes(anoNasc, mesNasc);
+        }
+        if (mesAtual < mesNasc) {
+            anoAtual--;
+            mesAtual += 12;
+        }
+        int Ano = anoAtual - anoNasc;
+        int Mes = mesAtual - mesNasc;
+        int Dia = diaAtual - diaNasc;
+
+        String AnoSingPlural = "";
+        String MesSingPlural = "";
+        String DiaSingPlural = "";
+        String ano = String.valueOf(Ano);
+        String mes = String.valueOf(Mes);
+        String dia = String.valueOf(Dia);
+        if (Ano > 1) {
+            AnoSingPlural = " Anos ";
+        } else {
+            AnoSingPlural = " Ano ";
+        }
+        if (Mes > 1) {
+            MesSingPlural = " Meses ";
+        } else {
+            MesSingPlural = " Mês ";
+        }
+        if (Dia > 1) {
+            DiaSingPlural = " Dias";
+        } else {
+            DiaSingPlural = " Dia";
+        }
+        if (Ano == 0) {
+            ano = "";
+            AnoSingPlural = "";
+        }
+        if (Mes == 0) {
+            mes = "";
+            MesSingPlural = "";
+        }
+        if (Dia == 0) {
+            dia = "";
+            DiaSingPlural = "";
+        }
+        idade = ano + AnoSingPlural + mes + MesSingPlural + dia + DiaSingPlural;
+
+        //idade = Ano + " Ano(s) " + Mes + " Mes(es) " + Dia + " Dia(s) ";
+        //Função de Idade importada do Delphi - Está dando diferença em algumas datas por isso não é utilizada
+
+        /*
+         * Calendar cal = Calendar.getInstance(); String idade = "";
+         *
+         * cal.setTime(data);
+         *
+         * int diaNasc = cal.get(Calendar.DAY_OF_MONTH); int mesNasc =
+         * (cal.get(Calendar.MONTH)+1); int anoNasc = cal.get(Calendar.YEAR);
+         *
+         * data = new Date(); cal.setTime(data);
+         *
+         * int diaAtual = cal.get(Calendar.DAY_OF_MONTH); int mesAtual =
+         * (cal.get(Calendar.MONTH)+1); int anoAtual = cal.get(Calendar.YEAR);
+         *
+         * int auxNasc = diaNasc; int auxAtual = diaAtual;
+         *
+         *
+         *
+         * if ((diaNasc > diaAtual) && ((mesAtual - mesNasc) == 1)) { diaAtual
+         * += getDiasNoMes(anoNasc, mesNasc); mesNasc = mesAtual; }else if
+         * ((diaNasc > diaAtual) && ( mesNasc != mesAtual)) { diaAtual +=
+         * getDiasNoMes(anoNasc, mesNasc); }else if((mesNasc == mesAtual) &&
+         * (diaNasc > diaAtual) && (anoNasc != anoAtual)){ diaAtual +=
+         * getDiasNoMes(anoNasc, mesNasc); mesAtual += 11; anoNasc += 1; }
+         *
+         * if((mesNasc > mesAtual) && (auxNasc <= auxAtual)){ anoNasc += 1;
+         * mesAtual += 12; }else if((mesNasc > mesAtual) && (auxNasc >
+         * auxAtual)){ anoNasc += 1; mesAtual += 12; }
+         *
+         * int ano,mes,dia;
+         *
+         * ano = anoAtual - anoNasc; mes = mesAtual - mesNasc; dia = diaAtual -
+         * diaNasc;
+         *
+         *
+         * idade = ano + " Ano(s) " + mes + " Mese(s) " + dia + " Dia(s) ";
+         *
+         */
+        return idade;
+    }
+
+    public static void updateBean(Object obj) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        try {
+            //sql normal, não HQL
+            ses.update(obj);
+            ses.beginTransaction().commit();
+            ses.refresh(obj);
+        } catch (ConstraintViolationException e) {
+            MensagensErros.erroConstrain();
+        } catch (NullPointerException e) {
+            MensagensErros.erroNullPointer();
+        } catch (GenericJDBCException e) {
+            MensagensErros.erroHibernateJdbc();
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            MensagensErros.erroHibernate();
+        } catch (Exception e) {
+            MensagensErros.erroGenericos();
+        } finally {
+            ses.close();
+        }
+    }
+
+    public static String formatDate(Date date) {
+        return year(date) + "-" + month(date) + "-" + day(date);
+    }
+
+    public static int day(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public static int month(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal.get(Calendar.MONTH) + 1;
+    }
+
+    public static int year(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal.get(Calendar.YEAR);
+    }
+
+    public static List getQuerySQLGeneric_MAP(String query, List<Object[]> listParam) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        List toReturn = null;
+        try {
+            toReturn = getQuerySQLGeneric_MAP(ses, query, listParam);
+            return toReturn;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            ses.close();
+        }
+    }
+
+    public static List getQuerySQLGeneric_MAP(Session ses, String query, List<Object[]> listParam) {
+        List toReturn = null;
+        try {
+            //fazer consulta sql não hql
+            SQLQuery qr = ses.createSQLQuery(query);
+            for (Object[] param : listParam) {
+                qr.addScalar(param[0].toString(), (Type) param[1]);
+            }
+            qr.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
+            toReturn = qr.list();
+            return toReturn;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static synchronized String convertDataBrToEua(String dataBr) {
+        try {
+            String[] array = dataBr.split("/");
+            return array[2] + "-" + array[1] + "-" + array[0];
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+   /* public static synchronized String convertDataEuaToBr(String dataEUA) {
+        if(jcUtil.isEmpty(dataEUA)){
+            return "";
+        }
+        return funcoesJava.convEUAtoBRA(dataEUA);
+    }*/
+
+    public static synchronized String mascaraCPF(String cpf) {
+        if (isEmpty(cpf)) {
+            return "";
+        }
+        if (cpf.length() != 11) {
+            return cpf;
+        }
+        cpf = removerAcentos(cpf);
+
+        try {
+            StringBuilder stringBuilder = new StringBuilder(cpf);
+            stringBuilder.insert(3, '.').insert(7, '.').insert(11, '-');
+            return stringBuilder.toString();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /*public JSONArray getEscolas() {
+        JSONArray jsArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        Connection con = ConexaoMySQL.getConexaoMySQL();
+        try {
+            Statement st = con.createStatement();
+            ResultSet rs = null;
+            String sql = "SELECT setCodigo, setNome FROM setor ORDER BY setCodigo";
+            rs = st.executeQuery(sql);
+
+            while (rs.next()) {
+                jsonObject = new JSONObject();
+                jsonObject.put("setCodigo", rs.getString("setCodigo"));
+                jsonObject.put("setNome", rs.getString("setNome"));
+                jsArray.put(jsonObject);
+            }
+            rs.close();
+
+        } catch (Exception ex) {
+            jsArray = new JSONArray();
+            ex.printStackTrace();
+        } finally {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(jcUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return jsArray;
+    }*/
+
+    /*public JSONArray getCadastros(String busca) {
+        JSONArray jsArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        Connection con = ConexaoMySQL.getConexaoMySQL();
+        try {
+            Statement st = con.createStatement();
+            ResultSet rs = null;
+            String sql = "SELECT * FROM\n"
+                    + "(SELECT aluCodigo as codigo, 'ALUNO' as tipo, trim(aluNome) as nome, date_format(aluDataNasc,'%d/%m/%Y') as dataNasc, aluRA as documento FROM aluno\n"
+                    + "UNION\n"
+                    + "SELECT proCodigo as codigo, 'PROFISSIONAL' as tipo, trim(proNome) as nome, date_format(proDataNasc,'%d/%m/%Y') as dataNasc, proCPF as documento FROM profissional)x\n"
+                    + "WHERE (nome like '%"+busca+"%' or documento like '%"+busca+"%')\n"
+                    + "ORDER BY nome DESC LIMIT 100";
+            rs = st.executeQuery(sql);
+
+            while (rs.next()) {
+                jsonObject = new JSONObject();
+                jsonObject.put("codigo", rs.getString("codigo"));
+                jsonObject.put("tipo", rs.getString("tipo"));
+                jsonObject.put("nome", rs.getString("nome"));
+                jsonObject.put("dataNasc", rs.getString("dataNasc"));
+                jsonObject.put("documento", rs.getString("documento"));
+                jsArray.put(jsonObject);
+            }
+            rs.close();
+
+        } catch (Exception ex) {
+            jsArray = new JSONArray();
+            ex.printStackTrace();
+        } finally {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(jcUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return jsArray;
+    }*/
+
+    public static Object ifNullOrEmpty(Object str, Object retorno) {
+        if (UtilFaces.isEmpty(str)) {
+            return retorno;
+        }
+
+        return str;
+    }
+
+    /*public Integer updateCadastros(JSONArray json) {
+        Integer status = 0;
+        Connection con = ConexaoMySQL.getConexaoMySQL();
+        PreparedStatement st = null;
+        Statement statement = null;
+        ResultSet rs = null;
+        try {
+            JSONObject obj = null;
+            String column;
+            for (int i = 0; i < json.length(); i++) {
+                obj = json.getJSONObject(i);
+                column = obj.getString("tipo").equals("ALUNO") ? "usuFacAluno" : obj.getString("tipo").equals("PROFISSIONAL") ? "usuFacProfissional" : "";
+                if(!column.isEmpty()){
+                    String sql = "INSERT INTO usuariofacial (usuFacDataHoraCad, usuFacID, usuFacExcluido, usuFacSetor, "+column+", codUsuario, codSetor, dtaHoraAtualizacao) VALUES (?,?,?,?,?,?,?,?)";
+                    st = con.prepareStatement(sql);
+                    st.setObject(1, new Date());
+                    st.setObject(2, obj.getString("id"));
+                    st.setObject(3, 0);
+                    st.setObject(4, obj.getString("setor"));
+                    st.setObject(5, obj.getString("codigo"));
+                    st.setObject(6, obj.getString("usuario"));
+                    st.setObject(7, obj.getString("setor"));
+                    st.setObject(8, new Date());
+                    st.executeUpdate();
+
+                    sql = "SELECT usuFacCodigo FROM usuariofacial WHERE "+column+" = "+obj.getString("codigo")+" AND usuFacID = '"+obj.getString("id")+"'";
+                    statement = con.createStatement();
+                    rs = statement.executeQuery(sql);
+                    if(rs.next()){
+                        status = 1;
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(jcUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return status;
+    }*/
+
+    public static synchronized void fecharConexao(ResultSet rset, Statement stmt, Connection conn) {
+        try {
+            if (rset != null && !rset.isClosed()) {
+                rset.close();
+            }
+            if (stmt != null && !stmt.isClosed()) {
+                stmt.close();
+            }
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (Exception e) {
+        }
+    }
+    public static synchronized int getAnoAtual() {
+        return Calendar.getInstance().get(Calendar.YEAR);
+    }
+
+    public static boolean isOnlyNumber(String value) {
+        if (isNotBlank(value)) {
+            return value.matches("[0-9]+");
+        }
+        return false;
+    }
+
+    public static boolean isNotBlank(String nome) {
+        return !isBlank(nome);
+    }
+
+    public static boolean isBlank(String text) {
+        if ((text != null) && (text.length() > 0)) {
+            int i = 0;
+            for (int iSize = text.length(); i < iSize; i++) {
+                if (text.charAt(i) != ' ') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static synchronized NativeQuery createNativeQuery(Session ses, String sql) {
+        return ses.createNativeQuery(sql);
+    }
+
+    /*public static synchronized void showDialogMesage(String detail, String sumary, String... width) {
+        showDialogMesage(detail, sumary, null, width);
+    }*/
+
+   /* public static synchronized void showDialogMesage(String detail, String sumary, FacesMessage.Severity severity, String... width) {
+        if (severity == null) {
+            severity = FacesMessage.SEVERITY_ERROR;
+        }
+        String backgroundColor = "#ec5151";
+        if (severity == FacesMessage.SEVERITY_INFO) {
+            backgroundColor = "#3094fb";
+        }
+        RequestContext.getCurrentInstance().showMessageInDialog(new FacesMessage(severity, sumary, detail));
+        RequestContext.getCurrentInstance().execute("$('.ui-message-dialog .ui-dialog-titlebar').css('padding','2px 3px');");
+        RequestContext.getCurrentInstance().execute("$('.ui-message-dialog .ui-dialog-titlebar').css('background','none');");
+        RequestContext.getCurrentInstance().execute("$('.ui-message-dialog .ui-dialog-titlebar').css('background-color','" + backgroundColor + "');");
+        RequestContext.getCurrentInstance().execute("$('.ui-message-dialog .ui-dialog-content').css('padding-top','15px');");
+        if (width != null && width.length > 0) {
+            RequestContext.getCurrentInstance().execute("$('#primefacesmessagedlg').width(" + width[0] + ");");
+        }
+    }*/
+
+    public static Calendar getCalendarPtBr() {
+        TimeZone tz = TimeZone.getTimeZone("America/Sao_Paulo");
+        Calendar cal = Calendar.getInstance(tz, new Locale("pt", "br"));
+        return cal;
+    }
+
+    public static String colorStatusClasse(String status) {
+        try {
+            return "EFETIVADO".equals(status) ? "color:lightgreen;;"
+                    : "NÃO COMPARECIMENTO".equals(status) ? "color:#ee7a04;"
+                    : "REMANEJADO".equals(status) ? "color:#00daee;"
+                    : "ABANDONO".equals(status) ? "color:red;;"
+                    : "TRANSFERIDO".equals(status) ? "color:#7EC0EE;"
+                    : "BAIXA TRANSFERENCIA".equals(status) ? "color:#ffca3f;"
+                    : "RECLASSIFICADO".equals(status) ? "color:#ee8eb6;"
+                    : "ATINGIU OBJETIVO".equals(status) ? "color:#009900;"
+                    : "";
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public static synchronized boolean comparaDataHoje(Date data){
+        if(data == null){
+            return false;
+        }
+        StringBuilder dataStr = new StringBuilder(new SimpleDateFormat("yyyy-MM-dd").format(data));
+        StringBuilder hoje = new StringBuilder(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+        return dataStr.toString().equals(hoje.toString());
+    }
+
+
+
+    public static String retiraCaracteresEspeciais(String stringFonte) {
+        String passa = stringFonte;
+        passa = passa.replaceAll("[ÂÀÁÄÃ]", "A");
+        passa = passa.replaceAll("[âãàáä]", "a");
+        passa = passa.replaceAll("[ÊÈÉË]", "E");
+        passa = passa.replaceAll("[êèéë]", "e");
+        passa = passa.replaceAll("ÎÍÌÏ", "I");
+        passa = passa.replaceAll("îíìï", "i");
+        passa = passa.replaceAll("[ÔÕÒÓÖ]", "O");
+        passa = passa.replaceAll("[ôõòóö]", "o");
+        passa = passa.replaceAll("[ÛÙÚÜ]", "U");
+        passa = passa.replaceAll("[ûúùü]", "u");
+        passa = passa.replaceAll("Ç", "C");
+        passa = passa.replaceAll("ç", "c");
+        passa = passa.replaceAll("[ýÿ]", "y");
+        passa = passa.replaceAll("Ý", "Y");
+        passa = passa.replaceAll("ñ", "n");
+        passa = passa.replaceAll("Ñ", "N");
+        passa = passa.replaceAll("  ", " ");
+        passa = passa.replaceAll("[-+=*&amp;%$#@!_]", "");
+        passa = passa.replaceAll("['\"]", "");
+        passa = passa.replaceAll("[<>()\\{\\}]", "");
+        passa = passa.replaceAll("['\\\\.,()|/]", "");
+        passa = passa.replaceAll("[^!-ÿ]{1}[^ -ÿ]{0,}[^!-ÿ]{1}|[^!-ÿ]{1}", " ");
+        return passa;
+    }
+    public static boolean isCnpjValido(String cnpj) {
+        if (!cnpj.substring(0, 1).equals("")) {
+            try {
+                cnpj = cnpj.replace('.', ' ');//onde há ponto coloca espaço
+                cnpj = cnpj.replace('/', ' ');//onde há barra coloca espaço
+                cnpj = cnpj.replace('-', ' ');//onde há traço coloca espaço
+                cnpj = cnpj.replaceAll(" ", "");//retira espaço
+                if (cnpj.equals("00000000000000") || cnpj.equals("11111111111111")
+                        || cnpj.equals("22222222222222") || cnpj.equals("33333333333333")
+                        || cnpj.equals("44444444444444") || cnpj.equals("55555555555555")
+                        || cnpj.equals("66666666666666") || cnpj.equals("77777777777777")
+                        || cnpj.equals("88888888888888") || cnpj.equals("99999999999999")
+                        || (cnpj.length() != 14)) {
+                    return (false);
+                }
+
+                int soma = 0, dig;
+                String cnpj_calc = cnpj.substring(0, 12);
+                if (cnpj.length() != 14) {
+                    return false;
+                }
+                char[] chr_cnpj = cnpj.toCharArray();
+                /* Primeira parte */
+                for (int i = 0; i < 4; i++) {
+                    if (chr_cnpj[i] - 48 >= 0 && chr_cnpj[i] - 48 <= 9) {
+                        soma += (chr_cnpj[i] - 48) * (6 - (i + 1));
+                    }
+                }
+                for (int i = 0; i < 8; i++) {
+                    if (chr_cnpj[i + 4] - 48 >= 0 && chr_cnpj[i + 4] - 48 <= 9) {
+                        soma += (chr_cnpj[i + 4] - 48) * (10 - (i + 1));
+                    }
+                }
+                dig = 11 - (soma % 11);
+                cnpj_calc += (dig == 10 || dig == 11) ? "0" : Integer.toString(
+                        dig);
+                /* Segunda parte */
+                soma = 0;
+                for (int i = 0; i < 5; i++) {
+                    if (chr_cnpj[i] - 48 >= 0 && chr_cnpj[i] - 48 <= 9) {
+                        soma += (chr_cnpj[i] - 48) * (7 - (i + 1));
+                    }
+                }
+                for (int i = 0; i < 8; i++) {
+                    if (chr_cnpj[i + 5] - 48 >= 0 && chr_cnpj[i + 5] - 48 <= 9) {
+                        soma += (chr_cnpj[i + 5] - 48) * (10 - (i + 1));
+                    }
+                }
+                dig = 11 - (soma % 11);
+                cnpj_calc += (dig == 10 || dig == 11) ? "0" : Integer.toString(
+                        dig);
+                return cnpj.equals(cnpj_calc);
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    public static Integer ifNullInteger(Integer value, Integer retorno) {
+        if (value == null) {
+            return retorno;
+        }
+
+        return retorno;
+    }
+
+    public static List<Object[]> getQuerySQLGenericTypeString(String query, String[] campos, Type type) {
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        List<Object[]> toReturn = new ArrayList<Object[]>();
+        try {
+            //fazer consulta sql não hql
+            SQLQuery qr = ses.createSQLQuery(query);
+            if (campos != null) {
+                for (int i = 1; i <= campos.length; i++) {
+                    qr.addScalar(campos[i - 1], type);
+                }
+            }
+            toReturn = (List<Object[]>) qr.list();
+
+            ses.beginTransaction().commit();
+            return toReturn;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toReturn;
+        } finally {
+            ses.close();
+        }
+    }
+
+    /**
+     *
+     * Sergio: metodo para calcular o total de vagas disponiveis no controle de vaga matricula.
+     */
+    public static int calculaVagaDisponiveis(int valor1, int valor2){
+        int resultado = (valor1 - valor2);
+        return Math.max(resultado, 0);
+
+    }
+
+    /*public static boolean verificaPeriodo(Date dta1, Date dta2, int dias) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            String data1 = format.format(dta1);
+            String data2 = format.format(dta2);
+            int dif = DiferencaEntreDatas(data1, data2);
+            if (dif > dias) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
+    }*/
+    public static String ifNullString(Object str) {
+        if (str == null) {
+            return "";
+        }
+        return String.valueOf(str);
+    }
+
+    public static String getSetaMesExtenso(Integer mes) {
+        String mesConvertido = String.valueOf(mes);
+        String mesFinal = "";
+        try {
+            switch (mesConvertido) {
+                case "1":
+                    mesFinal = "Janeiro";
+                    break;
+                case "2":
+                    mesFinal = "Fevereiro";
+                    break;
+                case "3":
+                    mesFinal = "Março";
+                    break;
+                case "4":
+                    mesFinal = "Abril";
+                    break;
+                case "5":
+                    mesFinal = "Maio";
+                    break;
+                case "6":
+                    mesFinal = "Junho";
+                    break;
+                case "7":
+                    mesFinal = "Julho";
+                    break;
+                case "8":
+                    mesFinal = "Agosto";
+                    break;
+                case "9":
+                    mesFinal = "Setembro";
+                    break;
+                case "10":
+                    mesFinal = "Outubro";
+                    break;
+                case "11":
+                    mesFinal = "Novembro";
+                    break;
+                case "12":
+                    mesFinal = "Dezembro";
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mesFinal;
+    }
+
+    public static String dataExtensao(Date data){
+        String dia = new SimpleDateFormat("dd").format(data);
+        String mes = new SimpleDateFormat("MM").format(data);
+        String ano = new SimpleDateFormat("yyyy").format(data);
+        return dia+ " de "+getSetaMesExtenso(Integer.parseInt(mes)).substring(0,3)+" de "+ano;
+    }
+
+    public static String moedaBr(BigDecimal vlr){
+        Locale.setDefault(new Locale("pt", "BR"));  // mudança global
+        DecimalFormat df = new DecimalFormat();
+        df.applyPattern("R$ #,##0.00");
+        double valorConvertido = vlr.doubleValue();
+        return df.format(valorConvertido);
+    }
+
+}

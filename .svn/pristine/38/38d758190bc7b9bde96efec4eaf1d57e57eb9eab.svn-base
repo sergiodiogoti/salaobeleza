@@ -1,0 +1,138 @@
+package com.Bean;
+
+import java.util.Date;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+/**
+ *
+ * @author Sergio - 02/09/2021
+ */
+
+@Entity
+@Table(name = "setor")
+public class Setor implements java.io.Serializable {
+private static final long serialVersionUID = 1L;
+
+@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="setCodigo", nullable=false)
+    private Integer setCodigo;
+
+@Column(name="setNome")
+    private String setNome;
+
+@Column(name="setResponsavel")
+    private String setResponsavel;
+
+@Column(name="setCidade")
+    private String setCidade;
+
+@Column(name="codUsuario")
+    private Integer codUsuario;
+
+@Column(name="codSetor")
+    private Integer codSetor;
+
+@Column(name="dataHoraAtualizacao")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataHoraAtualizacao;
+
+public Setor() {
+    }
+
+public Setor(int setor, int usuario) {
+        setCodSetor(setor);
+        setCodUsuario(usuario);
+    }
+
+
+
+public Integer getSetCodigo() {
+        return setCodigo;
+    }
+
+    public void setSetCodigo(Integer setCodigo) {
+        this.setCodigo = setCodigo;
+    }
+
+public String getSetNome() {
+        return setNome;
+    }
+
+    public void setSetNome(String setNome) {
+        this.setNome = setNome;
+    }
+
+public String getSetResponsavel() {
+        return setResponsavel;
+    }
+
+    public void setSetResponsavel(String setResponsavel) {
+        this.setResponsavel = setResponsavel;
+    }
+
+public String getSetCidade() {
+        return setCidade;
+    }
+
+    public void setSetCidade(String setCidade) {
+        this.setCidade = setCidade;
+    }
+
+public Integer getCodUsuario() {
+        return codUsuario;
+    }
+
+    public void setCodUsuario(Integer codUsuario) {
+        this.codUsuario = codUsuario;
+    }
+
+public Integer getCodSetor() {
+        return codSetor;
+    }
+
+    public void setCodSetor(Integer codSetor) {
+        this.codSetor = codSetor;
+    }
+
+public Date getDataHoraAtualizacao() {
+        return dataHoraAtualizacao;
+    }
+
+    public void setDataHoraAtualizacao(Date dataHoraAtualizacao) {
+        this.dataHoraAtualizacao = dataHoraAtualizacao;
+    }
+@Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Setor other = (Setor) obj;
+        if (this.setCodigo != other.setCodigo && (this.setCodigo == null || !this.setCodigo.equals(other.setCodigo))) {
+            return false;
+        }
+        return true;
+    }
+@Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + (this.setCodigo != null ? this.setCodigo.hashCode() : 0);
+        return hash;
+    }
+@Override
+  public String toString(){
+    return setCodigo+"";
+  }
+}

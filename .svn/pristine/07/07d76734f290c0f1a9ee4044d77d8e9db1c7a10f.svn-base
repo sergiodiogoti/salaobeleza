@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ui:composition template="../WEB-INF/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html">
+
+    <h:outputStylesheet library="css" name="style.css"/>
+    <ui:define name="menu">
+        <ui:include src="../WEB-INF/menu.menu-old.xhtml"/>
+    </ui:define>
+    <ui:define name="conteudo">
+        <h:form id="form">
+            <table>
+                <tr>
+                    <td>
+                        <p:panel header="Usuario" style="width:400px; margin-left:auto; margin-right:auto;text-align: center;">
+                            <table align="center">
+                                <tr>
+                                    <td>
+                                        <h:outputText value="Pesquisar: " />
+                                    </td>
+
+                                    <td>
+                                        <p:selectOneMenu>
+                                            <f:selectItem itemLabel="Listar Todos" itemvalue="#{null}"/>
+                                            <f:selectItem itemLabel="Nome" itemvalue="#{null}"/>
+                                            <f:selectItem itemLabel="Codigo" itemvalue="#{null}"/>
+                                        </p:selectOneMenu>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <br/>
+                                        <p:inputText/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <br/>
+                                        <p:commandButton value="Pesquisar" icon="ui-icon-search"/>
+                                        <p:spacer width="3px"/>
+                                        <p:commandButton value="Novo"
+                                                         icon="ui-icon-plus"
+                                                         onclick="PF('mpProc').show()"
+                                                         oncomplete="PF('mpProc').hide();"
+                                                         process="@this"
+                                                         action="#{usuarioFaces.doAddUsuario}"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </p:panel>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table>
+                            <tr>
+                                <td align="center">
+                                    <p:remoteCommand name="buscaInicial"
+                                                     process="@this"
+                                                     autoRun="true"
+                                                     actionListener="#{usuarioFaces.populaUsuario}"
+                                                     update="dataTable"/>
+                                    <p:dataTable var="item"
+                                                 id="dataTable"
+                                                 value="#{usuarioFaces.listaUsuario}"
+                                                 style="width: 50%;"
+                                                 paginatorPosition="bottom"
+                                                 emptyMessage="Nenhum arquivo encontrado!"
+                                                 rows="5"
+                                                 paginator="true">
+                                        <p:column headerText="Codigo" style="width: 10%;" sortBy="#{item.usuCodigo}">
+                                            <p:outputLabel value="#{item.usuCodigo}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Nome" style="width: 30%;" sortBy="#{item.usuNome}">
+                                            <p:outputLabel value="#{item.usuNome}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Login" style="width: 20%;" sortBy="#{item.usuLogin}">
+                                            <p:outputLabel value="#{item.usuLogin}"/>
+                                        </p:column>
+
+
+
+                                        <p:column headerText="Opções" style="width: 10%; text-align: center">
+                                            <p:commandLink action="#{usuarioFaces.doUpdateUsuario}">
+                                                <i class="fa fa-pencil ui-icon-circle-zoomin"/>
+                                                <f:setPropertyActionListener value="#{item}" target="#{usuarioFaces.usuarioSelected}"/>
+                                            </p:commandLink>
+                                            <p:commandLink action="#{usuarioFaces.doRemoveUsuario}">
+                                                <i class="fa fa-trash-o ui-icon-circle-zoomin"/>
+                                                <f:setPropertyActionListener value="#{item}" target="#{usuarioFaces.usuarioSelected}"/>
+                                            </p:commandLink>
+                                        </p:column>
+                                    </p:dataTable>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <ui:include src="../mpProc.xhtml"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

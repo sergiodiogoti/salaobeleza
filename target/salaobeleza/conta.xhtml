@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <f:facet name="first">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+    </f:facet>
+    <title>Login</title>
+    <h:outputScript name="js/ripple.js" library="barcelona-layout"/>
+    <h:outputScript name="js/layout.js" library="barcelona-layout"/>
+</h:head>
+
+<style>
+    body {
+        background-color: #F5F5F5;
+        margin: 0px;
+    }
+    .container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    body {
+        background-color: #F5F5F5;
+        margin: 0px;
+    }
+
+    .img-border {
+        border-radius: 50%;
+        background-position: -15px -15px;
+        height: 90px;
+        width: 90px;
+
+    }
+
+    .breakDiv {
+        flex-basis: 100%;
+        height: 0;
+    }
+
+    .styleBox {
+        padding: 0 !important;
+        box-shadow: 0px 0px 8px #F5F5F5;
+        width: 290px;
+    }
+
+    .btnMenor90 {
+        transform: scale(0.85); /* (110% zoom) */
+    }
+
+    .btnMenor90 .ui-button-text {
+        letter-spacing: 0.3px !important;
+    }
+
+    .ui-panel > .ui-widget-header {
+        border-top-left-radius: 8px !important;
+        border-top-right-radius: 8px !important;
+    }
+
+    .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-icon-left {
+        border-radius: 3px;
+    }
+</style>
+<script type="text/javascript">
+    function upperCase(a) {
+        setTimeout(function () {
+            a.value = a.value.toUpperCase();
+        }, 1);
+    }
+</script>
+<h:body>
+    <ui:include src="/mpProc.xhtml"/>
+    <h:form id="form">
+        <p:growl id="erro" showDetail="true" showSummary="true"/>
+        <div class="ui-g dashboard container">
+            <table align="center">
+                <tr>
+                    <td align="center">
+                        <p:panel header="Criar nova conta">
+                            <table cellpadding="5" cellspacing="5" border="0" style="width: 400px">
+                                <tr>
+                                    <td colspan="3">
+                                        <label class="ui-icon-colorTheme">Nome <span
+                                                style="color: red">*</span></label>
+                                        <br/>
+                                        <p:inputText value="#{usuarioFaces.usuarioSelected.usuNome}"
+                                                     id="nome"
+                                                     required="true"
+                                                     onkeyup="upperCase(this)"
+                                                     requiredMessage="Nome é Obrigatório"
+                                                     maxlength="500"
+                                                     style="width: 90%"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <label class="ui-icon-colorTheme">E-mail <span style="color: red">*</span></label>
+                                        <br/>
+                                        <p:inputText id="email" value="#{usuarioFaces.usuarioSelected.usuEmail}"
+                                                     required="true"
+                                                     requiredMessage="E-mail é Obrigatório"
+                                                     style="width: 90%"
+                                                     label="Email">
+                                        </p:inputText>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <label class="ui-icon-colorTheme">Login<span style="color: red">*</span></label>
+                                        <br/>
+                                        <p:inputText id="login" value="#{usuarioFaces.usuarioSelected.usuLogin}"
+                                                     required="true"
+                                                     onkeyup="upperCase(this)"
+                                                     requiredMessage="Login é Obrigatório"
+                                                     style="width: 90%"
+                                                     label="Email">
+                                        </p:inputText>
+                                    </td>
+                                    <td colspan="2">
+                                        <label class="ui-icon-colorTheme">Senha <span style="color: red">*</span></label>
+                                        <br/>
+                                        <p:password value="#{usuarioFaces.usuarioSelected.usuSenha}"
+                                                    required="true"
+                                                    requiredMessage="Senha é Obrigatório"
+                                                    size="27" toggleMask="true" redisplay="true"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <label class="ui-icon-colorTheme">Sexo</label>
+                                        <br/>
+                                        <p:selectOneMenu id="sexo"
+                                                         style="width: 90%"
+                                                         value="#{usuarioFaces.usuarioSelected.usuSexo}">
+                                            <f:selectItem itemValue="F" itemLabel="Feminino"/>
+                                            <f:selectItem itemValue="M" itemLabel="Masculino"/>
+                                            <p:ajax/>
+                                        </p:selectOneMenu>
+                                    </td>
+                                    <td colspan="2">
+                                        <label class="ui-icon-colorTheme">Data Nascimento</label>
+                                        <br/>
+                                        <p:calendar id="dataNasc"
+                                                    style="width: 90%"
+                                                    placeholder="dd/mm/aaaa"
+                                                    locale="pt_BR"
+                                                    mask="true"
+                                                    pattern="dd/MM/yyyy"
+                                                    value="#{usuarioFaces.usuarioSelected.usuDataNasc}">
+                                        </p:calendar>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <label class="ui-icon-colorTheme">Telefone Celular <span
+                                                style="color: red">*</span></label>
+                                        <br/>
+                                        <p:inputMask id="tel"
+                                                     required="true"
+                                                     requiredMessage="Telefone é Obrigatório"
+                                                     value="#{usuarioFaces.usuarioSelected.usuTelefone}"
+                                                     style="width: 98%"
+                                                     mask="(99)99999-9999"/>
+                                    </td>
+                                    <td colspan="2">
+                                        <label class="ui-icon-colorTheme">CPF <span
+                                                style="color: red">*</span></label>
+                                        <br/>
+                                        <p:inputMask id="cpf"
+                                                     required="true"
+                                                     requiredMessage="CPF é obrigatório"
+                                                     value="#{usuarioFaces.usuarioSelected.usuCPF}"
+                                                     style="width: 80%"
+                                                     mask="999.999.999-99">
+                                            <p:ajax/>
+                                        </p:inputMask>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="left">
+                                        <span style="color: red">*</span>
+                                        <i style="font-size: 9px;">Campos obrigatórios</i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" align="right">
+                                        <p:commandButton value="Cancelar"
+                                                         ajax="false"
+                                                         immediate="true"
+                                                         actionListener="#{usuarioFaces.doLogout}"
+                                                         style="background-color: #C62828;"
+                                                         icon="fa fa-reply"
+                                                         id="btnCancelar">
+                                        </p:commandButton>
+                                        <p:spacer width="5px"/>
+                                        <p:commandButton value="Salvar"
+                                                         process="@this,@form"
+                                                         style="background-color: #1ab394;"
+                                                         update="form:erro"
+                                                         icon="fa fa-check"
+                                                         onclick="PF('mpProc').show();"
+                                                         oncomplete="PF('mpProc').hide();"
+                                                         action="#{usuarioFaces.dofinishAddUsuario}"
+                                                         id="btnSalvar">
+                                            <f:setPropertyActionListener value="EXTERNO" target="#{usuarioFaces.tipoUsuario}"/>
+                                        </p:commandButton>
+                                    </td>
+                                </tr>
+                            </table>
+                        </p:panel>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </h:form>
+    <h:outputStylesheet name="css/layout-#{guestPreferences.layout}.css" library="barcelona-layout"/>
+    <h:outputStylesheet name="css/ripple.css" library="barcelona-layout"/>
+</h:body>
+</html>

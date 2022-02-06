@@ -1,0 +1,48 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:pa="http://primefaces.org/barcelona">
+
+    <style>
+        .fa-thumb-tack:before {
+            content: "\f08d";
+            display: none;
+            opacity: 0;
+        }
+        .img-border {
+            border-radius: 50%;
+            background-position: -15px -15px;
+            height: 90px;
+            width: 90px;
+
+        }
+    </style>
+    <div class="topbar">
+        <div class="logo">
+            <h:link outcome="/dashboard">
+                <p:graphicImage name="images/logo.svg" width="20" style="color: white" library="barcelona-layout" />
+            </h:link>
+        </div>
+
+        <ul class="topbar-menu fadeInDown animated">
+            <li class="profile-item">
+                <a id="topbar-usermenu-button" href="#">                            
+                    <div class="profile-image">
+                        <p:graphicImage name="images/semfoto.png"
+                                        library="barcelona-layout"
+                                        width="18" height="18"
+                                        styleClass="img-border"/>
+                    </div>
+                    <div class="profile-info">
+                        <span class="topbar-item-name profile-name">#{usuarioFaces.transformTextInicialMaiusculo(usuarioFaces.usuarioLogadoBean.usuLogin)}</span>
+                        <span class="topbar-item-name profile-role">#{usuarioFaces.usuarioLogadoBean.usuFuncao}</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+</ui:composition>

@@ -1,0 +1,177 @@
+package com.ManagedBeans;
+
+import com.Bean.Gasto;
+import com.Bean.Setor;
+import com.DAO.CategoriaDAO;
+import com.Bean.Categoria;
+import com.Bean.Usuario;
+import com.DAO.SetorDAO;
+import com.DAO.UsuarioDAO;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.io.Serializable;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+
+import com.Util.HibernateUtil;
+import com.Util.MensagensErros;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.primefaces.PrimeFaces;
+
+import javax.inject.Named;
+import javax.enterprise.context.SessionScoped;
+
+/**
+ *
+ * @author Viviane - 09/09/2021
+ */
+@Named
+@SessionScoped
+public class CategoriaFaces implements Serializable{
+
+    private List<Categoria> cachedCategorias = null;
+    private CategoriaDAO categoriaDAO = new CategoriaDAO();
+    private Categoria categoriaSelected;
+    private Usuario usuario;
+    private Setor setor;
+
+    public Setor getSetor() {
+        return setor;
+    }
+
+    public void setSetor(Setor setor) {
+        this.setor = setor;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public CategoriaDAO getCategoriaDAO() {
+        return categoriaDAO;
+    }
+
+    public void setCategoriaDAO(CategoriaDAO categoriaDAO) {
+        this.categoriaDAO = categoriaDAO;
+    }
+
+    public Categoria getCategoriaSelected() {
+        return categoriaSelected;
+    }
+
+    public void setCategoriaSelected(Categoria categoriaSelected) {
+        this.categoriaSelected = categoriaSelected;
+    }
+
+    public List<Categoria> getCachedCategorias() {
+        if (cachedCategorias == null) {
+            this.cachedCategorias = categoriaDAO.getCategorias();
+        }
+        return cachedCategorias;
+    }
+
+    public String doAddCategoria() {
+        int usuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        categoriaSelected = new Categoria(1, usuario);
+        return "categoriaNew";
+    }
+
+    public String dofinishAddCategoria() {
+        Date date = new Date();
+        categoriaSelected.setDataHoraAtualizacao(date);
+        categoriaDAO.addCategoria(categoriaSelected);
+        cachedCategorias = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "categoriaList";
+        }
+    }
+
+    public String doRemoveCategoria() {
+        if(categoriaSelected != null) {
+            try (Session ses = HibernateUtil.getSessionFactory().openSession()) {
+                String sql = "select *from gasto where gastCatCodigo = " + categoriaSelected.getCatCodigo();
+                Query q = ses.createNativeQuery(sql).addEntity(Gasto.class);
+                if (q.list().size() > 0) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Alerta!", "Categria não pode ser excluida , possui registros dependentes!. "));
+                    return null;
+                } else {
+                    categoriaDAO.removeCategoria(categoriaSelected);
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Alerta!", "Categoria excluida com sucesso!. "));
+                    cachedCategorias = null;
+                    return null;
+                }
+            }
+        }
+        return "";
+    }
+
+    public String doUpdateCategoria() {
+        UsuarioDAO usuDAO = new UsuarioDAO();
+        usuario = usuDAO.getUsuario(categoriaSelected.getCodUsuario());
+        SetorDAO posDAO = new SetorDAO();
+        setor = posDAO.getSetor(categoriaSelected.getCodSetor());
+        return "categoriaEdit";
+    }
+
+    public String dofinishUpdateCategoria() {
+        Date date = new Date();
+        int codUsuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        categoriaSelected.setCodUsuario(codUsuario);
+        int codSetor = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("setor").toString());
+        categoriaSelected.setCodSetor(codSetor);
+        categoriaSelected.setDataHoraAtualizacao(date);
+        categoriaDAO.updateCategoria(categoriaSelected);
+        cachedCategorias = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "categoriaList";
+        }
+    }
+
+    public void doSaveOrUpdateCategoria(){
+        if(categoriaSelected.getCatCodigo() == null){
+            dofinishAddCategoria();
+        }else{
+            dofinishUpdateCategoria();
+        }
+    }
+
+    public String doCancelCategoria() {
+        cachedCategorias = null;
+        return "categoriaList";
+    }
+
+    public List<SelectItem> getComboCategorias(){
+        List<SelectItem> listaComboCategoria = new ArrayList<SelectItem>(0);
+        List<Categoria> listaCategoria = categoriaDAO.getCategorias();
+        //listaComboCategoria.add(new SelectItem(0, "Selecione"));
+        int i = 0;
+        for (Categoria c : listaCategoria) {
+            SelectItem item = new SelectItem();
+            i++;
+            if(i == 1){
+                item.setLabel("Selecione");
+                item.setValue((Categoria) null);
+                listaComboCategoria.add(item);
+                item = new SelectItem();
+            }
+            item.setLabel(c.getCatDescricao());
+            item.setValue(c);
+            listaComboCategoria.add(item);
+        }
+        return listaComboCategoria;
+
+    }
+}

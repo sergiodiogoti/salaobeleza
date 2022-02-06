@@ -1,0 +1,236 @@
+package com.Bean;
+
+import java.util.Date;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+/**
+ *
+ * @author Sergio - 02/09/2021
+ */
+
+@Entity
+@Table(name = "usuario")
+public class Usuario implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="usuCodigo", nullable=false)
+    private Integer usuCodigo;
+
+    @Column(name="usuNome")
+    private String usuNome;
+
+    @Column(name="usuNomeFoto")
+    private String usuNomeFoto;
+
+    @Column(name="usuLogin")
+    private String usuLogin;
+
+    @Column(name="usuConfirmaSenha")
+    private String usuConfirmaSenha;
+
+    @Column(name="usuNovaSenha")
+    private String usuNovaSenha;
+
+    @Column(name="usuSenhaAntiga")
+    private String usuSenhaAntiga;
+
+    @Column(name="usuSexo")
+    private String usuSexo;
+
+    @Column(name="usuTelefone")
+    private String usuTelefone;
+
+    @Column(name="usuTema")
+    private String usuTema;
+
+    @Column(name = "usuDataNasc")
+    @Temporal(TemporalType.DATE)
+    private Date usuDataNasc;
+
+    @Column(name="usuSenha")
+    private String usuSenha;
+
+    @Column(name="usuSetCodigo")
+    private Integer usuSetCodigo;
+
+    @Column(name="codUsuario")
+    private Integer codUsuario;
+
+    @Column(name="codSetor")
+    private Integer codSetor;
+
+    @Column(name="dataHoraAtualizacao")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataHoraAtualizacao;
+
+    public Usuario() {
+    }
+
+    public String getUsuTema() {
+        return usuTema;
+    }
+
+    public void setUsuTema(String usuTema) {
+        this.usuTema = usuTema;
+    }
+
+    public String getUsuSenhaAntiga() {
+        return usuSenhaAntiga;
+    }
+
+    public void setUsuSenhaAntiga(String usuSenhaAntiga) {
+        this.usuSenhaAntiga = usuSenhaAntiga;
+    }
+
+    public String getUsuNovaSenha() {
+        return usuNovaSenha;
+    }
+
+    public void setUsuNovaSenha(String usuNovaSenha) {
+        this.usuNovaSenha = usuNovaSenha;
+    }
+
+    public Usuario(int setor, int usuario) {
+        setCodSetor(setor);
+        setCodUsuario(usuario);
+    }
+
+    public String getUsuNomeFoto() {
+        return usuNomeFoto;
+    }
+
+    public void setUsuNomeFoto(String usuNomeFoto) {
+        this.usuNomeFoto = usuNomeFoto;
+    }
+
+    public String getUsuConfirmaSenha() {
+        return usuConfirmaSenha;
+    }
+
+    public void setUsuConfirmaSenha(String usuConfirmaSenha) {
+        this.usuConfirmaSenha = usuConfirmaSenha;
+    }
+
+    public String getUsuSexo() {
+        return usuSexo;
+    }
+
+    public void setUsuSexo(String usuSexo) {
+        this.usuSexo = usuSexo;
+    }
+
+    public String getUsuTelefone() {
+        return usuTelefone;
+    }
+
+    public void setUsuTelefone(String usuTelefone) {
+        this.usuTelefone = usuTelefone;
+    }
+
+    public Date getUsuDataNasc() {
+        return usuDataNasc;
+    }
+
+    public void setUsuDataNasc(Date usuDataNasc) {
+        this.usuDataNasc = usuDataNasc;
+    }
+
+    public Integer getUsuCodigo() {
+        return usuCodigo;
+    }
+
+    public void setUsuCodigo(Integer usuCodigo) {
+        this.usuCodigo = usuCodigo;
+    }
+
+    public String getUsuNome() {
+        return usuNome;
+    }
+
+    public void setUsuNome(String usuNome) {
+        this.usuNome = usuNome;
+    }
+
+    public String getUsuLogin() {
+        return usuLogin;
+    }
+
+    public void setUsuLogin(String usuLogin) {
+        this.usuLogin = usuLogin;
+    }
+
+    public String getUsuSenha() {
+        return usuSenha;
+    }
+
+    public void setUsuSenha(String usuSenha) {
+        this.usuSenha = usuSenha;
+    }
+
+    public Integer getUsuSetCodigo() {
+        return usuSetCodigo;
+    }
+
+    public void setUsuSetCodigo(Integer usuSetCodigo) {
+        this.usuSetCodigo = usuSetCodigo;
+    }
+
+    public Integer getCodUsuario() {
+        return codUsuario;
+    }
+
+    public void setCodUsuario(Integer codUsuario) {
+        this.codUsuario = codUsuario;
+    }
+
+    public Integer getCodSetor() {
+        return codSetor;
+    }
+
+    public void setCodSetor(Integer codSetor) {
+        this.codSetor = codSetor;
+    }
+
+    public Date getDataHoraAtualizacao() {
+        return dataHoraAtualizacao;
+    }
+
+    public void setDataHoraAtualizacao(Date dataHoraAtualizacao) {
+        this.dataHoraAtualizacao = dataHoraAtualizacao;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Usuario other = (Usuario) obj;
+        if (this.usuCodigo != other.usuCodigo && (this.usuCodigo == null || !this.usuCodigo.equals(other.usuCodigo))) {
+            return false;
+        }
+        return true;
+    }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + (this.usuCodigo != null ? this.usuCodigo.hashCode() : 0);
+        return hash;
+    }
+    @Override
+    public String toString(){
+        return usuCodigo+"";
+    }
+}

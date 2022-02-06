@@ -1,0 +1,139 @@
+package com.Bean;
+
+import java.util.Date;
+import java.util.List;
+import javax.persistence.*;
+/**
+ *
+ * @author Sergio - 10/10/2021
+ */
+
+@Entity
+@Table(name = "metagasto")
+public class MetaGasto implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="metGaCodigo", nullable=false)
+    private Integer metGaCodigo;
+
+    @Column(name="metGaMes")
+    private Integer metGaMes;
+
+    @Column(name="metGaAno")
+    private Integer metGaAno;
+
+    @Column(name="metGaValor")
+    private Double metGaValor;
+
+    @ManyToOne
+    @JoinColumn(name="metGaUsuCodigo",referencedColumnName="usuCodigo",nullable=true)
+    private Usuario metGaUsuCodigo;
+
+    @Column(name="codUsuario")
+    private Integer codUsuario;
+
+    @Column(name="codSetor")
+    private Integer codSetor;
+
+    @Column(name="dataHoraAtualizacao")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataHoraAtualizacao;
+
+    public MetaGasto() {
+    }
+
+    public MetaGasto(int setor, int usuario) {
+        setCodSetor(setor);
+        setCodUsuario(usuario);
+    }
+
+    public Integer getMetGaCodigo() {
+        return metGaCodigo;
+    }
+
+    public void setMetGaCodigo(Integer metGaCodigo) {
+        this.metGaCodigo = metGaCodigo;
+    }
+
+    public Integer getMetGaMes() {
+        return metGaMes;
+    }
+
+    public void setMetGaMes(Integer metGaMes) {
+        this.metGaMes = metGaMes;
+    }
+
+    public Integer getMetGaAno() {
+        return metGaAno;
+    }
+
+    public void setMetGaAno(Integer metGaAno) {
+        this.metGaAno = metGaAno;
+    }
+
+    public Double getMetGaValor() {
+        return metGaValor;
+    }
+
+    public void setMetGaValor(Double metGaValor) {
+        this.metGaValor = metGaValor;
+    }
+
+    public Usuario getMetGaUsuCodigo() {
+        return metGaUsuCodigo;
+    }
+
+    public void setMetGaUsuCodigo(Usuario metGaUsuCodigo) {
+        this.metGaUsuCodigo = metGaUsuCodigo;
+    }
+
+    public Integer getCodUsuario() {
+        return codUsuario;
+    }
+
+    public void setCodUsuario(Integer codUsuario) {
+        this.codUsuario = codUsuario;
+    }
+
+    public Integer getCodSetor() {
+        return codSetor;
+    }
+
+    public void setCodSetor(Integer codSetor) {
+        this.codSetor = codSetor;
+    }
+
+    public Date getDataHoraAtualizacao() {
+        return dataHoraAtualizacao;
+    }
+
+    public void setDataHoraAtualizacao(Date dataHoraAtualizacao) {
+        this.dataHoraAtualizacao = dataHoraAtualizacao;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MetaGasto other = (MetaGasto) obj;
+        if (this.metGaCodigo != other.metGaCodigo && (this.metGaCodigo == null || !this.metGaCodigo.equals(other.metGaCodigo))) {
+            return false;
+        }
+        return true;
+    }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + (this.metGaCodigo != null ? this.metGaCodigo.hashCode() : 0);
+        return hash;
+    }
+    @Override
+    public String toString(){
+        return metGaCodigo+"";
+    }
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<style>
+    .divError{
+        background-color: #f5f5f5;
+        padding-top: 100px;
+        height: auto;
+        background-size: contain;
+    }
+</style>
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </f:facet>
+        <title>Erro</title>
+    </h:head>
+    <h:body styleClass="divError">
+        <div style="align-content: center; align-items: center; text-align: center;">
+            <p:graphicImage height="100" width="100" name="images/exception/error.png" library="barcelona-layout" />
+            <div class="exception-content">
+                <label style="font-size: 27px; font-weight: bold;">Ocorreu um erro</label><br/>
+                <label>Por favor, entre em contato com o adminstrador.</label><br/>
+                <label>Tel:(14)997609038</label><br/>
+                <label>Email:sergiodiogoti@gmail.com</label><br/><br/>
+            </div>
+            <p:button value="Voltar" outcome="/login" styleClass="error-page-btn" />
+        </div>
+        <h:outputStylesheet name="css/layout-#{guestPreferences.layout}.css" library="barcelona-layout" />
+    </h:body>
+
+</html>

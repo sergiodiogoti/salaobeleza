@@ -1,0 +1,485 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pa="http://primefaces.org/barcelona">
+<style>
+    .img-arredondada {
+        border-radius: 50%;
+        background-position: -15px -15px;
+        height: 45px;
+        width: 45px;
+
+    }
+    .img-arredondada2 {
+        border-radius: 50%;
+        background-position: -15px -15px;
+        height: 70px;
+        width: 70px;
+
+    }
+    .flex > div{
+        margin: 8px;
+        align-content: center;
+        align-items: center;
+    }
+    .flex{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .divChooseColorTheme{
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+    }
+    .fa_check{
+        position: relative;
+        margin-top: 6px;
+    }
+
+</style>
+    <div class="layout-sidebar">
+        <h:form id="formMenu">
+        <section class="flex">
+            <div>
+                <p:commandLink process="@this"
+                               onclick="PF('mpProc').show()"
+                               title="Editar Perfil"
+                               oncomplete="PF('mpProc').hide();PF('modalPerfil').show(); ">
+                <p:graphicImage id="imgUser"
+                                cache="false"
+                                styleClass="img-arredondada"
+                                rendered="#{null eq usuarioFaces.exibirFoto? false : true}"
+                                value="#{usuarioFaces.retornaFoto}"/>
+                <p:remoteCommand name="updateFoto" process="@this" update="imgUser"/>
+                </p:commandLink>
+            </div>
+            <div>
+                <p:commandLink process="@this"
+                               title="Menu inicial"
+                               action="/dashboard.xhtml"
+                               ajax="false">
+                    <i class="fa fa-home" style="color: #9e9e9e; font-size: 24px;"/>
+                </p:commandLink>
+            </div>
+            <div>
+                <p:commandLink process="@this"
+                               title="Gráficos"
+                               action="/graficos/graficoGeral.xhtml"
+                               ajax="false">
+                    <i class="fa fa-fw fa-area-chart" style="color: #9e9e9e; font-size: 20px;"/>
+                </p:commandLink>
+            </div>
+            <div>
+                <p:commandLink process="@this"
+                               title="Financeiro"
+                               action="/gasto/gasto.xhtml"
+                               ajax="false">
+                    <i class="fa fa-usd" style="color: #9e9e9e; font-size: 24px;"/>
+                </p:commandLink>
+            </div>
+            <div>
+                <p:commandLink process="@this"
+                               title="Aniversariantes"
+                               action="/aniversariante/aniversariante.xhtml"
+                               ajax="false">
+                    <i class="fa fa-users" style="color: #9e9e9e; font-size: 20px;"/>
+                </p:commandLink>
+            </div>
+            <p:tooltip position="right"/>
+        </section>
+        </h:form>
+    </div>
+    <p:dialog id="modalPerfil"
+              resizable="false"
+              responsive="true"
+              widgetVar="modalPerfil"
+              header="Atualizar Perfil"
+              modal="true">
+        <h:form id="formPerfil">
+            <p:outputPanel id="pnlPerfil">
+                <p:growl id="erro1" showDetail="true"/>
+                <table style="width: 100%" align="center" cellspacing="5" border="0">
+                    <tr>
+                        <td colspan="2" align="center">
+                            <p:graphicImage id="imgUserPerfil"
+                                            cache="false"
+                                            styleClass="img-arredondada2"
+                                            rendered="#{null eq usuarioFaces.exibirFoto? false : true}"
+                                            value="#{usuarioFaces.retornaFoto}"/>
+                            <p:commandButton
+                                    icon="ui-icon-pencil"
+                                    title="Atualizar foto perfil"
+                                    styleClass="btnMenor90"
+                                    onclick="PF('mpProc').show();"
+                                    process="@this"
+                                    update=":formFoto:pnlFoto"
+                                    oncomplete="PF('mpProc').hide();PF('ovlFoto').show();"/>
+                            <p:remoteCommand name="updateFotoEdit" process="@this" update="imgUserPerfil"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <label class="ui-icon-colorTheme">Nome<span style="color: red">*</span></label>
+                            <br/>
+                            <p:inputText value="#{usuarioFaces.usuarioSelected.usuNome}"
+                                         id="nome"
+                                         required="true"
+                                         requiredMessage="Nome é Obrigatório"
+                                         size="40"
+                                         maxlength="500"
+                                         style="text-transform: uppercase;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <label class="ui-icon-colorTheme">Senha</label>
+                            <br/>
+                            <p:password value="#{usuarioFaces.usuarioSelected.usuSenha}"
+                                        id="senhaAtual"
+                                        feedback="false"
+                                        readonly="true"
+                                        redisplay="true"
+                                        inline="true"
+                                        size="40"/>
+                            <p:commandButton
+                                    icon="ui-icon-pencil"
+                                    title="Alterar Senha"
+                                    styleClass="btnMenor90"
+                                    onclick="PF('mpProc').show();"
+                                    process="@this"
+                                    update=":formSenha:pnlSenha"
+                                    oncomplete="PF('mpProc').hide();PF('modalSenha').show();"/>
+                            <p:remoteCommand name="updateSenha" process="@this" update="senhaAtual"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="ui-icon-colorTheme">Data Nascimento</label>
+                            <br/>
+                            <p:calendar id="notfy"
+                                        size="18"
+                                        pattern="dd/MM/yyyy"
+                                        value="#{usuarioFaces.usuarioSelected.usuDataNasc}">
+                                <p:ajax/>
+                            </p:calendar>
+                        </td>
+                        <td>
+                            <label class="ui-icon-colorTheme">Gênero</label>
+                            <br/>
+                            <p:selectOneMenu id="gênero"
+                                             style="width: 150px"
+                                             value="#{usuarioFaces.usuarioSelected.usuSexo}">
+                                <f:selectItem itemValue="F" itemLabel="Feminino"/>
+                                <f:selectItem itemValue="M" itemLabel="Masculino"/>
+                                <p:ajax/>
+                            </p:selectOneMenu>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="ui-icon-colorTheme">Temas</label>
+                            <br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center">
+                            <p:outputPanel id="pnlColortheme">
+                                <div class="ui-g">
+                                    <div class="ui-g ui-md ui-lg">
+                                        <p:commandLink id="corTema1"
+                                                       onclick="PF('mpProc').show()"
+                                                       process="@this"
+                                                       update="pnlColortheme"
+                                                       oncomplete="PF('mpProc').hide();"
+                                                       title="Blue - Amber">
+                                            <div class="divChooseColorTheme" style="background-color: #1976d2;">
+                                                <i class="#{'blue' eq usuarioFaces.corTema? 'fa fa-check' :''} fa_check" style="color: #FFFFFF; font-size: 14px; height: auto;"/>
+                                            </div>
+                                            <f:setPropertyActionListener value="blue" target="#{usuarioFaces.corTema}"/>
+                                        </p:commandLink>
+                                    </div>
+                                    <p:spacer width="3px"/>
+                                    <div class="ui-g ui-md ui-lg">
+                                        <p:commandLink id="corTema2"
+                                                       onclick="PF('mpProc').show()"
+                                                       process="@this"
+                                                       update="pnlColortheme"
+                                                       oncomplete="PF('mpProc').hide();"
+                                                       title="Teal - Amber">
+                                            <div class="divChooseColorTheme" style="background-color: #00796b;">
+                                                <i class="#{'teal' eq usuarioFaces.corTema? 'fa fa-check' :''} fa_check" style="color: #FFFFFF; font-size: 14px;"/>
+                                            </div>
+                                            <f:setPropertyActionListener value="teal" target="#{usuarioFaces.corTema}"/>
+                                        </p:commandLink>
+                                    </div>
+                                    <p:spacer width="3px"/>
+                                    <div class="ui-g ui-md ui-lg">
+                                        <p:commandLink id="corTema3"
+                                                       onclick="PF('mpProc').show()"
+                                                       process="@this"
+                                                       update="pnlColortheme"
+                                                       oncomplete="PF('mpProc').hide();"
+                                                       title="Blue Grey - Green">
+                                            <div class="divChooseColorTheme" style="background-color: #607D8B;">
+                                                <i class="#{'blue-grey' eq usuarioFaces.corTema? 'fa fa-check' :''} fa_check" style="color: #FFFFFF; font-size: 14px;"/>
+                                            </div>
+                                            <f:setPropertyActionListener value="blue-grey" target="#{usuarioFaces.corTema}"/>
+                                        </p:commandLink>
+                                    </div>
+                                    <p:spacer width="3px"/>
+                                    <div class="ui-g ui-md ui-lg">
+                                        <p:commandLink id="corTema4"
+                                                       onclick="PF('mpProc').show()"
+                                                       process="@this"
+                                                       update="pnlColortheme"
+                                                       oncomplete="PF('mpProc').hide();"
+                                                       title="Cyan - Yellow">
+                                            <div class="divChooseColorTheme" style="background-color: #0097a7;">
+                                                <i class="#{'cyan' eq usuarioFaces.corTema? 'fa fa-check' :''} fa_check" style="color: #FFFFFF; font-size: 14px;"/>
+                                            </div>
+                                            <f:setPropertyActionListener value="cyan" target="#{usuarioFaces.corTema}"/>
+                                        </p:commandLink>
+                                    </div>
+                                    <p:spacer width="3px"/>
+                                    <div class="ui-g ui-md ui-lg">
+                                        <p:commandLink id="corTema5"
+                                                       onclick="PF('mpProc').show()"
+                                                       process="@this"
+                                                       update="pnlColortheme"
+                                                       oncomplete="PF('mpProc').hide();"
+                                                       title="Dark - Blue">
+                                            <div class="divChooseColorTheme" style="background-color: #3e464c;">
+                                                <i class="#{'dark-blue' eq usuarioFaces.corTema? 'fa fa-check' :''} fa_check" style="color: #FFFFFF; font-size: 14px;"/>
+                                            </div>
+                                            <f:setPropertyActionListener value="dark-blue" target="#{usuarioFaces.corTema}"/>
+                                        </p:commandLink>
+                                    </div>
+                                    <p:spacer width="3px"/>
+                                    <div class="ui-g ui-md ui-lg">
+                                        <p:commandLink id="corTema6"
+                                                       onclick="PF('mpProc').show()"
+                                                       process="@this"
+                                                       update="pnlColortheme"
+                                                       oncomplete="PF('mpProc').hide();"
+                                                       title="Light Blue - Green">
+                                            <div class="divChooseColorTheme" style="background-color: #03A9F4;">
+                                                <i class="#{'light-blue' eq usuarioFaces.corTema? 'fa fa-check' :''} fa_check" style="color: #FFFFFF; font-size: 14px;"/>
+                                            </div>
+                                            <f:setPropertyActionListener value="light-blue" target="#{usuarioFaces.corTema}"/>
+                                        </p:commandLink>
+                                    </div>
+                                    <p:spacer width="3px"/>
+                                    <div class="ui-g ui-md ui-lg">
+                                        <p:commandLink id="corTema7"
+                                                       onclick="PF('mpProc').show()"
+                                                       process="@this"
+                                                       update="pnlColortheme"
+                                                       oncomplete="PF('mpProc').hide();"
+                                                       title="Indigo - Pink">
+                                            <div class="divChooseColorTheme" style="background-color: #3f51b5;">
+                                                <i class="#{'indigo' eq usuarioFaces.corTema? 'fa fa-check' :''} fa_check" style="color: #FFFFFF; font-size: 14px;"/>
+                                            </div>
+                                            <f:setPropertyActionListener value="indigo" target="#{usuarioFaces.corTema}"/>
+                                        </p:commandLink>
+                                    </div>
+                                    <p:spacer width="3px"/>
+                                    <div class="ui-g ui-md ui-lg">
+                                        <p:commandLink id="corTema8"
+                                                       onclick="PF('mpProc').show()"
+                                                       process="@this"
+                                                       update="pnlColortheme"
+                                                       oncomplete="PF('mpProc').hide();"
+                                                       title="Deep-purple">
+                                            <div class="divChooseColorTheme" style="background-color: #673ab7;">
+                                                <i class="#{'deep-purple' eq usuarioFaces.corTema? 'fa fa-check' :''} fa_check" style="color: #FFFFFF; font-size: 14px;"/>
+                                            </div>
+                                            <f:setPropertyActionListener value="deep-purple" target="#{usuarioFaces.corTema}"/>
+                                        </p:commandLink>
+                                    </div>
+                                    <p:spacer width="3px"/>
+                                    <div class="ui-g ui-md ui-lg">
+                                        <p:commandLink id="corTema9"
+                                                       onclick="PF('mpProc').show()"
+                                                       process="@this"
+                                                       update="pnlColortheme"
+                                                       oncomplete="PF('mpProc').hide();"
+                                                       title="Green - Yellow">
+                                            <div class="divChooseColorTheme" style="background-color: #43A047;">
+                                                <i class="#{'green' eq usuarioFaces.corTema? 'fa fa-check' :''} fa_check" style="color: #FFFFFF; font-size: 14px;"/>
+                                            </div>
+                                            <f:setPropertyActionListener value="green" target="#{usuarioFaces.corTema}"/>
+                                        </p:commandLink>
+                                    </div>
+                                </div>
+                            </p:outputPanel>
+
+
+                            <p:selectOneMenu id="corTema"
+                                             rendered="false"
+                                             style="width: 150px"
+                                             value="#{usuarioFaces.corTema}">
+                                <f:selectItem itemValue="blue" itemLabel="Blue - Amber"/>
+                                <f:selectItem itemValue="teal" itemLabel="Teal - Amber"/>
+                                <f:selectItem itemValue="blue-grey" itemLabel="Blue Grey - Green"/>
+                                <f:selectItem itemValue="cyan" itemLabel="Cyan - Yellow"/>
+                                <f:selectItem itemValue="dark-blue" itemLabel="Dark - Blue"/>
+                                <f:selectItem itemValue="light-blue" itemLabel="Light Blue - Green"/>
+                                <f:selectItem itemValue="indigo" itemLabel="Indigo - Pink"/>
+                                <f:selectItem itemValue="deep-purple" itemLabel="deep-purple"/>
+                                <f:selectItem itemValue="green" itemLabel="Green - Yellow"/>
+
+                                <p:ajax onstart="PF('mpProc').show();" oncomplete="PF('mpProc').hide();" process="@this"/>
+                            </p:selectOneMenu>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center">
+                            <br/>
+                            <p:commandButton value="Salvar"
+                                             icon="fa fa-save"
+                                             styleClass="btnMenor90"
+                                             process="@this,@form"
+                                             onclick="PF('mpProc').show();"
+                                             oncomplete="if(!args.validationFailed){PF('modalPerfil').hide();}PF('mpProc').hide();"
+                                             ajax="false"
+                                             update="erro1"
+                                             action="#{usuarioFaces.dofinishUpdateUsuario}"
+                                             id="btnSavePerfil">
+                            </p:commandButton>
+                            <p:commandButton value="Cancelar"
+                                             icon="fa fa-repeat"
+                                             styleClass="btnMenor90"
+                                             onclick="PF('modalPerfil').hide();"
+                                             ajax="true">
+                            </p:commandButton>
+                        </td>
+                    </tr>
+                </table>
+            </p:outputPanel>
+        </h:form>
+    </p:dialog>
+    <p:dialog id="modalSenha"
+              widgetVar="modalSenha"
+              responsive="true"
+              resizable="false"
+              header="Mudar Senha"
+              modal="true">
+        <h:form id="formSenha">
+            <p:outputPanel id="pnlSenha">
+                <p:growl id="erro2" showDetail="true"/>
+                <table style="width: 100%" align="center" cellspacing="5" border="0">
+                    <tr>
+                        <td>
+                            <label class="ui-icon-colorTheme">Senha atual<span style="color: red">*</span></label>
+                            <br/>
+                            <p:password value="#{usuarioFaces.usuarioSelected.usuSenhaAntiga}"
+                                        id="antiga"
+                                        required="true"
+                                        requiredMessage="Senha atual é Obrigatório"
+                                        size="30"
+                                        maxlength="12"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="ui-icon-colorTheme">Senha nova<span style="color: red">*</span></label>
+                            <br/>
+                            <p:password value="#{usuarioFaces.usuarioSelected.usuNovaSenha}"
+                                        id="nova"
+                                        required="true"
+                                        requiredMessage="Senha nova é Obrigatório"
+                                        size="30"
+                                        maxlength="12"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="ui-icon-colorTheme">Confirmar senha nova <span style="color: red">*</span></label>
+                            <br/>
+                            <p:password value="#{usuarioFaces.usuarioSelected.usuConfirmaSenha}"
+                                        id="conf"
+                                        required="true"
+                                        requiredMessage="Confirmar senha nova  é Obrigatório"
+                                        size="30"
+                                        maxlength="12"/>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="4" align="center">
+                            <br/>
+                            <p:commandButton value="Salvar"
+                                             icon="fa fa-save"
+                                             styleClass="btnMenor90"
+                                             onclick="PF('mpProc').show();"
+                                             oncomplete="if(!args.validationFailed){PF('modalSenha').hide();}PF('mpProc').hide();updateSenha();"
+                                             ajax="true"
+                                             update="erro2"
+                                             action="#{usuarioFaces.doUpdateSenha}"
+                                             id="btnUpdateSenha">
+                            </p:commandButton>
+                            <p:commandButton value="Cancelar"
+                                             styleClass="btnMenor90"
+                                             icon="fa fa-repeat"
+                                             onclick="PF('modalSenha').hide();"
+                                             immediate="true"
+                                             ajax="true">
+                            </p:commandButton>
+                        </td>
+                    </tr>
+                </table>
+            </p:outputPanel>
+        </h:form>
+    </p:dialog>
+    <p:dialog id="ovlFoto"
+              widgetVar="ovlFoto"
+              responsive="true"
+              resizable="false"
+              dynamic="true"
+              modal="true"
+              showCloseIcon="true"
+              style="width: 550px;">
+        <h:form id="formFoto" enctype="multipart/form-data">
+            <p:outputPanel id="pnlFoto">
+                <table style="width: 100%" align="center" cellspacing="5" border="0">
+                    <tr>
+                        <td colspan="2" align="center">
+                            <!--            <p:fileUpload value="#{usuarioFaces.file}" mode="simple"/>-->
+                            <!--            <p:commandButton value="Salvar" action="#{usuarioFaces.uploadSalveImagem}" ajax="false"/>-->
+                            <p:fileUpload fileUploadListener="#{usuarioFaces.upload}"
+                                          fileLimit="1" required="true"
+                                          requiredMessage="O campo Foto é obrigatório."
+                                          style="font-size: 10px;"
+                                          fileLimitMessage="Excedido Limite de arquivos"
+                                          cancelLabel="Cancelar" label="Procurar"
+                                          uploadLabel="Anexar"
+                                          invalidSizeMessage="Tamanho excedido(200kb)"
+                                          sizeLimit="204800"
+                                          invalidFileMessage="Somente arquivos .jpg, .png ou .gif"
+                                          allowTypes="/(\.|\/)(gif|jpe?g|png)$/" mode="advanced"
+                                          skinSimple="true" />
+                            <!-- <p:commandButton value="Enviar" ajax="false" /> -->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center">
+                            <p:commandButton value="Atualizar foto"
+                                             icon="fa fa-save"
+                                             styleClass="btnMenor90"
+                                             onclick="PF('mpProc').show();"
+                                             oncomplete="if(!args.validationFailed){PF('ovlFoto').hide();}PF('mpProc').hide();updateFotoEdit();updateFoto();"
+                                             ajax="true"
+                                             id="btnatualizaFoto">
+                            </p:commandButton>
+                        </td>
+                    </tr>
+                </table>
+            </p:outputPanel>
+        </h:form>
+    </p:dialog>
+</ui:composition>

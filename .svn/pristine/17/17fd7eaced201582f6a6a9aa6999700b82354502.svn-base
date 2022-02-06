@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebContextManager">
+    <option name="state">
+      <map>
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/topbar.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/aniversariante/aniversariante.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/aniversariante" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/forms.xhtml" value="file://$PROJECT_DIR$/src/main/webapp" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/gasto/gasto.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/gasto" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/gasto/graficoGasto.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/gasto" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/graficoGasto.xhtml" value="file://$PROJECT_DIR$/src/main/webapp" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/graficos/graficoGeral.xhtml" value="file://$PROJECT_DIR$/src/main/webapp/graficos" />
+      </map>
+    </option>
+  </component>
+</project>

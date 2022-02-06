@@ -1,0 +1,129 @@
+package com.ManagedBeans;
+
+import com.Bean.Setor;
+import com.DAO.FamiliarDAO;
+import com.Bean.Familiar;
+import com.Bean.Usuario;
+import com.DAO.SetorDAO;
+import com.DAO.UsuarioDAO;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.io.Serializable;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+import com.Util.MensagensErros;
+import javax.inject.Named;
+import javax.enterprise.context.SessionScoped;
+
+/**
+ *
+ * @author Sergio - 02/09/2021
+ */
+@Named
+@SessionScoped
+public class FamiliarFaces implements Serializable{
+
+    private List<Familiar> cachedFamiliars = null;
+    private FamiliarDAO familiarDAO = new FamiliarDAO();
+    private Familiar familiarSelected;
+    private Usuario usuario;
+    private Setor setor;
+
+    public Setor getSetor() {
+        return setor;
+    }
+
+    public void setSetor(Setor setor) {
+        this.setor = setor;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public FamiliarDAO getFamiliarDAO() {
+        return familiarDAO;
+    }
+
+    public void setFamiliarDAO(FamiliarDAO familiarDAO) {
+        this.familiarDAO = familiarDAO;
+    }
+
+    public Familiar getFamiliarSelected() {
+        return familiarSelected;
+    }
+
+    public void setFamiliarSelected(Familiar familiarSelected) {
+        this.familiarSelected = familiarSelected;
+    }
+
+    public List<Familiar> getCachedFamiliars() {
+        if (cachedFamiliars == null) {
+            this.cachedFamiliars = familiarDAO.getFamiliars();
+        }
+        return cachedFamiliars;
+    }
+
+    public String doAddFamiliar() {
+        int setor = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("setor").toString());
+        int usuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        familiarSelected = new Familiar(setor, usuario);
+        return "familiarNew";
+    }
+
+    public String dofinishAddFamiliar() {
+        Date date = new Date();
+        familiarSelected.setDataHoraAtualizacao(date);
+        familiarDAO.addFamiliar(familiarSelected);
+        cachedFamiliars = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "familiarList";
+        }
+    }
+
+    public String doRemoveFamiliar() {
+        familiarDAO.removeFamiliar(familiarSelected);
+        cachedFamiliars = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "familiarList";
+        }
+    }
+
+    public String doUpdateFamiliar() {
+        UsuarioDAO usuDAO = new UsuarioDAO();
+        usuario = usuDAO.getUsuario(familiarSelected.getCodUsuario());
+        SetorDAO posDAO = new SetorDAO();
+        setor = posDAO.getSetor(familiarSelected.getCodSetor());
+        return "familiarEdit";
+    }
+
+    public String dofinishUpdateFamiliar() {
+        Date date = new Date();
+        int codUsuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        familiarSelected.setCodUsuario(codUsuario);
+        int codSetor = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("setor").toString());
+        familiarSelected.setCodSetor(codSetor);
+        familiarSelected.setDataHoraAtualizacao(date);
+        familiarDAO.updateFamiliar(familiarSelected);
+        cachedFamiliars = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "familiarList";
+        }
+    }
+
+    public String doCancelFamiliar() {
+        cachedFamiliars = null;
+        return "familiarList";
+    }
+}

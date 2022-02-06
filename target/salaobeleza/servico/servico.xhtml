@@ -1,0 +1,255 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Serviços</ui:define>
+
+    <ui:define name="head">
+        <style type="text/css">
+            .style-Icon {
+                color: #2d353c;
+                font-size: 17px;
+            }
+
+            .style-button {
+                font-size: 13px;
+                border: #1976d2 !important;
+            }
+
+            .text-column {
+                text-align: center;
+            }
+
+            .width-column-equals {
+                width: 7vw;
+            }
+
+            .width-column-dif {
+                width: 9vw;
+            }
+
+            .width-column-main {
+                width: 14vw;
+                text-align: left;
+            }
+            input::placeholder {
+                color: #FFFFFF;
+                font-size: 11px;
+            }
+        </style>
+
+        <script type="text/javascript">
+            function upperCase(a) {
+                setTimeout(function () {
+                    a.value = a.value.toUpperCase();
+                }, 1);
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="erro" showDetail="true" showSummary="true"/>
+            <table align="center" width="700px">
+                <tr>
+                    <td colspan="2">
+                        <p:panel styleClass="styleBox-title" style="border-radius: 8px;">
+                            <p:outputPanel style="text-align: center">
+                                <i class="fa fa-list-ol" style="font-size: 20px; color: #9e9e9e;"/>
+                                <p:spacer width="5px"/>
+                                <p:outputLabel value="SERVIÇO" style="font-size: 20px; color: #9e9e9e;"/>
+                            </p:outputPanel>
+                        </p:panel>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p:remoteCommand name="updateServicoList"
+                                         autoRun="true"
+                                         update="servicoList"
+                                         process="@this"
+                                         onstart="PF('mpProc').show()"
+                                         oncomplete="PF('mpProc').hide();"
+                                         actionListener="#{servicoFaces.populaServico}"/>
+                        <p:dataTable var="item"
+                                     id="servicoList"
+                                     draggableRows="true"
+                                     value="#{servicoFaces.servicoList}"
+                                     emptyMessage="Nenhum arquivo encontrado!">
+                            <f:facet name="header">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <p:commandButton
+                                                value="Novo"
+                                                icon="ui-icon-add"
+                                                update="formServico:pnlServico"
+                                                styleClass="btnMenor90"
+                                                action="#{servicoFaces.doAddServico}"
+                                                onclick="PF('mpProc').show()"
+                                                oncomplete="PF('mpProc').hide();PF('servicoDlg').show();"/>
+                                    </div>
+                                    <div>
+                                        <p:inputText style="width: 200px;"
+                                                     value="#{servicoFaces.param}"
+                                                     placeholder="Busque por descrição,valor ou duração"/>
+                                        <p:commandButton
+                                                icon="ui-icon-search"
+                                                styleClass="btnMenor90"
+                                                process="@this,@form"
+                                                onclick="PF('mpProc').show()"
+                                                oncomplete="PF('mpProc').hide();updateServicoList();"/>
+                                    </div>
+                                </div>
+
+                            </f:facet>
+                            <p:column headerText="Codigo" styleClass="text-column width-column-equals"
+                                      sortBy="#{item.serCodigo}">
+                                <h:outputText value="#{item.serCodigo}"/>
+                            </p:column>
+
+                            <p:column headerText="Descrição" sortBy="#{item.serDescricao}" styleClass="width-column-main">
+                                <h:outputText value="#{item.serDescricao}"/>
+                            </p:column>
+                            
+                            <p:column headerText="Duração" styleClass="text-column width-column-dif"
+                                      sortBy="#{item.serDuracao}">
+                                <h:outputText value="#{item.serDuracao}"/>
+                            </p:column>
+
+                            <p:column headerText="Valor" styleClass="text-column width-column-dif"
+                                      sortBy="#{item.serValor}">
+                                <h:outputText value="#{servicoFaces.moedaBr(item.serValor)}"/>
+                            </p:column>
+
+                            <p:column styleClass="text-column width-column-equals">
+                                <p:commandLink
+                                        title="Editar"
+                                        update="formServico:pnlServico"
+                                        onclick="PF('mpProc').show()"
+                                        oncomplete="PF('mpProc').hide();PF('servicoDlg').show();">
+                                    <i class="fa fa-edit style-Icon"/>
+                                    <f:setPropertyActionListener value="#{item}"
+                                                                 target="#{servicoFaces.servicoSelected}"/>
+                                </p:commandLink>
+                                <p:spacer width="5px"/>
+                                <p:commandLink
+                                        title="Remover"
+                                        onclick="PF('mpProc').show();"
+                                        process="@this"
+                                        style="width: 8%"
+                                        oncomplete="PF('mpProc').hide();PF('removeServico').show();">
+                                    <i class="fa fa-trash style-Icon"/>
+                                    <f:setPropertyActionListener value="#{item}"
+                                                                 target="#{servicoFaces.servicoSelected}"/>
+                                </p:commandLink>
+                            </p:column>
+                        </p:dataTable>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+        <h:form>
+            <p:growl id="message2" showDetail="true"/>
+            <p:confirmDialog id="removeServico" widgetVar="removeServico"
+                             header="Remover Serviço"
+                             message="Tem certeza que deseja remover?"
+                             style=" font-size: 13px;"
+                             severity="true"
+                             showEffect="bounce"
+                             hideEffect="bounce"
+                             width="300">
+                <p:commandButton value="Sim"
+                                 process="@this"
+                                 update="form:erro"
+                                 styleClass="style-button"
+                                 onclick="PF('mpProc').show();"
+                                 oncomplete="PF('mpProc').hide();updateServicoList();PF('removeServico').hide();"
+                                 actionListener="#{servicoFaces.doRemoveServico}"
+                                 icon="ui-icon-check"/>
+
+                <p:commandButton value="Nao"
+                                 styleClass="style-button"
+                                 onclick="PF('removeServico').hide();"
+                                 icon="ui-icon-close"/>
+            </p:confirmDialog>
+        </h:form>
+        <p:dialog id="servicoDlg"
+                  widgetVar="servicoDlg"
+                  responsive="true"
+                  header="Serviço"
+                  modal="true">
+            <h:form id="formServico">
+                <p:outputPanel id="pnlServico">
+                    <table cellpadding="5" cellspacing="5" border="0" style="width: 300px">
+                        <tr>
+                            <td colspan="3">
+                                <label class="ui-icon-colorTheme">Descrição <span style="color: red">*</span></label>
+                                <br/>
+                                <p:inputText value="#{servicoFaces.servicoSelected.serDescricao}"
+                                             id="nome"
+                                             required="true"
+                                             onkeyup="upperCase(this)"
+                                             requiredMessage="Descrição é Obrigatório"
+                                             maxlength="500"
+                                             style="width: 98%"/>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <label class="ui-icon-colorTheme">Duração <span style="color: red">*</span></label>
+                                <br/>
+                                <p:inputText value="#{servicoFaces.servicoSelected.serDuracao}"
+                                             id="durcao"
+                                             required="true"
+                                             requiredMessage="Duração é Obrigatório"
+                                             maxlength="500"
+                                             style="width: 98%"/>
+                            </td>
+                            <td>
+                                <label class="ui-icon-colorTheme">Valor <span style="color: red">*</span></label>
+                                <br/>
+                                <p:inputNumber id="vlr"
+                                               style="width: 49%"
+                                               required="true"
+                                               requiredMessage="Valor é Obrigatório"
+                                               value="#{servicoFaces.servicoSelected.serValor}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" colspan="3">
+                                <span style="color: red">*</span>
+                                <i style="font-size: 9px;">Campos obrigatórios</i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" align="right">
+                                <p:commandButton value="Cancelar"
+                                                 process="@this"
+                                                 style="background-color: #C62828;"
+                                                 icon="fa fa-reply"
+                                                 onclick="PF('servicoDlg').hide();"
+                                                 id="btnCancelar">
+                                </p:commandButton>
+                                <p:spacer width="5px"/>
+                                <p:commandButton value="Salvar"
+                                                 process="@this,@form"
+                                                 style="background-color: #1ab394;"
+                                                 update="form:erro"
+                                                 icon="fa fa-check"
+                                                 onclick="PF('mpProc').show();"
+                                                 oncomplete="if(!args.validationFailed){PF('servicoDlg').hide();updateServicoList();}PF('mpProc').hide();"
+                                                 action="#{servicoFaces.doSaveOrUpdateServico}"
+                                                 id="btnSalvar">
+                                </p:commandButton>
+                            </td>
+                        </tr>
+                    </table>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

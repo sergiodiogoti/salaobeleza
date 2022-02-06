@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/exodo.iml" filepath="$PROJECT_DIR$/exodo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/salaobeleza.iml" filepath="$PROJECT_DIR$/salaobeleza.iml" />
+    </modules>
+  </component>
+</project>

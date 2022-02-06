@@ -1,0 +1,21 @@
+ALTER TABLE `usuario`   
+  ADD COLUMN `usuTema` VARCHAR(100) NULL;
+
+CREATE TABLE `aniversariante`(  
+  `aniCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `aniNome` VARCHAR(30),
+  `aniDataAniversario` DATE,
+  `aniUsuCodigo` INT(11),
+  `codUsuario` INT(11),
+  `codSetor` INT(11),
+  `dataHoraAtualizacao` DATETIME,
+  PRIMARY KEY (`aniCodigo`),
+  INDEX `fkusuarioaniversario` (`aniUsuCodigo`),
+  CONSTRAINT `fkusuarioaniversario` FOREIGN KEY (`aniUsuCodigo`) REFERENCES `usuario`(`usuCodigo`)
+);
+
+ALTER TABLE `aniversariante`   
+  ADD COLUMN `aniMensagem` TEXT NULL AFTER `dataHoraAtualizacao`;
+  
+  ALTER TABLE `aniversariante`   
+  ADD COLUMN `aniTelefone` VARCHAR(50) NULL AFTER `aniMensagem`;

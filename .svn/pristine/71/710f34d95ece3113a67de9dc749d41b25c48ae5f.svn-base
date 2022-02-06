@@ -1,0 +1,181 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:pa="http://primefaces.org/barcelona" xmlns:F="http://java.sun.com/jsf/core">
+
+    <style>
+        .img-arredondada {
+            border-radius: 50%;
+            background-position: -15px -15px;
+            height: 100px;
+            width: 100px;
+        }
+        .img-arredondada2 {
+            /*border-radius: 50%;*/
+            background-position: -15px -15px;
+            color: white;
+            height: 30px;
+            width: 30px;
+        }
+        .btnMenor90 {
+            transform: scale(0.85); /* (110% zoom) */
+        }
+        .btnMenor90 .ui-button-text {
+            letter-spacing: 0.3px !important;
+        }
+        .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-icon-left{
+            border-radius: 3px;
+        }
+        .cssContasAPagar:hover{
+            box-shadow: 0px 0px 8px #00BCD4;
+            border-radius: 4px;
+        }
+        ul ul {
+            list-style-type: none;
+        }
+
+        .layout-wrapper.topbar.topbar-menu > li > ul a {
+            padding: 6px 10px;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            color: #424242;
+            position: relative;
+            list-style-type: none;
+        }
+    </style>
+        <p:remoteCommand name="rmtTopBar"
+                         actionListener="#{gastoFaces.notificaoConta}"
+                         onstart="PF('mpProc').show()"
+                         update="cmdEditarNotifica"
+                         oncomplete="PF('mpProc').hide();"
+                         autoRun="true"
+                         process="@this"/>
+        <div class="topbar">
+            <div class="logo">
+                <h:link outcome="/dashboard">
+                    <p:graphicImage name="images/logo-inicial.png" library="barcelona-layout" width="600" height="50"/>
+                </h:link>
+            </div>
+
+            <p:graphicImage rendered="false" name="images/logo-text.svg" library="barcelona-layout" styleClass="app-name"/>
+
+            <a id="topbar-menu-button" href="#">
+                <i class="fa fa-bars"></i>
+            </a>
+
+
+            <ul class="topbar-menu fadeInDown animated">
+                <li>
+                    <a href="#">
+                        <p:commandLink style="color: #999999; font-size: 16px"
+                                       id="cmdSair"
+                                       onclick="PF('mpProc').show();"
+                                       action="#{usuarioFaces.doUpdateUsuario}"
+                                       update=":formNotifica:pnlNotifica"
+                                       oncomplete="PF('mpProc').hide();PF('logout').show();"
+                                       title="Sair">
+                            <i class="topbar-icon fa fa-fw fa-power-off" style="color: #FFFFFF"></i>
+                            <span class="topbar-item-name">Sair</span>
+                        </p:commandLink>
+                        <p:tooltip for="cmdSair" position="bottom"/>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <p:commandLink style="color: #999999; font-size: 16px"
+                                       id="cmdEditarNotifica"
+                                       onclick="PF('mpProc').show();"
+                                       action="#{usuarioFaces.doUpdateUsuario}"
+                                       update=":formNotifica:pnlNotifica"
+                                       oncomplete="PF('mpProc').hide();PF('modalNotifica').show();"
+                                       title="Voce tem #{gastoFaces.listaNotificacaoConta.size()} conta(s) por Pagar">
+                            <i class="topbar-icon fa fa-fw fa-bell-o" style="color: #FFFFFF"></i>
+                            <span class="topbar-badge animated rubberBand">#{gastoFaces.listaNotificacaoConta.size()}</span>
+                            <span class="topbar-item-name">Notificação</span>
+                            <f:setPropertyActionListener value="#{usuarioFaces.usuarioLogadoBean}" target="#{usuarioFaces.usuarioSelected}"/>
+                        </p:commandLink>
+                        <p:tooltip for="cmdEditarNotifica" position="bottom"/>
+                    </a>
+                </li>
+                <li class="search-item" style="display: none;">
+                    <h:form>
+                    <span class="md-inputfield">
+                        <p:inputText />
+                        <i class="fa fa-search"></i>
+                        <label>Search</label>
+                    </span>
+
+                    </h:form>
+                </li>
+            </ul>
+        </div>
+    <h:form>
+        <p:growl id="message" showDetail="true" />
+        <p:confirmDialog id="logout" widgetVar="logout"
+                         header="Sair do sistema"
+                         message="Deseja realmente sair do sistema?"
+                         severity="true"
+                         showEffect="fade"
+                         hideEffect="fade"
+                         width="300">
+            <p:commandButton value="Sim"
+                             process="@this,@form"
+                             ajax="false"
+                             actionListener="#{usuarioFaces.doLogout}"
+                             action="/login"
+                             icon="ui-icon-check"/>
+
+            <p:commandButton value="Não"
+                             onclick="PF('logout').hide();"
+                             icon="ui-icon-close" />
+            <h:link outcome="/dashboard" rendered="false">
+                <p:graphicImage name="images/calendario.png" library="barcelona-layout" width="25" height="25"/>
+            </h:link>
+        </p:confirmDialog>
+    </h:form>
+    <p:dialog id="modalNotifica"
+              resizable="false"
+              widgetVar="modalNotifica"
+              header="Conta(s) por Pagar"
+              modal="true">
+        <h:form id="formNotifica">
+            <p:outputPanel id="pnlNotifica">
+                <p:growl id="erro3" showDetail="true"/>
+                <table style="width: 100%" align="center" cellspacing="5" border="0">
+                    <tr>
+                        <td class="tdCss">
+                            <p:repeat value="#{gastoFaces.listaNotificacaoConta}" var="item">
+                                <p:commandLink style="color: #000000; font-size: 16px"
+                                               id="cmdnotfy"
+                                               onclick="PF('mpProc').show();"
+                                               oncomplete="PF('mpProc').hide();PF('modalPerfil').show();">
+                                    <table align="left" border="0">
+                                        <tr class="cssContasAPagar">
+                                            <td colspan="2">
+                                                <p:graphicImage styleClass="img-arredondada2" name="images/dolar.png" library="barcelona-layout" />
+                                            </td>
+                                            <td colspan="2">
+                                                <p:outputLabel style="font-size: 12px; font-weight: bold;" value="#{usuarioFaces.transformTextInicialMaiusculo(item.gasDescricao)}"/>
+                                                <br/>
+                                                <p:outputLabel style="font-size: 9px; font-weight: bold;" value="Vencimento:"/>
+                                                <p:outputLabel style="font-size: 9px; font-weight: bold;" value="#{item.gasVencimento}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                </p:outputLabel>
+                                                <br/>
+                                                <p:outputLabel style="font-weight: bold; font-size: 11px; color: #DC143C" value="#{gastoFaces.moedaBr(item.gasValor)}"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </p:commandLink>
+                            </p:repeat>
+                        </td>
+                    </tr>
+                </table>
+            </p:outputPanel>
+        </h:form>
+    </p:dialog>
+</ui:composition>

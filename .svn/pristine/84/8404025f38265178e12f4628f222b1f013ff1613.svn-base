@@ -1,0 +1,792 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+                
+    <ui:define name="title">Gastos</ui:define>
+
+    <ui:define name="head">
+        <style type="text/css">
+            .ui-selectoneradio.ui-grid-responsive .ui-grid-col-4, .ui-selectmanycheckbox.ui-grid-responsive .ui-grid-col-4{
+                padding-bottom: 10px;
+            }
+            .layout-wrapper .layout-main {
+                margin-left: 65px;
+                padding: 5px;
+                -moz-transition: margin-left 0.3s;
+                -o-transition: margin-left 0.3s;
+                -webkit-transition: margin-left 0.3s;
+                transition: margin-left 0.3s;
+            }
+            .divCenter {
+                display: inline;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+            .ui-dialog .ui-dialog-title{
+                font-size: 13px!important;
+                float:left;
+                margin:.3em 16px .1em 0;
+            }
+
+            .tdCss {
+                font-size: 13px;
+                color: #1976d2!important;
+                padding-bottom: 5px;
+            }
+            .ui-button{
+                font-size: 10px;
+            }
+           .divFooterRed{
+               background-color: #DC143C!important;
+               width: 400px;
+               padding: 8px;
+               height: 8px;
+               color: #FFFFFF;
+               pointer-events: none;
+               display: block;
+               border: black solid;
+           }
+           .divFalta{
+               /*border-radius: 0px 0px 5px 5px;*/
+               /*position: absolute;*/
+               /*display: block;*/
+           }
+           .divFooterRoxo{
+               background-color: #9370DB!important;
+               width: 400px;
+               padding: 8px;
+               height: 8px;
+               color: #FFFFFF;
+               pointer-events: none;
+               display: block;
+               border: black solid;
+           }
+           .marginTopLabelDiv{
+               margin-top: -2%;
+           }
+           .divLabelFooterLeft{
+               float: left;
+               padding:2px;
+               font-size: 12px;
+               margin-top: -2%;
+           }
+           .divLabelFooterRight{
+               float: right;
+               padding:2px;
+               font-size: 12px;
+               margin-top: -2%;
+           }
+            /* Works on Firefox */
+            * {
+                scrollbar-width:thin;
+                scrollbar-color:#D3D3D3;
+            }
+
+            /* Works on Chrome, Edge, and Safari */
+            *::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            *::-webkit-scrollbar-track {
+                background: white;
+            }
+
+            *::-webkit-scrollbar-thumb {
+                background-color: #D3D3D3;
+                border-radius: 20px;
+            }
+            /*div {*/
+            /*    border: 1px solid red;*/
+            /*}*/
+
+            table {
+                border-collapse: separate;
+                border-spacing: 0px;
+                /*margin-top: -8px;*/
+            }
+
+            td {
+                /*border: 1px solid green;*/
+                /*border-left-width: 0;*/
+                /*min-width: 120px;*/
+                /*height: 14px;*/
+            }
+
+            td:first-child {
+                border-left-width: 1px;
+            }
+            .div_main{
+                background-color: #FFFFFF;
+                color: black;
+                float: left;
+                border-radius: 0px 10px 10px 0px;
+                height: 80px;width: 99%;
+            }
+
+            .div_main:hover{
+                /*background-color: #ECEFF1;*/
+                pointer-events: visible;
+                box-shadow: 0px 0px 8px #7e7f81;
+            }
+            .shadow{
+                -webkit-box-shadow: 0px 10px 13px -7px #000000, 50px 50px 18px 44px rgba(0,0,0,0);
+                box-shadow: 0px 10px 13px -7px #000000, 50px 50px 18px 44px rgba(0,0,0,0);
+            }
+            .iconSelect{
+
+            }
+            .iconUnselect{
+                background-color: #7e7f81;
+            }
+            .breakDiv{
+                flex-basis: 100%;
+                height: 0;
+            }
+            .styleBox{
+                padding: 0 !important;
+                border-radius: 10px;
+                box-shadow: 0px 0px 8px #666;
+                text-align: center;
+                width: 230px;
+            }
+            .ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-icon-left{
+                border-radius: 3px;
+            }
+            .btnMenor90 {
+                transform: scale(0.85); /* (110% zoom) */
+            }
+            .btnMenor90 .ui-button-text {
+                letter-spacing: 0.3px !important;
+            }
+            .layout-wrapper .layout-breadcrumb {
+                background-color: #ffffff;
+                box-shadow: inset 0 -2px 4px 0 rgb(0 0 0 / 14%);
+                -webkit-box-shadow: inset 0 -2px 4px 0 rgb(0 0 0 / 14%);
+                -moz-box-shadow: inset 0 -2px 4px 0 rgba(0, 0, 0, 0.14);
+                min-height: 38px;
+                width: 100%;
+                border-radius: 6px;
+            }body, html{
+                 height: 100%;
+             }
+
+            body{
+                background-color: blue;
+            }
+
+            .menu{
+                background-color: red;
+                height: 100%;
+                width: 250px;
+            }
+        </style>
+        <script>
+            PrimeFaces.locales['pt_BR'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                currentText: 'Começo',
+                monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+                dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+                dayNamesMin: ['D','S','T','Q','Q','S','S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Data Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText : 'Todo Dia'
+            };
+        </script>
+    </ui:define>
+    <ui:define name="content">
+
+        <h:body>
+        <p:remoteCommand name="rmtGasto"
+                         process="@this"
+                         actionListener="#{gastoFaces.populaListaGastos}"
+                         autoRun="true"
+                         update="form:pnlGeral"
+                         onstart="PF('mpProc').show();"
+                         oncomplete="PF('mpProc').hide();"/>
+        <h:form id="form">
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+            <p:growl id="erro" showDetail="true"/>
+            <p:outputPanel id="pnlGeral">
+                <div class="layout-breadcrumb">
+                    <p:outputPanel style="padding: 4px; color: #999999;" >
+                        <i class="fa fa-usd" style="font-size: 23px;"/>
+                        <p:spacer width="3px"/>
+                        <p:outputLabel value="Financeiro" style="font-family: 'Century Gothic'; font-size: 16px;"/>
+                    </p:outputPanel>
+                </div>
+                <p:spacer height="3px"/>
+                <table align="center" cellpadding="5" cellspacing="2" border="0">
+                <tr>
+                <td>
+                    <div style="width: 400px; height: auto; box-shadow: 0px 0px 12px #666; border: none; background-color: transparent;border-radius: 5px 5px 5px 5px;">
+                        <div class="background-colorTheme" style="width: auto;height: 20px;
+                                    text-align: center;
+                                    padding: 8px;
+                                    color: #FFFFFF; border-radius: 5px 5px 0px 0px;">
+                            <div style="float: left">
+                                <p:commandLink onstart="PF('mpProc').show();"
+                                               style="color: #FFFFFF"
+                                               actionListener="#{gastoFaces.minusMes}"
+                                               oncomplete="PF('mpProc').hide();rmtGasto();">
+                                    <i class="fa fa-chevron-circle-left" style="font-size: 20px;"/>
+                                </p:commandLink>
+                            </div>
+                            <div class="divCenter">
+                                <p:commandLink onstart="PF('mpProc').show();"
+                                               style="color: #FFFFFF"
+                                               oncomplete="PF('mpProc').hide();">
+                                    <i class="fa fa-calendar-o" style="font-size: 15px;"/>
+                                </p:commandLink>
+                                <p:outputLabel value=" #{gastoFaces.getSetaMesExtenso(gastoFaces.mes)} / #{gastoFaces.ano}"/>
+                                <p:commandLink onstart="PF('mpProc').show();"
+                                               title="Adicionar Gasto"
+                                               onclick="PF('mpProc').show();"
+                                               style="color: #FFFFFF;"
+                                               actionListener="#{gastoFaces.doAddGasto}"
+                                               update=":formCadGasto:pnlCadGasto"
+                                               oncomplete="PF('mpProc').hide();PF('modalCadGasto').show();">
+                                    <i class="fa fa-plus" style="font-size: 15px;"/>
+                                </p:commandLink>
+                            </div>
+                            <div style="float: right">
+                                <p:commandLink onstart="PF('mpProc').show();"
+                                               style="color: #FFFFFF"
+                                               actionListener="#{gastoFaces.plusMes}"
+                                               oncomplete="PF('mpProc').hide();rmtGasto();">
+                                    <i class="fa fa-chevron-circle-right" style="font-size: 20px;"/>
+                                </p:commandLink>
+                            </div>
+                        </div>
+                        <div style="background-color: #F0F8FF!important;
+                                    width: auto;
+                                    height: 350px;
+                                    padding: 8px;
+                                   justify-content: center;
+                                   align-items: center;
+                                    overflow: auto;
+                                    color: #FFFFFF;">
+                            <p:outputPanel id="pnlListaGastos">
+                                <p:repeat value="#{gastoFaces.listaGastos}" var="item">
+                                    <div style="width: auto; height: 80px; padding: 3px;">
+                                        <div style="background-color: #{gastoFaces.corTipoGasto(item.gasTipo)};
+                                                                    color: black;
+                                                                    float: left;
+                                                                    border-radius: 10px 0px 0px 10px;
+                                                                    width: 1%; height: 80px;">
+                                        </div>
+                                        <div class="div_main">
+                                            <table align="center" style="width: 100%; height: 2px;" border="0 ">
+                                                <tr>
+                                                    <td>
+                                                        <div>
+                                                            <div style="float: left; font-size: 12px;font-weight: bold;padding: 4px;">
+                                                                <p:outputLabel value="#{usuarioFaces.transformTextInicialMaiusculo(item.gasDescricao)}"/>
+
+                                                            </div>
+                                                            <div style="float: right; font-size: 12px;font-weight: bold;padding: 4px;">
+                                                                <p:outputLabel value="-#{gastoFaces.moedaBr(item.gasValor)}"/>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div>
+                                                            <div style="float: left;
+                                                                        font-size: 12px;
+                                                                        padding: 4px;">
+                                                                <p:outputLabel value=" #{gastoFaces.dataExtensao(item.gasVencimento)}"/>
+                                                            </div>
+                                                            <div style="float: right;
+                                                                        font-size: 12px;
+                                                                        font-weight: bold;
+                                                                        padding: 4px;">
+                                                                <p:commandLink
+                                                                        title="Duplicar despesa"
+                                                                        onclick="PF('mpProc').show();"
+                                                                        update=":formDuplicar:pnlDuplicar"
+                                                                        oncomplete="PF('mpProc').hide();PF('modalDuplicar').show();"
+                                                                        process="@this"
+                                                                        style="width: 8%">
+                                                                    <i class="fa fa-exchange" style="font-size: 16px; color: #A9A9A9;"/>
+                                                                    <f:setPropertyActionListener value="#{item}" target="#{gastoFaces.gastoSelected}"/>
+                                                                </p:commandLink>
+                                                                <p:spacer width="2px"/>
+                                                                <p:commandLink
+                                                                        title="#{'S' eq item.gasPago? 'Pago' : 'Não pago'}"
+                                                                        onclick="PF('mpProc').show();"
+                                                                        process="@this"
+                                                                        rendered="#{'D' eq item.gasTipo}"
+                                                                        style="width: 8%"
+                                                                        action="#{gastoFaces.gerarPagamento}"
+                                                                        oncomplete="PF('mpProc').hide();rmtGasto();">
+                                                                    <i class="#{'S' eq item.gasPago? 'fa fa-thumbs-up' : 'fa fa-thumbs-down'}"
+                                                                       style="font-size: 15px; color: #{'S' eq item.gasPago? '#32CD32' : '#DC143C'}"/>
+                                                                    <f:setPropertyActionListener value="#{item}" target="#{gastoFaces.gastoSelected}"/>
+                                                                </p:commandLink>
+                                                                <p:spacer width="2px"/>
+                                                                <p:commandLink
+                                                                        title="Alterar"
+                                                                        onclick="PF('mpProc').show();"
+                                                                        process="@this"
+                                                                        style="width: 8%"
+                                                                        actionListener="#{gastoFaces.doUpdateGasto}"
+                                                                        update=":formCadGasto:pnlCadGasto"
+                                                                        oncomplete="PF('mpProc').hide();PF('modalCadGasto').show();">
+                                                                    <i class="fa fa-pencil" style="font-size: 15px; color: #A9A9A9"/>
+                                                                    <f:setPropertyActionListener value="#{item}" target="#{gastoFaces.gastoSelected}"/>
+                                                                </p:commandLink>
+                                                                <p:spacer width="2px"/>
+                                                                <p:commandLink
+                                                                        title="Excluir"
+                                                                        onclick="PF('mpProc').show();"
+                                                                        process="@this"
+                                                                        style="width: 8%"
+                                                                        oncomplete="PF('mpProc').hide();PF('excluirGasto').show();">
+                                                                    <i class="fa fa-trash" style="font-size: 15px; color: #A9A9A9;"/>
+                                                                    <f:setPropertyActionListener value="#{item}" target="#{gastoFaces.gastoSelected}"/>
+                                                                </p:commandLink>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr style="top:-2px;">
+                                                    <td>
+                                                        <div>
+                                                            <div style="float: left; font-size: 12px;padding: 2px;">
+                                                                <p:commandLink
+                                                                        onclick="PF('mpProc').show();"
+                                                                        update=":formDuplicar:pnlDuplicar"
+                                                                        oncomplete="PF('mpProc').hide();PF('modalDuplicar').show();"
+                                                                        process="@this"
+                                                                        style="width: 8%; pointer-events: none">
+                                                                    <i class="fa fa-bookmark" style="font-size: 12px; color: #A9A9A9;"/>
+                                                                    <f:setPropertyActionListener value="#{item}" target="#{gastoFaces.gastoSelected}"/>
+                                                                </p:commandLink>
+                                                                <p:spacer width="4px"/>
+                                                                <p:outputLabel value="#{null eq item.gastCatCodigo? 'Sem Categoria' : 'Categoria:'}#{usuarioFaces.transformTextInicialMaiusculo(item.gastCatCodigo.catDescricao)}"/>
+
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </p:repeat>
+                            </p:outputPanel>
+                        </div>
+                        <div  style="background-color: #4169E1; width: auto;
+                                    padding: 8px;
+                                    height: 8px;
+                                    color: #FFFFFF;
+                                    pointer-events: none;
+                                    display: block;">
+                            <div class="divLabelFooterLeft">Receita Disponivel Atualmente</div>
+                            <div class="divLabelFooterRight">#{gastoFaces.receitaDisponivel}</div>
+                        </div>
+                        <div style="background-color: #DC143C!important;
+                                    width: auto;
+                                    padding: 8px;
+                                    height: 8px;
+                                    color: #FFFFFF;
+                                    pointer-events: none;
+                                    display: block;">
+                            <div class="divLabelFooterLeft">Total Despesas</div>
+                            <div class="divLabelFooterRight">#{gastoFaces.somatorioDespesa}</div>
+                        </div>
+                        <div style="background-color: #DC143C!important;
+                                    width: auto;
+                                    padding: 8px;
+                                    height: 8px;
+                                    color: #FFFFFF;
+                                    border-radius: 0px 0px 5px 5px;
+                                    pointer-events: none;
+                                    display: block;">
+                            <div class="divLabelFooterLeft">Falta Pagar</div>
+                            <div class="divLabelFooterRight">#{gastoFaces.faltaPagar}</div>
+                        </div>
+                    </div>
+                    <p:tooltip position="right" />
+                </td>
+                </tr>
+                </table>
+            </p:outputPanel>
+        </h:form>
+        </h:body>
+        <p:dialog id="modalCadGasto"
+                  widgetVar="modalCadGasto"
+                  responsive="true"
+                  width="340"
+                  resizable="false"
+                  header="Cadastrar"
+                  modal="true">
+        <h:form id="formCadGasto">
+            <p:outputPanel id="pnlCadGasto">
+                <table style="width: 100%" align="center" cellpadding="5" cellspacing="10" border="0">
+                    <tr>
+                        <td colspan="3">
+                                <p:selectOneRadio id="tipoDespesa"
+                                                  layout="responsive" columns="2"
+                                                  value="#{gastoFaces.gastoSelected.gasTipo}"
+                                                  required="true"
+                                                  requiredMessage="O Campo Despesa/Receita deve ser selecionado"
+                                                  unselectable="true">
+                                    <f:selectItem itemLabel="Despesa" itemValue="D"/>
+                                    <f:selectItem itemLabel="Receita" itemValue="R"/>
+                                </p:selectOneRadio>
+                            <br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <h:panelGroup styleClass="md-inputfield tdCss">
+                                <p:inputText value="#{gastoFaces.gastoSelected.gasDescricao}"
+                                             id="tipo"
+                                             required="true"
+                                             requiredMessage="Descrição é Obrigatório"
+                                             maxlength="25"
+                                             style="text-transform: uppercase; width: 98%"/>
+                                <label>Descrição<span style="color: red">*</span></label>
+                            </h:panelGroup>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <label class="ui-icon-colorTheme">Categoria </label>
+                            <br/>
+                            <p:selectOneMenu id="categoria"
+                                             style="width: 89%"
+                                             valueChangeListener="#{gastoFaces.onChangeCategoria}"
+                                             value="#{gastoFaces.gastoSelected.gastCatCodigo}">
+                                <f:selectItems value="#{categoriaFaces.comboCategorias}"/>
+                                <f:converter converterId="CategoriaConverter"/>
+                                <p:ajax update="formCadGasto:idBtnCog" process="@this"/>
+                            </p:selectOneMenu>
+                            <p:spacer width="2px"/>
+                            <p:menuButton id="idBtnCog" icon="fa fa-cog" styleClass="btnMenor90">
+                                <p:menuitem value="Cadastrar"
+                                            disabled="#{null eq gastoFaces.gastoSelected.gastCatCodigo? false : true}"
+                                            onclick="PF('mpProc').show();"
+                                            process="@this"
+                                            actionListener="#{categoriaFaces.doAddCategoria}"
+                                            icon="ui-icon-add"
+                                            update=":formCategoria:pnlCategoria"
+                                            oncomplete="PF('mpProc').hide();PF('modalCategoria').show();">
+                                </p:menuitem>
+                                <p:menuitem value="Alterar"
+                                            disabled="#{null ne gastoFaces.gastoSelected.gastCatCodigo? false : true}"
+                                            icon="ui-icon-pencil"
+                                            process="@this"
+                                            update=":formCategoria:pnlCategoria"
+                                            oncomplete="PF('mpProc').hide();PF('modalCategoria').show();">
+                                    <f:setPropertyActionListener value="#{gastoFaces.gastoSelected.gastCatCodigo}"
+                                                                 target="#{categoriaFaces.categoriaSelected}"/>
+                                </p:menuitem>
+                                <p:menuitem value="Excluir"
+                                            disabled="#{null ne gastoFaces.gastoSelected.gastCatCodigo? false : true}"
+                                            icon="ui-icon-trash"
+                                            process="@this"
+                                            oncomplete="PF('mpProc').hide();PF('excluirCategoria').show();">
+                                    <f:setPropertyActionListener value="#{gastoFaces.gastoSelected.gastCatCodigo}"
+                                                                 target="#{categoriaFaces.categoriaSelected}"/>
+                                </p:menuitem>
+                                
+                            </p:menuButton>
+                            <p:remoteCommand name="updateCategoria" update="categoria"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="ui-icon-colorTheme">Valor<span style="color: red">*</span></label>
+                            <br/>
+                            <p:inputNumber id="vlr"
+                                           style="width: 49%"
+                                           required="true"
+                                           requiredMessage="Valor é Obrigatório"
+                                           value="#{gastoFaces.gastoSelected.gasValor}"/>
+                        </td>
+                        <td valign="top">
+                            <label class="ui-icon-colorTheme">Vencimento<span style="color: red">*</span></label>
+                            <br/>
+                            <p:calendar id="receber"
+                                        size="8"
+                                        required="true"
+                                        requiredMessage="Vencimento é Obrigatório"
+                                        pattern="dd/MM/yyyy"
+                                        value="#{gastoFaces.gastoSelected.gasVencimento}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="ui-icon-colorTheme">Receber Notificação </label>
+                            <br/>
+                            <p:toggleSwitch id="receNotfy"
+                                            value="#{gastoFaces.gastoSelected.gasReceberNotificacao}">
+                                <p:ajax process="@this"
+                                        onclick="PF('mpProc').show();"
+                                        oncomplete="PF('mpProc').hide();"
+                                        update="pnlNotFy"/>
+                            </p:toggleSwitch>
+                        </td>
+                        <td>
+                            <p:outputPanel id="pnlNotFy">
+                                <p:outputPanel rendered="#{gastoFaces.gastoSelected.gasReceberNotificacao}">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <label class="ui-icon-colorTheme">Notificar em </label>
+                                                <br/>
+                                                <p:calendar id="notfy"
+                                                            size="8"
+                                                            pattern="dd/MM/yyyy"
+                                                            value="#{gastoFaces.gastoSelected.gasNotificarEm}"/>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </p:outputPanel>
+                            </p:outputPanel>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="ui-icon-colorTheme">Valor meta do Mês<span style="color: red">*</span></label>
+                            <p:commandLink>
+                                <i class="fa fa-question" style="color: white; font-size: 17px;"/>
+                            </p:commandLink>
+                            <br/>
+                            <p:inputNumber id="vlrMeta"
+                                           style="width: 30%"
+                                           value="#{gastoFaces.metagastoSelected.metGaValor}"/>
+                            <p:commandLink
+                                    title="Excluir"
+                                    process="@this"
+                                    style="width: 8%">
+                                <i class="fa fa-question" style="color: #00c9b6; font-size: 17px;"/>
+                            </p:commandLink>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <label class="ui-icon-colorTheme">Anotação Extra </label>
+                            <br/>
+                            <p:inputTextarea rows="2" cols="40" counter="display"
+                                             maxlength="500"
+                                             style="width: 98%"
+                                             value="#{gastoFaces.gastoSelected.gasAnotacaoExtra}"
+                                             counterTemplate="{0} caracteres restantes"
+                                             autoResize="true"/>
+                            <br/>
+                            <h:outputText id="display" class="p-d-block" />
+                        </td>
+                    </tr>
+                    <tr>
+                            <td colspan="2" align="center">
+                                <p:commandButton value="Salvar"
+                                                 styleClass="btnMenor90"
+                                                 icon="fa fa-save"
+                                                 onclick="PF('mpProc').show();"
+                                                 oncomplete="if(!args.validationFailed){PF('modalCadGasto').hide();rmtGasto();}PF('mpProc').hide();"
+                                                 update="form:erro"
+                                                 ajax="true"
+                                                 action="#{gastoFaces.doSaveOrUpdateGasto}"
+                                                 id="btnSalvar">
+                                </p:commandButton>
+                                <p:commandButton value="Cancelar"
+                                                 styleClass="btnMenor90"
+                                                 icon="fa fa-repeat"
+                                                 onclick="PF('modalCadGasto').hide();"
+                                                 ajax="true"
+                                                 id="btnCancelar">
+                                </p:commandButton>
+                            </td>
+                    </tr>
+                </table>
+            </p:outputPanel>
+        </h:form>
+        </p:dialog>
+        <p:dialog id="modalCategoria"
+                  widgetVar="modalCategoria"
+                  header="Categoria"
+                  modal="true">
+            <h:form id="formCategoria">
+                <p:outputPanel id="pnlCategoria">
+                    <table style="width: 100%" align="center" cellspacing="5">
+                        <tr>
+                            <td class="tdCss" colspan="2">
+                                <label>Descrição<span style="color: red">*</span></label>
+                                <br/>
+                                <p:inputText value="#{categoriaFaces.categoriaSelected.catDescricao}"
+                                             id="cat"
+                                             required="true"
+                                             requiredMessage="Descrição é Obrigatório"
+                                             size="40"
+                                             maxlength="500"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="center">
+                                <p:commandButton value="Salvar"
+                                                 icon="fa fa-save"
+                                                 styleClass="btnMenor90"
+                                                 onclick="PF('mpProc').show();"
+                                                 oncomplete="if(!args.validationFailed){PF('modalCategoria').hide();}PF('mpProc').hide();updateCategoria();"
+                                                 update="form:erro"
+                                                 ajax="true"
+                                                 action="#{categoriaFaces.doSaveOrUpdateCategoria}"
+                                                 id="btnSalvarCategria">
+                                </p:commandButton>
+                                <p:commandButton value="Cancelar"
+                                                 styleClass="btnMenor90"
+                                                 icon="fa fa-repeat"
+                                                 onclick="PF('modalCategoria').hide();"
+                                                 ajax="true"
+                                                 id="btnCancelarCategoria">
+                                </p:commandButton>
+                            </td>
+                        </tr>
+                    </table>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+        <p:dialog id="modalDuplicar"
+                  widgetVar="modalDuplicar"
+                  header="Selecione"
+                  modal="true">
+            <h:form id="formDuplicar">
+                <p:outputPanel id="pnlDuplicar">
+                    <table style="width: 100%" align="center" cellspacing="5" border="0">
+                        <tr>
+                            <td>
+                                <label>Ano<span style="color: red">*</span></label>
+                                <br/>
+                                <p:inputText value="#{gastoFaces.anoDuplicar}"
+                                             id="ano"
+                                             required="true"
+                                             requiredMessage="Ano é Obrigatório"
+                                             size="10"
+                                             maxlength="500"
+                                             style="text-transform: uppercase;"/>
+                            </td>
+                            <td>
+                                <label>Mês<span style="color: red">*</span></label>
+                                <br/>
+                                <p:selectOneMenu id="meses"
+                                                 value="#{gastoFaces.mesDuplicar}">
+                                    <f:selectItem itemValue="1" itemLabel="Janeiro"/>
+                                    <f:selectItem itemValue="2" itemLabel="Fevereiro"/>
+                                    <f:selectItem itemValue="3" itemLabel="Março"/>
+                                    <f:selectItem itemValue="4" itemLabel="Abril"/>
+                                    <f:selectItem itemValue="5" itemLabel="Maio"/>
+                                    <f:selectItem itemValue="6" itemLabel="Junho"/>
+                                    <f:selectItem itemValue="7" itemLabel="Julho"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agosto"/>
+                                    <f:selectItem itemValue="9" itemLabel="Setembro"/>
+                                    <f:selectItem itemValue="10" itemLabel="Outubro"/>
+                                    <f:selectItem itemValue="11" itemLabel="Novembro"/>
+                                    <f:selectItem itemValue="12" itemLabel="Dezembro"/>
+                                </p:selectOneMenu>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2" align="center">
+                                <p:commandButton value="Salvar"
+                                                 icon="fa fa-save"
+                                                 styleClass="btnMenor90"
+                                                 onclick="PF('mpProc').show();"
+                                                 oncomplete="if(!args.validationFailed){PF('modalDuplicar').hide();}PF('mpProc').hide();rmtGasto();"
+                                                 update="form:erro"
+                                                 ajax="true"
+                                                 action="#{gastoFaces.duplicaReceitaOrDespesa}"
+                                                 id="btnDuplicar">
+                                </p:commandButton>
+                                <p:commandButton value="Cancelar"
+                                                 icon="fa fa-repeat"
+                                                 styleClass="btnMenor90"
+                                                 onclick="PF('modalDuplicar').hide();"
+                                                 immediate="true"
+                                                 ajax="true">
+                                </p:commandButton>
+                            </td>
+                        </tr>
+                    </table>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+        <h:form>
+            <p:growl id="message" showDetail="true" />
+            <p:confirmDialog id="excluirGasto" widgetVar="excluirGasto"
+                             header="Excluir"
+                             message="Tem certeza que deseja excluir?"
+                             style=" font-size: 13px;"
+                             severity="true"
+                             showEffect="fade"
+                             hideEffect="fade"
+                             width="300">
+                <p:commandButton value="Sim"
+                                 process="@this"
+                                 style="font-size: 13px;border:#1976d2!important;"
+                                 onclick="PF('mpProc').show();"
+                                 oncomplete="PF('excluirGasto').hide();rmtGasto();PF('mpProc').hide();"
+                                 actionListener="#{gastoFaces.doRemoveGasto}"
+                                 icon="ui-icon-check"/>
+
+                <p:commandButton value="Nao"
+                                 style=" font-size: 13px;border: #1976d2!important;"
+                                 onclick="PF('excluirGasto').hide();"
+                                 icon="ui-icon-close" />
+            </p:confirmDialog>
+        </h:form>
+        <h:form>
+            <p:growl id="message2" showDetail="true" />
+            <p:confirmDialog id="excluirCategoria" widgetVar="excluirCategoria"
+                             header="Excluir"
+                             message="Tem certeza que deseja excluir?"
+                             style=" font-size: 13px;"
+                             severity="true"
+                             showEffect="fade"
+                             hideEffect="fade"
+                             width="300">
+                <p:commandButton value="Sim"
+                                 process="@this"
+                                 update="form:erro"
+                                 style="font-size: 13px;border:#1976d2!important;"
+                                 onclick="PF('mpProc').show();"
+                                 oncomplete="PF('excluirCategoria').hide();updateCategoria();PF('mpProc').hide();"
+                                 actionListener="#{categoriaFaces.doRemoveCategoria}"
+                                 icon="ui-icon-check"/>
+
+                <p:commandButton value="Nao"
+                                 style=" font-size: 13px;border: #1976d2!important;"
+                                 onclick="PF('excluirCategoria').hide();"
+                                 icon="ui-icon-close" />
+            </p:confirmDialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

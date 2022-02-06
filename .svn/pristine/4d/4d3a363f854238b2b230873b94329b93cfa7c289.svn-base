@@ -1,0 +1,44 @@
+package com.DAO;
+import com.Bean.Usuario;
+import com.Util.MensagensErros;
+import java.util.List;
+import org.hibernate.Session;
+
+/**
+ *
+ * @author Sergio - 02/09/2021
+ */
+public class UsuarioDAO extends GenericDAO {
+    private static final long serialVersionUID = 1L;
+    private Session session;
+	
+    public UsuarioDAO(Session session) {
+        this.session = session;
+    }
+
+    public UsuarioDAO() {
+        this.session = getSession();
+    }
+    public int addUsuario(Usuario usuario) {
+        setAtualizar(false);
+            saveOrUpdatePojo(usuario);
+            if (MensagensErros.isErro()) {
+                return 0;
+            } else {
+                return usuario.getUsuCodigo();
+            }   
+    }
+    public Usuario getUsuario(int usuarioID) {
+        return getPojo(Usuario.class, usuarioID);
+    }
+    public void updateUsuario(Usuario usuario) {
+        setAtualizar(true);
+        saveOrUpdatePojo(usuario);
+    }
+    public void removeUsuario(Usuario usuario) {
+        removePojo(usuario);
+    }
+    public List<Usuario> getUsuarios() {
+        return getPureList(Usuario.class, "from Usuario ar");
+    }
+}

@@ -1,0 +1,25 @@
+CREATE TABLE `exodo`.`categoria`(  
+  `catCodigo` INT(11) NOT NULL AUTO_INCREMENT,
+  `catDescricao` VARCHAR(500),
+  `codUsuario` INT(11) DEFAULT NULL,
+  `codSetor` INT(11) DEFAULT NULL,
+  `dataHoraAtualizacao` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`catCodigo`)
+);
+
+ALTER TABLE `gasto`   
+  ADD COLUMN `gastCatCodigo` INT(11) NULL AFTER `dataHoraAtualizacao`, 
+  ADD  INDEX `FK_categoria_gastos` (`gastCatCodigo`),
+  ADD CONSTRAINT `FK_categoria_gastos` FOREIGN KEY (`gastCatCodigo`) REFERENCES `categoria`(`catCodigo`);
+
+ALTER TABLE `gasto`   
+  CHANGE `gasDescricao` `gasPago` CHAR(1) CHARSET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'N';
+
+ALTER TABLE `gasto`   
+  CHANGE `gasCategoria` `gasDescricao` VARCHAR(500) CHARSET utf8mb4 COLLATE utf8mb4_general_ci NULL;
+
+ALTER TABLE `usuario`   
+  ADD COLUMN `usuPhoto` LONGBLOB;
+
+ALTER TABLE `usuario`   
+  ADD COLUMN `usuNomeFoto` TEXT NULL;

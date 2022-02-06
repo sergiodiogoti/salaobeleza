@@ -1,0 +1,809 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Agendamento</ui:define>
+
+    <ui:define name="head">
+        <style type="text/css">
+            .style-Icon {
+                color: #2d353c;
+                font-size: 17px;
+            }
+
+            .style-button {
+                font-size: 13px;
+                border: #1976d2 !important;
+            }
+
+            .text-column {
+                text-align: center;
+            }
+
+            .width-column-equals {
+                width: 7vw;
+            }
+
+            input::placeholder {
+                color: #FFFFFF;
+                font-size: 11px;
+            }
+
+            .styleBox-title {
+                padding: 0 !important;
+                box-shadow: 0px 0px 8px #F5F5F5;
+                width: auto;
+            }
+
+            .styleBox-body {
+                padding: 0 !important;
+                box-shadow: 0px 0px 8px #F5F5F5;
+                width: auto;
+            }
+
+            body .ui-datepicker table {
+                table-layout: fixed;
+                border-spacing: 0;
+                border-collapse: collapse;
+                font-size: 10px;
+            }
+
+            .ui-button-icon-left .ui-icon .ui-icon-calendar {
+                display: none;
+            }
+
+
+            .csslistaHorario .ui-datatable table tr td {
+                border: none;
+                padding: 2px;
+            }
+
+            .csslistaHorario th[role=columnheader] {
+                display: none;
+            }
+
+            .csslistaHorario .ui-datatable-data .ui-widget-content {
+                border: none;
+            }
+
+            body {
+                overflow-x: hidden;
+            }
+
+            .divColor-horario {
+                border: 1px solid #0D47A1 !important;
+                background-color: #0D47A1 !important;
+                color: #FFFFFF !important;
+                padding: 5px !important;
+                border-radius: 5px;
+            }
+
+            .divBlank-horario {
+                padding: 5px !important;
+                border: 1px solid #b5b5b5 !important;
+                color: #0D47A1 !important;
+                border-radius: 5px;
+            }
+
+            .horarioStyle {
+                border: none !important;
+                background: none !important;
+            }
+
+            .horarioStyle > .ui-widget-header {
+                display: none !important;
+            }
+
+            .ui-widget-overlay {
+                opacity: .4 !important;
+            }
+
+            .horarioStyle > .ui-dialog-content {
+                overflow: hidden !important;
+            }
+        </style>
+
+        <script type="text/javascript">
+            function upperCase(a) {
+                setTimeout(function () {
+                    a.value = a.value.toUpperCase();
+                }, 1);
+            }
+
+            PrimeFaces.widget.Dialog.prototype.applyFocus = function () {
+                var firstInput = this.jq.find(':not(:submit):not(:button):input:visible:enabled:first');
+                if (!firstInput.hasClass('hasDatepicker')) {
+                    firstInput.focus();
+                }
+            }
+            $(document).ready(function () {
+                $(".horarioStyle").removeClass("ui-shadow");
+            });
+            PrimeFaces.locales['pt'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                currentText: 'Começo',
+                monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+                dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+                dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+                weekHeader: 'Semana',
+                firstDay: 0,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText: 'Todo o Dia'
+            };
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="erro" showDetail="true" showSummary="true"/>
+            <table style="width: 100%">
+                <tr>
+                    <td colspan="2">
+                        <p:panel styleClass="styleBox-title" style="border-radius: 8px;">
+                            <p:outputPanel style="text-align: center">
+                                <i class="fa fa-calendar" style="font-size: 20px; color: #9e9e9e;"/>
+                                <p:spacer width="5px"/>
+                                <p:outputLabel value="AGENDAMENTO" style="font-size: 20px; color: #9e9e9e;"/>
+                            </p:outputPanel>
+                        </p:panel>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">
+                        <p:panel styleClass="styleBox-body" style="border-radius: 8px; width: 300px">
+                            <table align="center">
+                                <tr>
+                                    <td colspan="2" align="center">
+                                        <i style="color: #b5b5b5; font-size: 12px;"><b>Parametros de busca</b></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p:selectOneRadio id="param"
+                                                          value="#{agendamentoFaces.parametros}"
+                                                          unselectable="true">
+                                            <f:selectItem itemLabel="Por Dia" itemValue="dia"/>
+                                            <f:selectItem itemLabel="Por Periodo" itemValue="periodo"/>
+                                            <p:ajax process="@this"
+                                                    onstart="PF('mpProc').show()"
+                                                    oncomplete="PF('mpProc').hide()"
+                                                    update="pnlParametro"/>
+                                        </p:selectOneRadio>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p:outputPanel id="pnlParametro">
+                                            <p:outputPanel rendered="#{'dia' eq agendamentoFaces.parametros}">
+                                                <p:calendar id="inline" value="#{agendamentoFaces.dataSelected}"
+                                                            mindate="today"
+                                                            mode="inline"
+                                                            locale="pt">
+                                                    <p:ajax event="dateSelect" listener="#{agendamentoFaces.setaData}"
+                                                            process="@this"
+                                                            update="form"
+                                                            oncomplete="updateAgendamentoList();"/>
+                                                </p:calendar>
+                                            </p:outputPanel>
+                                            <p:outputPanel rendered="#{'periodo' eq agendamentoFaces.parametros}">
+                                                <table align="center">
+                                                    <tr>
+                                                        <td>
+                                                            <div style="float: left;">
+                                                                <label>Data Inicial <span
+                                                                        style="color: red">*</span></label>
+                                                                <br/>
+                                                                <p:calendar id="dataIni"
+                                                                            placeholder="dd/mm/aaaa"
+                                                                            required="true"
+                                                                            size="12"
+                                                                            requiredMessage="Data inicial é Obrigatório"
+                                                                            locale="pt"
+                                                                            mask="true"
+                                                                            pattern="dd/MM/yyyy"
+                                                                            value="#{agendamentoFaces.dataInicial}">
+                                                                    <p:ajax process="@this"
+                                                                            event="dateSelect"
+                                                                            onstart="PF('mpProc').show()"
+                                                                            oncomplete="PF('mpProc').hide();"/>
+                                                                </p:calendar>
+                                                            </div>
+                                                            <div style="float: left; margin-left: 10px;">
+                                                                <label>Data Fim <span
+                                                                        style="color: red">*</span></label>
+                                                                <br/>
+                                                                <p:calendar id="dataFim"
+                                                                            placeholder="dd/mm/aaaa"
+                                                                            required="true"
+                                                                            size="12"
+                                                                            requiredMessage="Data final é Obrigatório"
+                                                                            locale="pt"
+                                                                            mask="true"
+                                                                            pattern="dd/MM/yyyy"
+                                                                            value="#{agendamentoFaces.dataFinal}">
+                                                                    <p:ajax process="@this"
+                                                                            event="dateSelect"
+                                                                            onstart="PF('mpProc').show()"
+                                                                            oncomplete="PF('mpProc').hide();"/>
+                                                                </p:calendar>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" align="center">
+                                                            <p:commandButton value="Pesquisar"
+                                                                             style="background-color: #1ab394;"
+                                                                             process="@this,@form"
+                                                                             icon="ui-icon-search"
+                                                                             onclick="PF('mpProc').show();"
+                                                                             oncomplete="PF('mpProc').hide();updateAgendamentoList();"
+                                                                             id="btnPesq">
+                                                            </p:commandButton>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </p:outputPanel>
+                                        </p:outputPanel>
+                                    </td>
+                                </tr>
+                            </table>
+                        </p:panel>
+                    </td>
+                    <td valign="top">
+                        <p:panel styleClass="styleBox-body" style="border-radius: 8px;">
+                            <table>
+                                <tr>
+                                    <td align="center">
+                                        <p:remoteCommand name="updateAgendamentoList"
+                                                         autoRun="true"
+                                                         update="agendamentoList"
+                                                         process="@this"
+                                                         actionListener="#{agendamentoFaces.populaAgendamento}"
+                                                         onstart="PF('mpProc').show()"
+                                                         oncomplete="PF('mpProc').hide();"/>
+                                        <p:dataTable id="agendamentoList"
+                                                     widgetVar="agendamentoList"
+                                                     var="age" value="#{agendamentoFaces.agendamentoList}"
+                                                     editable="true"
+                                                     emptyMessage="Nenhum registro encontrado!"
+                                                     editMode="cell">
+
+                                            <f:facet name="header">
+                                                <div style="display: flex; justify-content: space-between;">
+                                                    <div>
+                                                        <p:commandButton value="Agendar"
+                                                                         process="@this"
+                                                                         style="background-color: #1ab394;"
+                                                                         update="formAgendamento:pnlAgendamento"
+                                                                         icon="ui-icon-add"
+                                                                         onclick="PF('mpProc').show();"
+                                                                         oncomplete="PF('agendamentoDlg').show();PF('mpProc').hide();"
+                                                                         actionListener="#{agendamentoFaces.doAddAgendamento}"
+                                                                         id="btnAgendar">
+                                                        </p:commandButton>
+                                                    </div>
+                                                    <div>
+                                                        <p:outputLabel value="#{agendamentoFaces.diaSemana} "/>
+                                                        <h:outputLabel value="#{agendamentoFaces.dataSelected}">
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </h:outputLabel>
+                                                    </div>
+                                                </div>
+                                            </f:facet>
+
+                                            <p:column style="text-align: center; width: 80px;" headerText="Data">
+                                                <h:outputLabel value="#{age.ageData}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                </h:outputLabel>
+                                            </p:column>
+
+                                            <p:column headerText="Cliente">
+                                                <h:outputLabel value="#{age.ageCliCodigo.cliNome}"/><br/>
+                                            </p:column>
+
+                                            <p:column headerText="Celular" style="text-align: center;">
+                                                <h:outputLabel value="#{age.ageCliCodigo.cliCelular}"/>
+                                            </p:column>
+
+                                            <p:column headerText="Serviços agendados" style="text-align: center;">
+                                                <h:outputLabel value="#{age.qtdeServicos}"/>
+                                            </p:column>
+
+                                            <p:spacer width="5px"/>
+                                            <p:column styleClass="text-column width-column-equals">
+                                                <p:commandLink
+                                                        rendered="#{'N' eq agendamentoFaces.getPermiteAlteracao(age.ageData)? true : false}"
+                                                        title="Excedeu o prazo de alteração do agendamento, qualquer alteração só poderá ser feita pelo telefone"
+                                                        process="@this">
+                                                    <i class="fa fa-exclamation-triangle"
+                                                       style="font-size: 20px; color: #f5a623;"/>
+                                                </p:commandLink>
+                                                <p:spacer width="5px"/>
+                                                <p:commandLink
+                                                        title="Editar"
+                                                        process="@this"
+                                                        rendered="#{'S' eq agendamentoFaces.getPermiteAlteracao(age.ageData)? true : false}"
+                                                        update="formAgendamento:pnlAgendamento"
+                                                        action="#{agendamentoFaces.doUpdateAgendamento}"
+                                                        onclick="PF('mpProc').show()"
+                                                        oncomplete="PF('mpProc').hide();PF('agendamentoDlg').show();">
+                                                    <i class="fa fa-edit style-Icon"/>
+                                                    <f:setPropertyActionListener value="#{age}"
+                                                                                 target="#{agendamentoFaces.agendamentoSelected}"/>
+                                                </p:commandLink>
+                                                <p:spacer width="5px"/>
+                                                <p:commandLink
+                                                        title="Remover"
+                                                        onclick="PF('mpProc').show();"
+                                                        rendered="#{'S' eq agendamentoFaces.getPermiteAlteracao(age.ageData)? true : false}"
+                                                        process="@this"
+                                                        style="width: 8%"
+                                                        oncomplete="PF('mpProc').hide();PF('removeAgendamento').show();">
+                                                    <i class="fa fa-trash style-Icon"/>
+                                                    <f:setPropertyActionListener value="#{age}"
+                                                                                 target="#{agendamentoFaces.agendamentoSelected}"/>
+                                                </p:commandLink>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </td>
+                                </tr>
+                            </table>
+                        </p:panel>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+        <h:form>
+            <p:growl id="message2" showDetail="true"/>
+            <p:confirmDialog id="removeAgendamento" widgetVar="removeAgendamento"
+                             header="Remover Agendamento"
+                             message="Tem certeza que deseja remover?"
+                             style=" font-size: 13px;"
+                             severity="true"
+                             showEffect="bounce"
+                             hideEffect="bounce"
+                             width="300">
+                <p:commandButton value="Sim"
+                                 process="@this"
+                                 update="form:erro"
+                                 styleClass="style-button"
+                                 onclick="PF('mpProc').show();"
+                                 oncomplete="PF('mpProc').hide();updateAgendamentoList();PF('removeAgendamento').hide();"
+                                 actionListener="#{agendamentoFaces.doRemoveAgendamento}"
+                                 icon="ui-icon-check"/>
+
+                <p:commandButton value="Não"
+                                 styleClass="style-button"
+                                 onclick="PF('removeAgendamento').hide();"
+                                 icon="ui-icon-close"/>
+            </p:confirmDialog>
+        </h:form>
+        <p:dialog id="agendamentoDlg"
+                  widgetVar="agendamentoDlg"
+                  onShow="$(document.activeElement).blur()"
+                  responsive="true"
+                  header="Agendar"
+                  modal="true">
+            <h:form id="formAgendamento">
+                <p:outputPanel id="pnlAgendamento">
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <table cellpadding="5" cellspacing="5" width="500">
+                                    <tr>
+                                        <td>
+                                            <div style="float: left">
+                                                <label class="ui-icon-colorTheme">Cliente <span
+                                                        style="color: red">*</span></label>
+                                                <br/>
+                                                <p:autoComplete id="cliente"
+                                                                value="#{agendamentoFaces.clienteSelected}"
+                                                                var="c"
+                                                                size="30"
+                                                                required="true"
+                                                                requiredMessage="Cliente é Obrigatório"
+                                                                itemLabel="#{c.cliNome}"
+                                                                itemValue="#{c}"
+                                                                converter="ClienteConverter"
+                                                                forceSelection="true"
+                                                                placeholder="buscar"
+                                                                completeMethod="#{clienteFaces.buscaClienteAutoComplete}">
+                                                    <p:ajax event="itemSelect"
+                                                            listener="#{agendamentoFaces.handlerCliente}"
+                                                            onstart="PF('mpProc').show();"
+                                                            oncomplete="PF('mpProc').hide();updateItensAgendamentoList();"
+                                                            process="@this"/>
+                                                </p:autoComplete>
+                                            </div>
+                                            <div style="float: left; margin-left: 10px;">
+                                                <label>Data </label>
+                                                <br/>
+                                                <p:outputLabel value="#{agendamentoFaces.diaSemana} - "/>
+                                                <h:outputLabel value="#{agendamentoFaces.dataSelected}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                </h:outputLabel>
+                                                <p:calendar id="dataNasc"
+                                                            placeholder="dd/mm/aaaa"
+                                                            required="true"
+                                                            size="12"
+                                                            rendered="false"
+                                                            mindate="today"
+                                                            requiredMessage="Data é Obrigatório"
+                                                            locale="pt"
+                                                            mask="true"
+                                                            pattern="dd/MM/yyyy"
+                                                            value="#{agendamentoFaces.dataSelected}">
+                                                    <p:ajax process="@this"
+                                                            event="dateSelect"
+                                                            onstart="PF('mpProc').show();"
+                                                            oncomplete="PF('mpProc').hide();updateItensAgendamentoList();"/>
+                                                </p:calendar>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <p:commandButton value="Serviços"
+                                                             process="@this,@form"
+                                                             style="background-color: #1ab394;"
+                                                             icon="ui-icon-add"
+                                                             update="formServico:pnlServico"
+                                                             actionListener="#{agendamentoFaces.doAddItensAgendamento}"
+                                                             onclick="PF('mpProc').show();"
+                                                             oncomplete="PF('mpProc').hide();PF('servicoDlg').show();"
+                                                             id="btnAddServico">
+                                            </p:commandButton>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" colspan="2">
+                                            <p:remoteCommand name="updateItensAgendamentoList"
+                                                             autoRun="true"
+                                                             update="itensAgendamentoList"
+                                                             process="@this"
+                                                             actionListener="#{agendamentoFaces.populaItensAgendamento}"
+                                                             onstart="PF('mpProc').show()"
+                                                             oncomplete="PF('mpProc').hide();"/>
+                                            <p:dataTable id="itensAgendamentoList"
+                                                         widgetVar="itensAgendamentoList"
+                                                         var="it" value="#{agendamentoFaces.itensAgendamentoList}"
+                                                         editable="true"
+                                                         emptyMessage="Nenhum registro encontrado!"
+                                                         editMode="cell">
+
+
+                                                <p:column style="text-align: center; width: 80px;" headerText="Data">
+                                                    <h:outputLabel value="#{it.itAgeData}">
+                                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                    </h:outputLabel>
+                                                </p:column>
+
+                                                <p:column style="text-align: center; width: 80px;" headerText="Hora">
+                                                    <h:outputLabel value="#{it.itAgeHora}"/>
+                                                </p:column>
+
+                                                <p:column headerText="Profissional"
+                                                          style="text-align: center; width: 120px;">
+                                                    <h:outputLabel value="#{it.itAgeProCodigo.proNome}"/><br/>
+                                                </p:column>
+
+                                                <p:column style="text-align: center; width: 120px;"
+                                                          headerText="Serviço">
+                                                    <h:outputLabel value="#{it.itAgeSerCodigo.serDescricao}"/>
+                                                </p:column>
+
+                                                <p:column style="text-align: center;  width: 80px;"
+                                                          headerText="Duração">
+                                                    <h:outputLabel value="#{it.itAgeSerCodigo.serDuracao}"/>
+                                                </p:column>
+
+                                                <p:column style="text-align: center;  width: 80px;" headerText="Valor">
+                                                    <h:outputLabel value="#{it.itAgeSerCodigo.serValor}"/>
+                                                </p:column>
+
+                                                <p:spacer width="5px"/>
+                                                <p:column styleClass="text-column width-column-equals">
+                                                    <p:commandLink
+                                                            rendered="#{'N' eq agendamentoFaces.getPermiteAlteracao(it.itAgeData)? true : false}"
+                                                            title="Excedeu o prazo de alteração do agendamento, qualquer alteração só poderá ser feita pelo telefone"
+                                                            process="@this">
+                                                        <i class="fa fa-exclamation-triangle"
+                                                           style="font-size: 20px; color: #f5a623;"/>
+                                                    </p:commandLink>
+                                                    <p:spacer width="5px"/>
+                                                    <p:commandLink
+                                                            title="Editar"
+                                                            process="@this"
+                                                            rendered="#{'S' eq agendamentoFaces.getPermiteAlteracao(it.itAgeData)? true : false}"
+                                                            update="formServico:pnlServico"
+                                                            action="#{agendamentoFaces.doUpdateAgendamento}"
+                                                            onclick="PF('mpProc').show()"
+                                                            oncomplete="PF('mpProc').hide();PF('servicoDlg').show();">
+                                                        <i class="fa fa-edit style-Icon"/>
+                                                        <f:setPropertyActionListener value="#{it}" target="#{agendamentoFaces.itensAgendamentoSelected}"/>
+                                                    </p:commandLink>
+                                                    <p:spacer width="5px"/>
+                                                    <p:commandLink
+                                                            title="Remover"
+                                                            onclick="PF('mpProc').show();"
+                                                            rendered="#{'S' eq agendamentoFaces.getPermiteAlteracao(it.itAgeData)? true : false}"
+                                                            process="@this"
+                                                            style="width: 8%"
+                                                            oncomplete="PF('mpProc').hide();PF('removeAgendamento').show();">
+                                                        <i class="fa fa-trash style-Icon"/>
+                                                        <f:setPropertyActionListener value="#{it}" target="#{agendamentoFaces.itensAgendamentoSelected}"/>
+                                                    </p:commandLink>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" align="right">
+                                <p:commandButton value="Agendar"
+                                                 process="@this,@form"
+                                                 style="background-color: #1ab394;"
+                                                 update="form:erro,formAlerta:pnlAlerta"
+                                                 icon="fa fa-clock-o"
+                                                 onclick="PF('mpProc').show();"
+                                                 oncomplete="if(!args.validationFailed){PF('agendamentoDlg').hide();updateAgendamentoList();}PF('mpProc').hide();"
+                                                 actionListener="#{agendamentoFaces.verificaAgendamento}"
+                                                 id="btnAgen">
+                                </p:commandButton>
+                            </td>
+                        </tr>
+                    </table>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+        <p:dialog id="servicoDlg"
+                  widgetVar="servicoDlg"
+                  header="Adicionar Serviço"
+                  responsive="true"
+                  modal="true">
+            <h:form id="formServico">
+                <p:outputPanel id="pnlServico">
+                    <table style="width: 400px;" cellpadding="3" cellspacing="3">
+                        <tr>
+                            <td colspan="3">
+                                <label class="ui-icon-colorTheme">Profissional <span style="color: red">*</span></label>
+                                <br/>
+                                <p:autoComplete id="profissional"
+                                                value="#{agendamentoFaces.itensAgendamentoSelected.itAgeProCodigo}"
+                                                var="p"
+                                                size="60"
+                                                required="true"
+                                                requiredMessage="Profissional é Obrigatório"
+                                                dropdown="true"
+                                                itemLabel="#{p.proNome}"
+                                                itemValue="#{p}"
+                                                converter="ProfissionalConverter"
+                                                forceSelection="true"
+                                                completeMethod="#{profissionalFaces.buscaProfissionalAutoComplete}">
+                                    <p:ajax event="itemSelect"
+                                            listener="#{agendamentoFaces.handlerProfissional}"
+                                            process="@this"
+                                            onstart="PF('mpProc').show()"
+                                            oncomplete="PF('mpProc').hide();"/>
+                                </p:autoComplete>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <label class="ui-icon-colorTheme">Serviço <span style="color: red">*</span></label>
+                                <br/>
+                                <p:autoComplete id="servico"
+                                                value="#{agendamentoFaces.itensAgendamentoSelected.itAgeSerCodigo}"
+                                                var="s"
+                                                size="60"
+                                                required="true"
+                                                requiredMessage="Serviço é Obrigatório"
+                                                dropdown="true"
+                                                itemLabel="#{s.serDescricao}"
+                                                itemValue="#{s}"
+                                                converter="ServicoConverter"
+                                                forceSelection="true"
+                                                completeMethod="#{servicoFaces.buscaServicoAutoComplete}">
+                                    <p:ajax event="itemSelect" listener="#{agendamentoFaces.handlerServico}"
+                                            update="duracao,valor"
+                                            process="@this"/>
+                                </p:autoComplete>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Duração</label>
+                                <br/>
+                                <p:inputText style="font-weight: bold"
+                                             id="duracao"
+                                             readonly="true"
+                                             value="#{agendamentoFaces.itensAgendamentoSelected.itAgeSerCodigo.serDuracao}"/>
+                            </td>
+                            <td>
+                                <label>Valor</label>
+                                <br/>
+                                <span>R$ </span>
+                                <p:inputText style="font-weight: bold"
+                                             readonly="true"
+                                             id="valor"
+                                             value="#{agendamentoFaces.itensAgendamentoSelected.itAgeSerCodigo.serValor}">
+                                    <f:convertNumber pattern="#,##0.00"
+                                                     minFractionDigits="2"/>
+                                </p:inputText>
+                            </td>
+                            <td>
+                                <label>Horario</label>
+                                <br/>
+                                <p:inputMask mask="99:99"
+                                             size="5"
+                                             readonly="true"
+                                             value="#{agendamentoFaces.itensAgendamentoSelected.itAgeHora}">
+                                    <p:ajax/>
+                                </p:inputMask>
+                                <p:spacer width="5px"/>
+                                <p:commandLink onclick="PF('mpProc').show();"
+                                               update="formHorarioDisponivel:pnlHorarioDisponivel"
+                                               id="horario"
+                                               process="@this"
+                                               oncomplete="PF('mpProc').hide();PF('horarioDisponivelDlg').show();updateHorario();">
+                                    <i class="fa fa-clock-o" style="color: #455A64; font-size: 22px;"/>
+                                </p:commandLink>
+                                <p:remoteCommand name="updateHoras" update="horario"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="right">
+                                <br/>
+                                <p:commandButton value="Cancelar"
+                                                 style="background-color: #C62828;"
+                                                 icon="fa fa-times"
+                                                 onclick="PF('servicoDlg').hide();"
+                                                 id="btnCancelar">
+                                </p:commandButton>
+                                <p:spacer width="5px"/>
+                                <p:commandButton value="Salvar"
+                                                 process="@this,@form"
+                                                 style="background-color: #1ab394;"
+                                                 update="form:erro"
+                                                 icon="fa fa-check"
+                                                 onclick="PF('mpProc').show();"
+                                                 oncomplete="if(!args.validationFailed){PF('servicoDlg').hide();updateItensAgendamentoList();}PF('mpProc').hide();"
+                                                 actionListener="#{agendamentoFaces.doSaveorUpdateItensAgendamento}"
+                                                 id="btnSalvar">
+                                </p:commandButton>
+                            </td>
+                        </tr>
+                    </table>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+        <p:dialog id="horarioDisponivelDlg"
+                  widgetVar="horarioDisponivelDlg"
+                  responsive="true"
+                  modal="true">
+            <h:form id="formHorarioDisponivel">
+                <p:outputPanel id="pnlHorarioDisponivel">
+                    <table>
+                        <tr>
+                            <td>
+                                <p:remoteCommand name="updateHorario"
+                                                 autoRun="true"
+                                                 process="@this"
+                                                 onstart="PF('mpProc').show();"
+                                                 oncomplete="PF('mpProc').hide();"
+                                                 actionListener="#{agendamentoFaces.populaHorarioDisponiveisAgendamento}"
+                                                 update="listaHorario"/>
+
+                                <label>Horários disponiveis</label>
+                                <p:dataGrid var="h" value="#{agendamentoFaces.horarioTrabalhoList}"
+                                            columns="6"
+                                            layout="grid"
+                                            rows="12"
+                                            emptyMessage="Nenhum registro encontrado!"
+                                            id="listaHorario"
+                                            paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                            rowsPerPageTemplate="6,12,16">
+
+                                    <h:panelGrid columns="1" style="width:100%;text-align:center;">
+                                        <p:commandLink oncomplete="PF('horarioDisponivelDlg').hide();updateHoras();"
+                                                       process="@this"
+                                                       update="formServico:pnlServico"
+                                                       action="#{agendamentoFaces.setaHora}"
+                                                       styleClass="#{h.horTraHorario eq agendamentoFaces.horario? 'divColor-horario' : 'divBlank-horario'}">
+                                            <h:outputText value="#{h.horTraHorario}"
+                                                          style="margin:0 auto;"/>
+                                            <f:setPropertyActionListener value="#{h.horTraHorario}"
+                                                                         target="#{agendamentoFaces.itensAgendamentoSelected.itAgeHora}"/>
+                                        </p:commandLink>
+                                    </h:panelGrid>
+                                </p:dataGrid>
+                            </td>
+                        </tr>
+                    </table>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+        <p:dialog id="alertaAgendamentoExistente"
+                  widgetVar="alertaAgendamentoExistente"
+                  responsive="true"
+                  modal="true">
+            <h:form id="formAlerta">
+                <p:outputPanel id="pnlAlerta">
+                    <table>
+                        <tr>
+                            <td>
+                                <p:outputPanel>
+                                    <i class="fa fa-exclamation-triangle" style="font-size: 20px; color: #f5a623;"/>
+                                    <span style="font-size: 15px; color: #f5a623;">Atenção!</span>
+                                </p:outputPanel>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>Existe um agendamento cadastrado na semana da data selecionada</span><br/>
+                                <span>Deseja que os serviços sejam agendados no mesmo dia? </span><br/>
+                                <span>Ao confirmar o sistema irá gerar o novo agendamento com a data do primeiro agendamento</span>
+                                <b>
+                                    <p:outputLabel value="#{agendamentoFaces.agendamentoSemana.ageData}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </p:outputLabel>
+                                </b>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <span><b>Confirma esta ação?</b></span><br/><br/>
+                                <span><b>Não</b> - Desejo apenas salvar na data selecionada</span><br/>
+                                <span><b>Sim</b> - Desejo que os serviços sejam agendados no dia do primeiro agendamento</span><br/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" align="right">
+                                <p:commandButton value="Não"
+                                                 process="@this,@form"
+                                                 style="background-color: #C62828;"
+                                                 update="form:erro"
+                                                 icon="fa fa-times"
+                                                 onclick="PF('mpProc').show();"
+                                                 oncomplete="if(!args.validationFailed){PF('alertaAgendamentoExistente').hide();PF('agendamentoDlg').hide();updateAgendamentoList();}PF('mpProc').hide();"
+                                                 actionListener="#{agendamentoFaces.doSaveorUpdateAgendamento}"
+                                                 id="btnNao">
+                                </p:commandButton>
+                                <p:spacer width="5px"/>
+                                <p:commandButton value="Sim"
+                                                 process="@this,@form"
+                                                 style="background-color: #1ab394;"
+                                                 update="form:erro"
+                                                 icon="fa fa-check"
+                                                 onclick="PF('mpProc').show();"
+                                                 oncomplete="if(!args.validationFailed){PF('alertaAgendamentoExistente').hide();PF('agendamentoDlg').hide();updateAgendamentoList();}PF('mpProc').hide();"
+                                                 actionListener="#{agendamentoFaces.setaDataAgendamento}"
+                                                 id="btnSim">
+                                </p:commandButton>
+                            </td>
+                        </tr>
+                    </table>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

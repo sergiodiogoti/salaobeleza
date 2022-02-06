@@ -1,0 +1,30 @@
+CREATE TABLE `setor` (
+  `setCodigo` int(11) NOT NULL AUTO_INCREMENT,
+  `setNome` varchar(50) DEFAULT NULL,
+  `setResponsavel` varchar(50) DEFAULT NULL,
+  `setCidade` varchar(50) DEFAULT NULL,
+  `codUsuario` int(11) DEFAULT NULL,
+  `codSetor` int(11) DEFAULT NULL,
+  `dataHoraAtualizacao` datetime DEFAULT NULL,
+  PRIMARY KEY (`setCodigo`)
+) ENGINE=InnoDB;
+
+
+
+
+CREATE TABLE `usuario` (
+  `usuCodigo` int(11) NOT NULL AUTO_INCREMENT,
+  `usuNome` varchar(50) DEFAULT NULL,
+  `usuLogin` varchar(50) DEFAULT NULL,
+  `usuSenha` varchar(12) DEFAULT NULL,
+  `usuSetCodigo` int(11) NOT NULL,
+  `codUsuario` int(11) DEFAULT NULL,
+  `codSetor` int(11) DEFAULT NULL,
+  `dataHoraAtualizacao` int(11) DEFAULT NULL,
+  PRIMARY KEY (`usuCodigo`),
+  KEY `fk_usuSetor` (`usuSetCodigo`),
+  CONSTRAINT `fk_usuSetor` FOREIGN KEY (`usuSetCodigo`) REFERENCES `setor` (`setCodigo`)
+) ENGINE=InnoDB;
+
+
+

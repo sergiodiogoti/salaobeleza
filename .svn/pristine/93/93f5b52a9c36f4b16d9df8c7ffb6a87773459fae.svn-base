@@ -1,0 +1,42 @@
+package com.Converters;
+
+
+import com.DAO.AniversarianteDAO;
+import com.Bean.Aniversariante;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+
+/**
+ *
+ * @author Sergio - 10/10/2021
+ */
+@FacesConverter(value="AniversarianteConverter")
+public class AniversarianteConverter  implements Converter{
+
+    private AniversarianteDAO aniversarianteDAO =new AniversarianteDAO();
+    public AniversarianteConverter(){
+    }
+
+    public Object getAsObject(FacesContext context, UIComponent component, String value) {
+       if (value == null || value.length() == 0) {
+            return null;
+        }else{
+          try{ 
+              Integer idaniversariante = Integer.parseInt(value);
+              return aniversarianteDAO.getAniversariante(idaniversariante);
+          }catch(NumberFormatException n){
+          return null;    
+          }
+       }  
+    }
+
+    public String getAsString(FacesContext context, UIComponent component, Object value) {
+        if(value == null){
+            return "";
+        }
+        return ((Aniversariante)value).getAniCodigo().toString();
+    }
+
+}

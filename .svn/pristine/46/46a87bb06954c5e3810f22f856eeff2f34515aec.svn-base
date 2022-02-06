@@ -1,0 +1,163 @@
+package com.Bean;
+
+import java.util.Date;
+import java.util.List;
+import javax.persistence.*;
+
+/**
+ *
+ * @author Sergio - 25/09/2021
+ */
+
+@Entity
+@Table(name = "aniversariante")
+public class Aniversariante implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="aniCodigo", nullable=false)
+    private Integer aniCodigo;
+
+    @Column(name="aniNome")
+    private String aniNome;
+
+    @Column(name="aniMensagem")
+    private String aniMensagem;
+
+    @Column(name="aniFoto")
+    private String aniFoto;
+
+    @Column(name="aniTelefone")
+    private String aniTelefone;
+
+    @Column(name = "aniDataAniversario")
+    @Temporal(TemporalType.DATE)
+    private Date aniDataAniversario;
+
+    @ManyToOne
+    @JoinColumn(name="aniUsuCodigo", referencedColumnName="usuCodigo",nullable=true)
+    private Usuario aniUsuCodigo;
+
+    @Column(name="codUsuario")
+    private Integer codUsuario;
+
+    @Column(name="codSetor")
+    private Integer codSetor;
+
+    @Column(name="dataHoraAtualizacao")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dataHoraAtualizacao;
+
+    public Aniversariante() {
+    }
+
+    public Aniversariante(int setor, int usuario) {
+        setCodSetor(setor);
+        setCodUsuario(usuario);
+    }
+
+    public String getAniFoto() {
+        return aniFoto;
+    }
+
+    public void setAniFoto(String aniFoto) {
+        this.aniFoto = aniFoto;
+    }
+
+    public String getAniMensagem() {
+        return aniMensagem;
+    }
+
+    public void setAniMensagem(String aniMensagem) {
+        this.aniMensagem = aniMensagem;
+    }
+
+    public String getAniTelefone() {
+        return aniTelefone;
+    }
+
+    public void setAniTelefone(String aniTelefone) {
+        this.aniTelefone = aniTelefone;
+    }
+
+    public Integer getAniCodigo() {
+        return aniCodigo;
+    }
+
+    public void setAniCodigo(Integer aniCodigo) {
+        this.aniCodigo = aniCodigo;
+    }
+
+    public String getAniNome() {
+        return aniNome;
+    }
+
+    public void setAniNome(String aniNome) {
+        this.aniNome = aniNome;
+    }
+
+    public Date getAniDataAniversario() {
+        return aniDataAniversario;
+    }
+
+    public void setAniDataAniversario(Date aniDataAniversario) {
+        this.aniDataAniversario = aniDataAniversario;
+    }
+
+    public Usuario getAniUsuCodigo() {
+        return aniUsuCodigo;
+    }
+
+    public void setAniUsuCodigo(Usuario aniUsuCodigo) {
+        this.aniUsuCodigo = aniUsuCodigo;
+    }
+
+    public Integer getCodUsuario() {
+        return codUsuario;
+    }
+
+    public void setCodUsuario(Integer codUsuario) {
+        this.codUsuario = codUsuario;
+    }
+
+    public Integer getCodSetor() {
+        return codSetor;
+    }
+
+    public void setCodSetor(Integer codSetor) {
+        this.codSetor = codSetor;
+    }
+
+    public Date getDataHoraAtualizacao() {
+        return dataHoraAtualizacao;
+    }
+
+    public void setDataHoraAtualizacao(Date dataHoraAtualizacao) {
+        this.dataHoraAtualizacao = dataHoraAtualizacao;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Aniversariante other = (Aniversariante) obj;
+        if (this.aniCodigo != other.aniCodigo && (this.aniCodigo == null || !this.aniCodigo.equals(other.aniCodigo))) {
+            return false;
+        }
+        return true;
+    }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + (this.aniCodigo != null ? this.aniCodigo.hashCode() : 0);
+        return hash;
+    }
+    @Override
+    public String toString(){
+        return aniCodigo+"";
+    }
+}

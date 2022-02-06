@@ -1,0 +1,44 @@
+package com.DAO;
+import com.Bean.Familiar;
+import com.Util.MensagensErros;
+import java.util.List;
+import org.hibernate.Session;
+
+/**
+ *
+ * @author Sergio - 02/09/2021
+ */
+public class FamiliarDAO extends GenericDAO {
+    private static final long serialVersionUID = 1L;
+    private Session session;
+	
+    public FamiliarDAO(Session session) {
+        this.session = session;
+    }
+
+    public FamiliarDAO() {
+        this.session = getSession();
+    }
+    public int addFamiliar(Familiar familiar) {
+        setAtualizar(false);
+            saveOrUpdatePojo(familiar);
+            if (MensagensErros.isErro()) {
+                return 0;
+            } else {
+                return familiar.getFamCodigo();
+            }   
+    }
+    public Familiar getFamiliar(int familiarID) {
+        return getPojo(Familiar.class, familiarID);
+    }
+    public void updateFamiliar(Familiar familiar) {
+        setAtualizar(true);
+        saveOrUpdatePojo(familiar);
+    }
+    public void removeFamiliar(Familiar familiar) {
+        removePojo(familiar);
+    }
+    public List<Familiar> getFamiliars() {
+        return getPureList(Familiar.class, "from Familiar ar");
+    }
+}

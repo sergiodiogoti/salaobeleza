@@ -1,0 +1,41 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:pa="http://primefaces.org/barcelona">
+    
+    <div class="layout-sidebar">
+        <pa:tabMenu>
+            <pa:tab icon="home" title="Menu">
+                <h:form id="menu-form">
+                    <pa:menu widgetVar="me">
+                        <p:menuitem id="cliente" value="Clientes" icon="fa fa-users" outcome="/cliente/cliente" rendered="#{'EXTERNO' ne usuarioFaces.usuarioLogadoBean.usuTipo}"/>
+                        <p:menuitem id="profissional" value="Profisional" icon="fa fa-user" outcome="/profissional/profissional" rendered="#{'EXTERNO' ne usuarioFaces.usuarioLogadoBean.usuTipo}"/>
+                        <p:menuitem id="servico" value="Serviços" icon="fa fa-list-ol" outcome="/servico/servico" rendered="#{'EXTERNO' ne usuarioFaces.usuarioLogadoBean.usuTipo}"/>
+                        <p:menuitem id="agendamento" value="Agendamento" icon="fa fa-calendar" outcome="/agendamento/agendamento"/>
+                        <p:menuitem id="atendimento" value="Atendimento" icon="fa fa-sort-alpha-asc" outcome="/servico/servico" rendered="#{'EXTERNO' ne usuarioFaces.usuarioLogadoBean.usuTipo}"/>
+                        <p:submenu id="conf" label="Configurações" icon="fa fa-cogs">
+                            <p:menuitem id="usuario" value="Usuario" icon="fa fa-user" outcome="/usuario/usuario" rendered="#{'EXTERNO' ne usuarioFaces.usuarioLogadoBean.usuTipo}"/>
+                            <p:submenu id="um_themes" label="Temas" icon="&#xE40A;" rendered="true">
+                                <p:menuitem id="theme1" value="Blue - Amber" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('blue')}" ajax="false" />
+                                <p:menuitem id="theme2" value="Teal - Amber" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('teal')}" ajax="false" />
+                                <p:menuitem id="theme3" value="Blue Grey - Green" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('blue-grey')}" ajax="false" />
+                                <p:menuitem id="theme4" value="Cyan - Yellow" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('cyan')}" ajax="false" />
+                                <p:menuitem id="theme5" value="Dark - Blue" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('dark-blue')}" ajax="false" />
+                                <p:menuitem id="theme6" value="Dark - Green" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('dark-green')}" ajax="false" />
+                                <p:menuitem id="theme7" value="Light Blue - Green" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('light-blue')}" ajax="false" />
+                                <p:menuitem id="theme8" value="Indigo - Cyan" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('indigo')}" ajax="false" />
+                                <p:menuitem id="theme9" value="Deep Purple - Pink" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('deep-purple')}" ajax="false" />
+                                <p:menuitem id="theme10" value="Green - Yellow" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('green')}" ajax="false" />
+                                <p:menuitem id="theme11" value="Crimson" icon="&#xE40A;" actionListener="#{guestPreferences.setTheme('crimson')}" ajax="false" />
+                            </p:submenu>
+                        </p:submenu>
+                        <p:menuitem id="logout" action="#{usuarioFaces.doLogout}" ajax="false" value="Sair" icon="fa fa-power-off"/>
+                    </pa:menu>
+                </h:form>
+            </pa:tab>
+        </pa:tabMenu>        
+    </div>
+</ui:composition>

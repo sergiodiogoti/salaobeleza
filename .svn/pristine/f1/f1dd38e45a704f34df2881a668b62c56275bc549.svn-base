@@ -1,0 +1,44 @@
+package com.DAO;
+import com.Bean.MetaGasto;
+import com.Util.MensagensErros;
+import java.util.List;
+import org.hibernate.Session;
+
+/**
+ *
+ * @author Sergio - 10/10/2021
+ */
+public class MetaGastoDAO extends GenericDAO {
+    private static final long serialVersionUID = 1L;
+    private Session session;
+	
+    public MetaGastoDAO(Session session) {
+        this.session = session;
+    }
+
+    public MetaGastoDAO() {
+        this.session = getSession();
+    }
+    public int addMetaGasto(MetaGasto metaGasto) {
+        setAtualizar(false);
+            saveOrUpdatePojo(metaGasto);
+            if (MensagensErros.isErro()) {
+                return 0;
+            } else {
+                return metaGasto.getMetGaCodigo();
+            }   
+    }
+    public MetaGasto getMetaGasto(int metaGastoID) {
+        return getPojo(MetaGasto.class, metaGastoID);
+    }
+    public void updateMetaGasto(MetaGasto metaGasto) {
+        setAtualizar(true);
+        saveOrUpdatePojo(metaGasto);
+    }
+    public void removeMetaGasto(MetaGasto metaGasto) {
+        removePojo(metaGasto);
+    }
+    public List<MetaGasto> getMetaGastos() {
+        return getPureList(MetaGasto.class, "from MetaGasto ar");
+    }
+}

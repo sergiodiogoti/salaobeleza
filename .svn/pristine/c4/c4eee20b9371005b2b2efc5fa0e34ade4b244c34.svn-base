@@ -1,0 +1,42 @@
+package com.Converters;
+
+
+import com.DAO.GastoDAO;
+import com.Bean.Gasto;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+
+/**
+ *
+ * @author Sergio - 03/09/2021
+ */
+@FacesConverter(value="GastoConverter")
+public class GastoConverter  implements Converter{
+
+    private GastoDAO gastoDAO =new GastoDAO();
+    public GastoConverter(){
+    }
+
+    public Object getAsObject(FacesContext context, UIComponent component, String value) {
+       if (value == null || value.length() == 0) {
+            return null;
+        }else{
+          try{ 
+              Integer idgasto = Integer.parseInt(value);
+              return gastoDAO.getGasto(idgasto);
+          }catch(NumberFormatException n){
+          return null;    
+          }
+       }  
+    }
+
+    public String getAsString(FacesContext context, UIComponent component, Object value) {
+        if(value == null){
+            return "";
+        }
+        return ((Gasto)value).getGasCodigo().toString();
+    }
+
+}

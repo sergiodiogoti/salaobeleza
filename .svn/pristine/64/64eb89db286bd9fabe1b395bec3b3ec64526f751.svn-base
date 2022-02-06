@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="../WEB-INF/layout.xhtml">
+    <h:outputStylesheet library="css" name="style.css"/>
+    <title> Cadastrar Usuario</title>
+    <ui:define name="menu">
+        <ui:include src="../WEB-INF/menu.menu-old.xhtml"/>
+    </ui:define>
+    <ui:define name="conteudo">
+        <h:body>
+            <h:form id="form">
+                    <table align="center">
+                        <tr>
+                            <td>
+                                <p:panel header="Cadastrar Usuario">
+                                <table width="300px">
+                                    <tr>
+                                        <p:growl id="erro" life="2000"/>
+                                        <td colspan="1">
+                                            <label>Nome</label>
+                                            <br/>
+                                            <p:inputText value="#{usuarioFaces.usuarioSelected.usuNome}"
+                                                         size="69"
+                                                         required="true"
+                                                         requiredMessage="Campo Nome precisa ser prenchido"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1">
+                                            <label>Login</label>
+                                            <br/>
+                                            <p:inputText value="#{usuarioFaces.usuarioSelected.usuLogin}"
+                                                         size="69"
+                                                         required="true"
+                                                         requiredMessage="Campo Login precisa ser prenchido"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1">
+                                            <label>Senha</label>
+                                            <br/>
+                                            <p:password value="#{usuarioFaces.usuarioSelected.usuSenha}"
+                                                         size="69"
+                                                         required="true"
+                                                         requiredMessage="Campo Senha precisa ser prenchido"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" align="center">
+                                            <p:commandButton value="Inserir"
+                                                             process="@this,form"
+                                                             action="#{usuarioFaces.doAddFinishUsuario}"
+                                                             update="form:erro"/>
+                                            <p:commandButton value="Cancelar" action="#{usuarioFaces.doCancelUsuario}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                                </p:panel>
+                            </td>
+                        </tr>
+                    </table>
+                <ui:include src="../mpProc.xhtml"/>
+                </h:form>
+        </h:body>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,645 @@
+package com.ManagedBeans;
+
+import com.Bean.*;
+import com.DAO.GastoDAO;
+import com.DAO.MetaGastoDAO;
+import com.DAO.SetorDAO;
+import com.DAO.UsuarioDAO;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.io.Serializable;
+import javax.annotation.PostConstruct;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
+import javax.faces.model.SelectItem;
+
+import com.Util.HibernateUtil;
+import com.Util.MensagensErros;
+import com.Util.UtilFaces;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.type.StandardBasicTypes;
+import org.primefaces.PrimeFaces;
+import org.primefaces.json.JSONArray;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.enterprise.context.SessionScoped;
+import javax.json.JsonObject;
+
+/**
+ *
+ * @author Sergio - 03/09/2021
+ */
+@Named
+@SessionScoped
+public class GastoFaces implements Serializable{
+
+    @Inject
+    private UsuarioFaces usuarioFaces;
+
+    private List<Gasto> cachedGastos = null;
+    private GastoDAO gastoDAO = new GastoDAO();
+    private Gasto gastoSelected;
+    private Usuario usuario;
+    private Setor setor;
+    private List<Gasto> listaGastos = new ArrayList<>();
+    private Integer mes;
+    private Integer ano;
+    private String receitaDisponivel;
+    private String somatorioDespesa;
+    private String faltaPagar;
+    private int anoDuplicar;
+    private int mesDuplicar;
+    private String icocSelectGasto;
+    private String icocSelectCartaoCredito;
+    private String icocSelectEmprestimo;
+    private String tipoCor;
+    private Map mapPolaris = new HashMap();
+    private List<Gasto> listaNotificacaoConta = new ArrayList<>();
+    private boolean notificao;
+    private MetaGasto metagastoSelected;
+
+
+    public MetaGasto getMetagastoSelected() {
+        return metagastoSelected;
+    }
+
+    public void setMetagastoSelected(MetaGasto metagastoSelected) {
+        this.metagastoSelected = metagastoSelected;
+    }
+
+    public boolean isNotificao() {
+        return notificao;
+    }
+
+    public void setNotificao(boolean notificao) {
+        this.notificao = notificao;
+    }
+
+    public List<Gasto> getListaNotificacaoConta() {
+        return listaNotificacaoConta;
+    }
+
+    public void setListaNotificacaoConta(List<Gasto> listaNotificacaoConta) {
+        this.listaNotificacaoConta = listaNotificacaoConta;
+    }
+
+    public Map getMapPolaris() {
+        return mapPolaris;
+    }
+
+    public void setMapPolaris(Map mapPolaris) {
+        this.mapPolaris = mapPolaris;
+    }
+
+    public String getTipoCor() {
+        return tipoCor;
+    }
+
+    public void setTipoCor(String tipoCor) {
+        this.tipoCor = tipoCor;
+    }
+
+    public String getIcocSelectGasto() {
+        if(icocSelectGasto == null){
+            icocSelectGasto = "#4169E1;";
+        }
+        return icocSelectGasto;
+    }
+
+    public void setIcocSelectGasto(String icocSelectGasto) {
+        this.icocSelectGasto = icocSelectGasto;
+    }
+
+    public String getIcocSelectCartaoCredito() {
+        if (icocSelectCartaoCredito == null){
+            icocSelectCartaoCredito = "#A9A9A9;";
+        }
+        return icocSelectCartaoCredito;
+    }
+
+    public void setIcocSelectCartaoCredito(String icocSelectCartaoCredito) {
+        this.icocSelectCartaoCredito = icocSelectCartaoCredito;
+    }
+
+    public String getIcocSelectEmprestimo() {
+        if(icocSelectEmprestimo == null){
+            icocSelectEmprestimo = "#A9A9A9;";
+        }
+        return icocSelectEmprestimo;
+    }
+
+    public void setIcocSelectEmprestimo(String icocSelectEmprestimo) {
+        this.icocSelectEmprestimo = icocSelectEmprestimo;
+    }
+
+    public int getAnoDuplicar() {
+        if(anoDuplicar == 0){
+            anoDuplicar = Calendar.getInstance().get(Calendar.YEAR);
+        }
+        return anoDuplicar;
+    }
+
+    public void setAnoDuplicar(int anoDuplicar) {
+        this.anoDuplicar = anoDuplicar;
+    }
+
+    public int getMesDuplicar() {
+        if(mesDuplicar == 0){
+            String m = new SimpleDateFormat("MM").format(new Date());
+            mesDuplicar = Integer.parseInt(m)+1;
+        }
+        return mesDuplicar;
+    }
+
+    public void setMesDuplicar(int mesDuplicar) {
+        this.mesDuplicar = mesDuplicar;
+    }
+
+    public void setMes(Integer mes) {
+        this.mes = mes;
+    }
+
+    public void setAno(Integer ano) {
+        this.ano = ano;
+    }
+
+    public String getReceitaDisponivel() {
+        return receitaDisponivel;
+    }
+
+    public void setReceitaDisponivel(String receitaDisponivel) {
+        this.receitaDisponivel = receitaDisponivel;
+    }
+
+    public String getSomatorioDespesa() {
+        return somatorioDespesa;
+    }
+
+    public void setSomatorioDespesa(String somatorioDespesa) {
+        this.somatorioDespesa = somatorioDespesa;
+    }
+
+    public String getFaltaPagar() {
+        return faltaPagar;
+    }
+
+    public void setFaltaPagar(String faltaPagar) {
+        this.faltaPagar = faltaPagar;
+    }
+
+    public int getMes() {
+        if(mes == null){
+            String m = new SimpleDateFormat("MM").format(new Date());
+            mes = Integer.parseInt(m);
+        }
+        return mes;
+    }
+
+    public void setMes(int mes) {
+        this.mes = mes;
+    }
+
+    public int getAno() {
+        if(ano == null){
+            ano = Calendar.getInstance().get(Calendar.YEAR);
+        }
+        return ano;
+    }
+
+    public void setAno(int ano) {
+        this.ano = ano;
+    }
+
+    public List<Gasto> getListaGastos() {
+        return listaGastos;
+    }
+
+    public void setListaGastos(List<Gasto> listaGastos) {
+        this.listaGastos = listaGastos;
+    }
+
+    public Setor getSetor() {
+        return setor;
+    }
+
+    public void setSetor(Setor setor) {
+        this.setor = setor;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public GastoDAO getGastoDAO() {
+        return gastoDAO;
+    }
+
+    public void setGastoDAO(GastoDAO gastoDAO) {
+        this.gastoDAO = gastoDAO;
+    }
+
+    public Gasto getGastoSelected() {
+        return gastoSelected;
+    }
+
+    public void setGastoSelected(Gasto gastoSelected) {
+        this.gastoSelected = gastoSelected;
+    }
+
+    public List<Gasto> getCachedGastos() {
+        if (cachedGastos == null) {
+            this.cachedGastos = gastoDAO.getGastos();
+        }
+        return cachedGastos;
+    }
+
+    public String doAddGasto() {
+        int setor = 1;
+        int usuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        gastoSelected = new Gasto(setor, usuario);
+        doAddGastoMes();
+        return "gastoNew";
+    }
+
+    public String dofinishAddGasto() {
+        Usuario usuarioLogado = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario");
+        Date date = new Date();
+        gastoSelected.setDataHoraAtualizacao(date);
+        gastoSelected.setGasUsuCodigo(usuarioLogado);
+        gastoDAO.addGasto(gastoSelected);
+        cachedGastos = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "gastoList";
+        }
+    }
+
+    public String doRemoveGasto() {
+        gastoDAO.removeGasto(gastoSelected);
+        cachedGastos = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "gastoList";
+        }
+    }
+
+    public String doUpdateGasto() {
+        UsuarioDAO usuDAO = new UsuarioDAO();
+        usuario = usuDAO.getUsuario(gastoSelected.getCodUsuario());
+        SetorDAO posDAO = new SetorDAO();
+        setor = posDAO.getSetor(gastoSelected.getCodSetor());
+        doAddGastoMes();
+        return "gastoEdit";
+    }
+
+    public String dofinishUpdateGasto() {
+        Date date = new Date();
+        int codUsuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        gastoSelected.setCodUsuario(codUsuario);
+        int codSetor = 1;
+        gastoSelected.setCodSetor(codSetor);
+        gastoSelected.setDataHoraAtualizacao(date);
+        gastoDAO.updateGasto(gastoSelected);
+        cachedGastos = null;
+        if (MensagensErros.isErro()) {
+            return "";
+        } else {
+            return "gastoList";
+        }
+    }
+
+    public void doSaveOrUpdateGasto(){
+        if(gastoSelected.getGasCodigo() == null){
+            dofinishAddGasto();
+        }else{
+            dofinishUpdateGasto();
+        }
+        doSaveAddOrUpdateMetaGasto();
+        PrimeFaces.current().executeScript("rmtTopBar();");
+    }
+
+    public String doCancelGasto() {
+        cachedGastos = null;
+        return "gastoList";
+    }
+    public void populaListaGastos(){
+        Usuario usuario = new UtilFaces().getUsuarioLogadoBean();
+        listaGastos = new ArrayList<>();
+        try{
+            listaGastos = gastoDAO.getGastosUsuario(usuario.getUsuCodigo(),mes,ano);
+            BigDecimal receitaDispo = BigDecimal.ZERO,
+                    calculaRd = BigDecimal.ZERO,
+                    rd = BigDecimal.ZERO,
+                    somadTotalDispesa = BigDecimal.ZERO,
+                    faltaPag = BigDecimal.ZERO,
+                    dispesaspagas = BigDecimal.ZERO,
+                    calculaFaltaPagar = BigDecimal.ZERO;
+            for(Gasto g : listaGastos){
+                if("D".equals(g.getGasTipo())){
+                    somadTotalDispesa = somadTotalDispesa.add(BigDecimal.valueOf(g.getGasValor()));
+                    if("S".equals(g.getGasPago())){
+                        dispesaspagas = dispesaspagas.add(BigDecimal.valueOf(g.getGasValor()));
+                    }
+                }
+                if("R".equals(g.getGasTipo())){
+                    rd = rd.add(BigDecimal.valueOf(g.getGasValor()));
+                }
+            }
+            calculaFaltaPagar = somadTotalDispesa.subtract(dispesaspagas);
+            faltaPag = faltaPag.add(calculaFaltaPagar);
+
+            calculaRd = rd.subtract(dispesaspagas);
+            receitaDispo = receitaDispo.add(calculaRd);
+
+            receitaDisponivel = moedaBr(receitaDispo);
+            somatorioDespesa = moedaBr(somadTotalDispesa);
+            faltaPagar = moedaBr(faltaPag);
+        }catch (Exception ex){
+            listaGastos = new ArrayList<>();
+            ex.printStackTrace();
+        }
+    }
+
+    public void plusMes(){
+        mes = mes + 1;
+        if(mes > 12) {
+            ano = ano + 1;
+            mes = 1;
+        }
+    }
+
+    public void minusMes(){
+        mes = mes - 1;
+        if(mes <= 0) {
+            ano = ano - 1;
+            mes = 12;
+        }
+    }
+
+    public String getSetaMesExtenso(Integer mes) {
+        String mesConvertido = String.valueOf(mes);
+        String mesFinal = "";
+        try {
+            switch (mesConvertido) {
+                case "1":
+                    mesFinal = "Janeiro";
+                    break;
+                case "2":
+                    mesFinal = "Fevereiro";
+                    break;
+                case "3":
+                    mesFinal = "Março";
+                    break;
+                case "4":
+                    mesFinal = "Abril";
+                    break;
+                case "5":
+                    mesFinal = "Maio";
+                    break;
+                case "6":
+                    mesFinal = "Junho";
+                    break;
+                case "7":
+                    mesFinal = "Julho";
+                    break;
+                case "8":
+                    mesFinal = "Agosto";
+                    break;
+                case "9":
+                    mesFinal = "Setembro";
+                    break;
+                case "10":
+                    mesFinal = "Outubro";
+                    break;
+                case "11":
+                    mesFinal = "Novembro";
+                    break;
+                case "12":
+                    mesFinal = "Dezembro";
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mesFinal;
+    }
+
+    public String dataExtensao(Date data){
+        String dia = new SimpleDateFormat("dd").format(data);
+        String mes = new SimpleDateFormat("MM").format(data);
+        String ano = new SimpleDateFormat("yyyy").format(data);
+        return dia+ " de "+getSetaMesExtenso(Integer.parseInt(mes)).substring(0,3)+" de "+ano;
+    }
+
+    public String moedaBr(BigDecimal vlr){
+        Locale.setDefault(new Locale("pt", "BR"));  // mudança global
+        DecimalFormat df = new DecimalFormat();
+        df.applyPattern("R$ #,##0.00");
+        double valorConvertido = vlr.doubleValue();
+        return df.format(valorConvertido);
+    }
+
+    public String corTipoGasto(String tipo){
+        if("D".equals(tipo)){
+            return "#FF0000";
+        }
+        if("R".equals(tipo)){
+            return "#4169E1";
+        }
+        return "white";
+    }
+
+    public void gerarPagamento(){
+        int usuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        gastoSelected.setDataHoraAtualizacao(new Date());
+        gastoSelected.setCodUsuario(usuario);
+        gastoSelected.setCodSetor(1);
+
+        if("S".equals(gastoSelected.getGasPago())){
+            gastoSelected.setGasPago("N");
+        }else{
+            gastoSelected.setGasPago("S");
+        }
+        gastoDAO.updateGasto(gastoSelected);
+
+        PrimeFaces.current().executeScript("rmtTopBar();");
+    }
+
+    public void duplicaReceitaOrDespesa() throws ParseException {
+        int usuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        try {
+            Gasto gastoNovo = new Gasto(1,usuario);
+
+            String diaDuplicar = new SimpleDateFormat("dd").format(gastoSelected.getGasDataCad());
+            String mesDuplicarConvert = String.valueOf(mesDuplicar);
+            if(mesDuplicar < 10 && mesDuplicarConvert.length() == 1){
+                mesDuplicarConvert = "0"+mesDuplicar;
+            }
+            String dataCadastro = anoDuplicar+"-"+mesDuplicarConvert+"-"+diaDuplicar;
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = formatter.parse(dataCadastro);
+
+            gastoNovo.setGasDataCad(date);
+            gastoNovo.setGasPago("N");
+            gastoNovo.setGasAnotacaoExtra(gastoSelected.getGasAnotacaoExtra());
+            gastoNovo.setGasDescricao(gastoSelected.getGasDescricao());
+            gastoNovo.setGasVencimento(gastoSelected.getGasVencimento());
+            gastoNovo.setGasUsuCodigo(gastoSelected.getGasUsuCodigo());
+            gastoNovo.setGasNotificarEm(gastoSelected.getGasNotificarEm());
+            gastoNovo.setGasReceberNotificacao(gastoSelected.getGasReceberNotificacao());
+            gastoNovo.setGasTipo(gastoSelected.getGasTipo());
+            gastoNovo.setGastCatCodigo(gastoSelected.getGastCatCodigo());
+            gastoNovo.setGasValor(gastoSelected.getGasValor());
+            gastoNovo.setDataHoraAtualizacao(new Date());
+            gastoDAO.addGasto(gastoNovo);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public void getColorIconSelect(){
+        if("gasto".equals(tipoCor)){
+            icocSelectGasto = "#3f51b5;";
+            icocSelectCartaoCredito = "#A9A9A9;";
+            icocSelectEmprestimo ="#A9A9A9;";
+        }
+        if("credito".equals(tipoCor)){
+            icocSelectCartaoCredito = "#3f51b5;";
+            icocSelectGasto = "#A9A9A9;";
+            icocSelectEmprestimo ="#A9A9A9;";
+        }
+        if("emprestimo".equals(tipoCor)){
+            icocSelectEmprestimo = "#3f51b5;";
+            icocSelectGasto = "#A9A9A9;";
+            icocSelectCartaoCredito ="#A9A9A9;";
+        }
+    }
+
+    public void populaSQLGraphics(){
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        try{
+            String SQL = "SELECT c.`catDescricao`, \n" +
+                    "(SUM(g.`gasValor`) / (SELECT SUM(g2.`gasValor`)FROM gasto g2 \n" +
+                    "JOIN categoria c ON g2.`gastCatCodigo` = c.`catCodigo`\n" +
+                    "WHERE g2.`gasTipo` = 'D'\n" +
+                    "AND MONTH(g2.gasDataCad) = " + mes + "\n" +
+                    "AND YEAR(g2.gasDataCad) = " + ano + "\n" +
+                    "AND g2.`gasUsuCodigo` = " + usuarioFaces.getUsuarioLogadoBean().getUsuCodigo() + ") * 100) porcentagem\n" +
+                    "FROM gasto g \n" +
+                    "JOIN categoria c ON g.`gastCatCodigo` = c.`catCodigo`\n" +
+                    "JOIN usuario u ON g.`gasUsuCodigo` = u.`usuCodigo` \n" +
+                    "WHERE usuCodigo = " + usuarioFaces.getUsuarioLogadoBean().getUsuCodigo() + "\n" +
+                    "AND g.`gasTipo` = 'D'\n" +
+                    "AND MONTH(g.gasDataCad) = " + mes + "\n" +
+                    "AND YEAR(g.gasDataCad) = " + ano + "\n" +
+                    "GROUP BY c.`catCodigo`; ";
+            SQLQuery q = ses.createSQLQuery(SQL)
+                    .addScalar("catDescricao", StandardBasicTypes.STRING)
+                    .addScalar("porcentagem", StandardBasicTypes.DOUBLE);
+            List<Object[]> listaGastosPorCategoria = q.list();
+
+            String str = new String();
+            int cont = 0;
+            String vlrFinal = "100",vlrConv,descricao;
+            int numAntesdoPonto;
+            double vlrPorcent;
+            for(Object[] ob : listaGastosPorCategoria){
+                vlrPorcent = (double) ob[1];
+                vlrConv = String.valueOf(vlrPorcent);
+                numAntesdoPonto = vlrConv.indexOf(".");
+                if(numAntesdoPonto < 3){
+                    vlrFinal = vlrConv.substring(0,numAntesdoPonto)+""+vlrConv.substring(numAntesdoPonto,numAntesdoPonto+3);
+                }
+                descricao = usuarioFaces.transformTextInicialMaiusculo((String)ob[0]);
+                cont++;
+                if(cont == listaGastosPorCategoria.size()) {
+                    str += "{ x: \"" + descricao + "\", y: " + vlrFinal + "}";
+                }else{
+                    str += "{ x: \"" + descricao + "\", y: " + vlrFinal + "},";
+                }
+            }
+            mapPolaris.put("graficogastos", str);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally {
+            ses.close();
+        }
+    }
+
+    public void notificaoConta(){
+        listaNotificacaoConta = new ArrayList<>();
+        notificao = false;
+        try(Session ses = HibernateUtil.getSessionFactory().openSession()){
+            String SQL = "SELECT *FROM gasto g \n" +
+                    "JOIN categoria c ON g.`gastCatCodigo` = c.`catCodigo`\n" +
+                    "WHERE g.`gasTipo` = 'D'\n" +
+                    "AND g.`gasUsuCodigo` = "+usuarioFaces.getUsuarioLogadoBean().getUsuCodigo()+"\n" +
+                    "AND g.`gasPago` = 'N' \n" +
+                    "AND g.`gasReceberNotificacao` is true";
+            Query q = ses.createNativeQuery(SQL).addEntity(Gasto.class);
+            listaNotificacaoConta = q.list();
+            if(q.list().size() > 0){
+                notificao = true;
+            }
+        }catch (Exception ex){
+            listaNotificacaoConta = new ArrayList<>();
+            ex.printStackTrace();
+        }
+    }
+    public void onChangeCategoria(ValueChangeEvent e){
+        Categoria c = (Categoria) e.getNewValue();
+        gastoSelected.setGastCatCodigo(c);
+        CategoriaFaces categoriaFaces = UtilFaces.getManagedBean(CategoriaFaces.class);
+        categoriaFaces.doAddCategoria();
+        categoriaFaces.setCategoriaSelected(c);
+    }
+
+    public void doAddGastoMes(){
+        Session ses = HibernateUtil.getSessionFactory().openSession();
+        int setor = 1;
+        int usuario = Integer.parseInt(FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario").toString());
+        try{
+            String sql = "SELECT mg.* FROM metagasto mg WHERE mg.metGaUsuCodigo = "+ usuario +"\n" +
+                    "AND metGaMes = "+ mes +"\n" +
+                    "AND metGaAno = "+ano;
+            Query q = ses.createNativeQuery(sql).addEntity(MetaGasto.class);
+            metagastoSelected = (MetaGasto) q.uniqueResult();
+            if(metagastoSelected == null){
+                metagastoSelected = new MetaGasto(setor, usuario);
+                metagastoSelected.setMetGaUsuCodigo((Usuario)FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuario"));
+                metagastoSelected.setMetGaValor(0.00);
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }finally {
+            ses.close();
+        }
+    }
+
+    public void doSaveAddOrUpdateMetaGasto() {
+        Date date = new Date();
+        metagastoSelected.setDataHoraAtualizacao(date);
+        metagastoSelected.setMetGaMes(mes);
+        metagastoSelected.setMetGaAno(ano);
+        if(metagastoSelected.getMetGaCodigo() == null) {
+            new MetaGastoDAO().addMetaGasto(metagastoSelected);
+        }else{
+            new MetaGastoDAO().updateMetaGasto(metagastoSelected);
+        }
+    }
+}
