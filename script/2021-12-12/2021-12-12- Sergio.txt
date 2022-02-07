@@ -1,5 +1,0 @@
-ALTER TABLE `usuario`   
-  ADD COLUMN `usuEmail` VARCHAR(500) NULL,
-  ADD COLUMN `usuFuncao` VARCHAR(500) NULL;
-  
-  UPDATE usuario SET usuFuncao = 'Adm';

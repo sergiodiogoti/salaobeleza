@@ -1,7 +1,0 @@
-CREATE TABLE `setor` (
-  `setCodigo` INT(11) NOT NULL AUTO_INCREMENT,
-  `setNome` VARCHAR(50) DEFAULT NULL,
-  `setResponsavel` VARCHAR(50) DEFAULT NULL,
-  `setCidade` VARCHAR(50) DEFAULT NULL,
-  PRIMARY KEY (`setCodigo`)
-) ENGINE=INNODB; 
